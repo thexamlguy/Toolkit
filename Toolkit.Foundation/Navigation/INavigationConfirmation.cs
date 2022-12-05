@@ -1,4 +1,4 @@
-﻿namespace Kromek.Framework.Core.Extensions
+﻿namespace Toolkit.Foundation
 {
     public interface INavigationConfirmation
     {

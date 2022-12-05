@@ -2,10 +2,6 @@
 using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Markup.Xaml;
-using Kromek.Framework.Core.Extensions;
-using Kromek.Framework.Core;
-using System;
-using System.Collections.Generic;
 
 namespace Toolkit.Foundation.Avalonia
 {

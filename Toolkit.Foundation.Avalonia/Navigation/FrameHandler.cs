@@ -1,9 +1,8 @@
 ﻿using Avalonia.Controls.Primitives;
 using FluentAvalonia.UI.Controls;
 using FluentAvalonia.UI.Navigation;
-using Toolkit.Foundation.Avalonia;
 
-namespace Kromek.Framework.Avalonia
+namespace Toolkit.Foundation.Avalonia
 {
     public class FrameHandler : NavigationRouteHandler<Frame>
     {

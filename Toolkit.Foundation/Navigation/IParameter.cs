@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Toolkit.Foundation
+﻿namespace Toolkit.Foundation
 {
     public interface IParameter
     {

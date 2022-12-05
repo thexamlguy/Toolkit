@@ -1,8 +1,6 @@
 ﻿using FluentAvalonia.UI.Controls;
-using Kromek.Framework.Core.Extensions;
-using Toolkit.Foundation.Avalonia;
 
-namespace Kromek.Framework.Avalonia
+namespace Toolkit.Foundation.Avalonia
 {
     public class ContentDialogHandler : NavigationRouteHandler<ContentDialog>
     {

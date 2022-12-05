@@ -1,5 +1,4 @@
 ﻿using Avalonia.Markup.Xaml;
-using Kromek.Framework.Avalonia;
 
 namespace Toolkit.Foundation.Avalonia
 {
