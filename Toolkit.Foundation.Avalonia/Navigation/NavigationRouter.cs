@@ -1,5 +1,6 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Interactivity;
 using CommunityToolkit.Mvvm.Messaging;
 using FluentAvalonia.UI.Controls;
 
@@ -32,15 +33,7 @@ namespace Toolkit.Foundation.Avalonia
             this.descriptors = descriptors;
         }
 
-        public Task InitializeAsync()
-        {
-            messenger.Register<Navigate>(this, (sender, args) => OnNavigate(args));
-            messenger.Register<NavigateBack>(this, (sender, args) => OnNavigateBack(args));
-
-            return Task.CompletedTask;
-        }
-
-        private async void OnNavigate(Navigate args)
+        public async void Navigate(Navigate args)
         {
             object? data = null;
             object? template = null;
@@ -115,7 +108,30 @@ namespace Toolkit.Foundation.Avalonia
             }
         }
 
-        private void OnNavigateBack(NavigateBack args)
+        public void Register(string name, object route)
+        {
+            if (route is TemplatedControl control)
+            {
+                void HandleUnloaded(object? sender, RoutedEventArgs args)
+                {
+                    if (descriptors.FirstOrDefault(x => x.Route == sender) is INavigationRouteDescriptor descriptor)
+                    {
+                        descriptors.Remove(descriptor);
+                    }
+                }
+
+                control.Unloaded += HandleUnloaded;
+            }
+
+            if (descriptors.FirstOrDefault(x => x.Name == name) is INavigationRouteDescriptor descriptor)
+            {
+                descriptors.Remove(descriptor);
+            }
+
+            descriptors.Add(new NavigationRouteDescriptor(name, route));
+        }
+
+        public void GoBack(NavigateBack args)
         {
             if (descriptors.FirstOrDefault(x => args.Route is string { } name && name == x.Name) is NavigationRouteDescriptor descriptor)
             {

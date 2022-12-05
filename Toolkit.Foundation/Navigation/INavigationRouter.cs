@@ -1,6 +1,9 @@
 ﻿namespace Toolkit.Foundation
 {
-    public interface INavigationRouter : IInitializer
+    public interface INavigationRouter
     {
+        void Navigate(Navigate args);
+
+        void Register(string name, object route);
     }
 }

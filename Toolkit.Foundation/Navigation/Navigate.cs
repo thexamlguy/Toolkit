@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Toolkit.Foundation
+﻿namespace Toolkit.Foundation
 {
     public record Navigate
     {
