@@ -1,4 +1,6 @@
-﻿namespace Toolkit.Foundation
+﻿using Mediator;
+
+namespace Toolkit.Foundation
 {
-    public record Write<TConfiguration>(string Section, Action<TConfiguration> UpdateDelegate) where TConfiguration : class;
+    public abstract record Write<TConfiguration>(string Section, Action<TConfiguration> UpdateDelegate) : IRequest  where TConfiguration : class;
 }

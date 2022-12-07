@@ -1,28 +1,30 @@
-﻿using CommunityToolkit.Mvvm.Messaging;
+﻿using Mediator;
 
 namespace Toolkit.Foundation
 {
-    public class WriteHandler<TConfiguration> : IRecipient<Write<TConfiguration>> where TConfiguration : class
+    public class WriteHandler<TConfiguration> : IRequestHandler<Write<TConfiguration>> where TConfiguration : class
     {
-        private readonly IMessenger messenger;
+        private readonly IMediator mediator;
         private readonly TConfiguration configuration;
         private readonly IConfigurationWriter<TConfiguration> writer;
 
         public WriteHandler(TConfiguration configuration,
             IConfigurationWriter<TConfiguration> writer,
-            IMessenger messenger)
+            IMediator mediator)
         {
-            this.messenger = messenger;
+            this.mediator = mediator;
             this.configuration = configuration;
             this.writer = writer;
         }
 
-        public void Receive(Write<TConfiguration> request)
+        public async ValueTask<Unit> Handle(Write<TConfiguration> request, CancellationToken cancellationToken)
         {
             request.UpdateDelegate.Invoke(configuration);
             writer.Write(request.Section, configuration);
 
-            messenger.Send(new ConfigurationChanged<TConfiguration>(configuration));
+            await mediator.Send(new ConfigurationChanged<TConfiguration>(configuration), cancellationToken);
+
+            return default;
         }
     }
 }

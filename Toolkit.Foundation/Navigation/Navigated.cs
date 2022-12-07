@@ -1,30 +1,30 @@
 ﻿namespace Toolkit.Foundation
 {
-    public class Navigated<TContent, TDataContext> where TContent : class where TDataContext : class
+    public class Navigated<TTemplate, TContent> where TTemplate : class where TContent : class
     {
         public Navigated()
         {
         }
 
-        public Navigated(TContent content, TDataContext dataContext, IDictionary<string, object>? parameters = null)
+        public Navigated(TTemplate template, TContent content, IDictionary<string, object>? parameters = null)
         {
+            Template = template;
             Content = content;
-            DataContext = dataContext;
             Parameters = parameters;
         }
 
-        public TContent? Content { get; }
+        public TTemplate? Template { get; }
 
-        public TDataContext? DataContext { get; }
+        public TContent? Content { get; }
 
         public IDictionary<string, object>? Parameters { get; }
     }
 
     public class Navigated
     {
-        public static Navigated<TTemplate, TDataTemplate> Create<TTemplate, TDataTemplate>(TTemplate content, TDataTemplate dataContext, IDictionary<string, object>? parameters = null) where TTemplate : class where TDataTemplate : class
+        public static Navigated<TTemplate, TContent> Create<TTemplate, TContent>(TTemplate template, TContent? content, IDictionary<string, object>? parameters = null) where TTemplate : class where TContent : class
         {
-            return new Navigated<TTemplate, TDataTemplate>(content, dataContext, parameters);
+            return new Navigated<TTemplate, TContent>(template, content, parameters);
         }
     }
 }

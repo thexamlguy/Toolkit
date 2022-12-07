@@ -1,22 +1,22 @@
-﻿using CommunityToolkit.Mvvm.Messaging;
+﻿using Mediator;
 
 namespace Toolkit.Foundation
 {
     public class ConfigurationInitializer<TConfiguration> : IInitializer where TConfiguration : class, new()
     {
         private readonly TConfiguration configuration;
-        private readonly IMessenger messenger;
+        private readonly IMediator mediator;
 
         public ConfigurationInitializer(TConfiguration configuration,
-            IMessenger messenger)
+            IMediator mediator)
         {
             this.configuration = configuration;
-            this.messenger = messenger;
+            this.mediator = mediator;
         }
 
         public async Task InitializeAsync()
         {
-            messenger.Send(configuration);
+            await mediator.Send(configuration);
             await Task.CompletedTask;
         }
     }

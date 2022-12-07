@@ -1,23 +1,23 @@
-﻿using CommunityToolkit.Mvvm.Messaging;
+﻿using Mediator;
 using Microsoft.Extensions.Hosting;
 
 namespace Toolkit.Foundation
 {
     public class AppService : IHostedService
     {
-        private readonly IMessenger messenger;
+        private readonly IMediator mediator;
         private readonly IInitialization initialization;
 
-        public AppService(IMessenger messenger,
+        public AppService(IMediator mediator,
             IInitialization initialization)
         {
-            this.messenger = messenger;
+            this.mediator = mediator;
             this.initialization = initialization;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            messenger.Send(new Initialize());
+            await mediator.Send(new Initialize());
             await initialization.InitializeAsync();
         }
 

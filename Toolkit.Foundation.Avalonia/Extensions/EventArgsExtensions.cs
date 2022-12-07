@@ -1,10 +1,8 @@
-﻿using Avalonia;
-using Avalonia.Data.Converters;
+﻿using Avalonia.Data.Converters;
 using System.Globalization;
 
 namespace Toolkit.Foundation.Avalonia
 {
-
     public static class EventArgsExtensions
     {
         public static dynamic? GetEventArguments(this EventArgs args, string? path, IValueConverter? converter, object? converterParameter)

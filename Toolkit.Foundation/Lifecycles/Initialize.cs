@@ -1,4 +1,6 @@
-﻿namespace Toolkit.Foundation
+﻿using Mediator;
+
+namespace Toolkit.Foundation
 {
-    public record class Initialize;
+    public record class Initialize : IRequest;
 }
