@@ -2,5 +2,5 @@
 
 namespace Toolkit.Foundation
 {
-    public record class Initialize : IRequest;
+    public record class Initialized : IRequest;
 }
