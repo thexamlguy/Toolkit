@@ -1,10 +1,8 @@
-﻿namespace Toolkit.Foundation
+﻿namespace Toolkit.Foundation;
+
+public interface IWritableJsonConfigurationDescriptor
 {
-    public interface IWritableJsonConfigurationDescriptor
-    {
-        Type ConfigurationType { get; }
+    Type ConfigurationType { get; }
 
-        string Key { get; }
-    }
-
+    string Key { get; }
 }

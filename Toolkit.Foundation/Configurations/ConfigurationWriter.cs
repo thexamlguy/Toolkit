@@ -2,30 +2,28 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace Toolkit.Foundation
+namespace Toolkit.Foundation;
+
+public class ConfigurationWriter<TConfiguration> : IConfigurationWriter<TConfiguration> where TConfiguration : class, new()
 {
-    public class ConfigurationWriter<TConfiguration> : IConfigurationWriter<TConfiguration> where TConfiguration : class, new()
+    private readonly IConfiguration rootConfiguration;
+
+    public ConfigurationWriter(IConfiguration rootConfiguration)
     {
-        private readonly IConfiguration rootConfiguration;
+        this.rootConfiguration = rootConfiguration;
+    }
 
-        public ConfigurationWriter(IConfiguration rootConfiguration)
+    public void Write(string section, TConfiguration configuration)
+    {
+        if (rootConfiguration is IConfigurationRoot root)
         {
-            this.rootConfiguration = rootConfiguration;
-        }
-
-        public void Write(string section, TConfiguration configuration)
-        {
-            if (rootConfiguration is IConfigurationRoot root)
+            foreach (IConfigurationProvider? provider in root.Providers)
             {
-                foreach (IConfigurationProvider? provider in root.Providers)
+                if (provider is IWritableConfigurationProvider writableConfigurationProvider)
                 {
-                    if (provider is IWritableConfigurationProvider writableConfigurationProvider)
-                    {
-                        writableConfigurationProvider.Write(section, configuration);
-                    }
+                    writableConfigurationProvider.Write(section, configuration);
                 }
             }
         }
     }
-
 }

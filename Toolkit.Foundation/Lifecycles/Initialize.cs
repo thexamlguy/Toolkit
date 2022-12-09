@@ -2,4 +2,4 @@
 
 namespace Toolkit.Foundation;
 
-public record class Initialized : IRequest;
+public record Initialize : IRequest;

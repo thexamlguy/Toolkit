@@ -1,14 +1,12 @@
-﻿namespace Toolkit.Foundation
+﻿namespace Toolkit.Foundation;
+
+public interface IWritableJsonConfigurationBuilder
 {
-    public interface IWritableJsonConfigurationBuilder
-    {
-        Stream? DefaultFileStream { get; }
+    Stream? DefaultFileStream { get; }
 
-        IWritableJsonConfigurationBuilder AddDefaultConfiguration<TConfiguration>(string Key) where TConfiguration : class;
+    IWritableJsonConfigurationBuilder AddDefaultConfiguration<TConfiguration>(string Key) where TConfiguration : class;
 
-        IWritableJsonConfigurationBuilder AddDefaultFileStream(Stream stream);
+    IWritableJsonConfigurationBuilder AddDefaultFileStream(Stream stream);
 
-        void Build(string path);
-    }
-
+    void Build(string path);
 }

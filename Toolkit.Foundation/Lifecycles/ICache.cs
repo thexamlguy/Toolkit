@@ -1,7 +1,6 @@
-﻿namespace Toolkit.Foundation
-{
-    public interface ICache
-    {
+﻿namespace Toolkit.Foundation;
 
-    }
+public interface ICache
+{
+
 }

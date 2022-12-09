@@ -1,23 +1,22 @@
 ﻿using Mediator;
 
-namespace Toolkit.Foundation
+namespace Toolkit.Foundation;
+
+public class ConfigurationInitializer<TConfiguration> : IInitializable where TConfiguration : class, new()
 {
-    public class ConfigurationInitializer<TConfiguration> : IInitializer where TConfiguration : class, new()
+    private readonly TConfiguration configuration;
+    private readonly IMediator mediator;
+
+    public ConfigurationInitializer(TConfiguration configuration,
+        IMediator mediator)
     {
-        private readonly TConfiguration configuration;
-        private readonly IMediator mediator;
+        this.configuration = configuration;
+        this.mediator = mediator;
+    }
 
-        public ConfigurationInitializer(TConfiguration configuration,
-            IMediator mediator)
-        {
-            this.configuration = configuration;
-            this.mediator = mediator;
-        }
-
-        public async Task InitializeAsync()
-        {
-            await mediator.Send(configuration);
-            await Task.CompletedTask;
-        }
+    public async Task InitializeAsync()
+    {
+        await mediator.Send(configuration);
+        await Task.CompletedTask;
     }
 }
