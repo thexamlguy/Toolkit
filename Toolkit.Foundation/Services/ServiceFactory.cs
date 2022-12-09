@@ -11,13 +11,13 @@
             this.creator = creator;
         }
 
-        public T? Get<T>(Type type)
+        public object? Create(Type type, params object?[] parameters)
         {
-            T? value = (T?)factory(type);
-            return value;
+            dynamic? lookup = factory(typeof(IServiceCreator<>).MakeGenericType(type));
+            return lookup is not null ? lookup.Create(creator, parameters) : creator(type, parameters);
         }
 
-        public T Create<T>(Type type, params object?[] parameters)
+        public T? Create<T>(Type type, params object?[] parameters)
         {
             dynamic? lookup = factory(typeof(IServiceCreator<>).MakeGenericType(type));
             return lookup is not null ? (T)lookup.Create(creator, parameters) : (T)creator(type, parameters);

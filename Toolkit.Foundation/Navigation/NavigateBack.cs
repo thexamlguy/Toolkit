@@ -1,4 +1,7 @@
-﻿namespace Toolkit.Foundation
+﻿using Mediator;
+
+namespace Toolkit.Foundation
 {
-    public record NavigateBack(object Route);
+    public record NavigateBack(object Route) : IRequest;
+
 }

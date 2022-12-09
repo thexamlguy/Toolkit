@@ -23,7 +23,7 @@
 
             if (provider.Get(name) is ITemplateDescriptor descriptor)
             {
-                view = serviceFactory.Get<object>(descriptor.TemplateType);
+                view = serviceFactory.Create(descriptor.TemplateType);
                 if (view is ICache cache)
                 {
                     this.cache[name] = cache;

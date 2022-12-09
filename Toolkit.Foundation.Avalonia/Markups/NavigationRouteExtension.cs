@@ -4,20 +4,21 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Data;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using Mediator;
 
 namespace Toolkit.Foundation.Avalonia
 {
     public class NavigationRouteExtension : MarkupExtension
     {
-        private static readonly AttachedProperty<object> RouteProperty =
-            AvaloniaProperty.RegisterAttached<NavigationRouteExtension, Control, object>("Route");
+        private static readonly AttachedProperty<IMediator> MediatorProperty =
+            AvaloniaProperty.RegisterAttached<NavigationRouteExtension, Control, IMediator>("Mediator");
 
         private readonly string name;
-        private readonly Binding? routeBinding;
+        private readonly Binding? mediatorBinding;
 
-        public NavigationRouteExtension(object route, string name)
+        public NavigationRouteExtension(object mediator, string name)
         {
-            routeBinding = route is Binding toBinding ? toBinding : route.ToBinding();
+            mediatorBinding = mediator is Binding toBinding ? toBinding : mediator.ToBinding();
             this.name = name;
         }
 
@@ -33,50 +34,55 @@ namespace Toolkit.Foundation.Avalonia
             {
                 if (target.TargetObject is TemplatedControl control)
                 {
-                    if (routeBinding is not null)
+                    if (!TryGetBinding(control, out object? binding))
                     {
-                        if (!TryGetBinding(control, out object? binding))
+                        void HandleDataContextChanged(object? sender, EventArgs args)
                         {
-                            void HandleDataContextChanged(object? sender, EventArgs args)
-                            {
-                                if (TryGetBinding(control, out binding))
-                                {
-                                    control.Loaded -= HandleLoaded;
-                                    control.Bind(RouteProperty, routeBinding);
-
-                                    if (control?.GetValue(RouteProperty) is INavigationRouter router)
-                                    {
-                                        router.Register(name, control);
-                                        control.ClearValue(RouteProperty);
-                                    }
-                                }
-                            }
-
-                            control.DataContextChanged += HandleDataContextChanged;
-
-                            void HandleLoaded(object? sender, RoutedEventArgs args)
+                            if (TryGetBinding(control, out binding))
                             {
                                 control.Loaded -= HandleLoaded;
-                                if (TryGetBinding(control, out binding))
+                                if (mediatorBinding is not null)
                                 {
-                                    control.Bind(RouteProperty, routeBinding);
-                                    if (control?.GetValue(RouteProperty) is INavigationRouter router)
+                                    control.Bind(MediatorProperty, mediatorBinding);
+                                    if (control.GetValue(MediatorProperty) is IMediator mediator)
                                     {
-                                        router.Register(name, control);
-                                        control.ClearValue(RouteProperty);
+                                        mediator.Send(new NavigationRoute(name, control));
+                                        control.ClearValue(MediatorProperty);
                                     }
                                 }
                             }
-
-                            control.Loaded += HandleLoaded;
                         }
-                        else
+
+                        control.DataContextChanged += HandleDataContextChanged;
+
+                        void HandleLoaded(object? sender, RoutedEventArgs args)
                         {
-                            control.Bind(RouteProperty, routeBinding);
-                            if (control?.GetValue(RouteProperty) is INavigationRouter router)
+                            control.Loaded -= HandleLoaded;
+                            if (TryGetBinding(control, out binding))
                             {
-                                router.Register(name, control);
-                                control.ClearValue(RouteProperty);
+                                if (mediatorBinding is not null)
+                                {
+                                    control.Bind(MediatorProperty, mediatorBinding);
+                                    if (control.GetValue(MediatorProperty) is IMediator mediator)
+                                    {
+                                        mediator.Send(new NavigationRoute(name, control));
+                                        control.ClearValue(MediatorProperty);
+                                    }
+                                }
+                            }
+                        }
+
+                        control.Loaded += HandleLoaded;
+                    }
+                    else
+                    {
+                        if (mediatorBinding is not null)
+                        {
+                            control.Bind(MediatorProperty, mediatorBinding);
+                            if (control.GetValue(MediatorProperty) is IMediator mediator)
+                            {
+                                mediator.Send(new NavigationRoute(name, control));
+                                control.ClearValue(MediatorProperty);
                             }
                         }
                     }

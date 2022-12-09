@@ -2,8 +2,8 @@
 {
     public interface IServiceFactory
     {
-        T? Get<T>(Type type);
+        object? Create(Type type, params object?[] parameters);
 
-        T Create<T>(Type type, params object?[] parameters);
+        T? Create<T>(Type type, params object?[] parameters);
     }
 }

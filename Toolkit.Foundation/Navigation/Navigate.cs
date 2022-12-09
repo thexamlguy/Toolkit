@@ -1,6 +1,8 @@
-﻿namespace Toolkit.Foundation
+﻿using Mediator;
+
+namespace Toolkit.Foundation
 {
-    public record Navigate
+    public record Navigate : IRequest
     {
         public Navigate(string name, params object?[] parameters)
         {

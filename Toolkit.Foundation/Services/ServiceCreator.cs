@@ -1,6 +1,6 @@
 ﻿namespace Toolkit.Foundation
 {
-    public class ServiceCreator<T> : IServiceCreator<T>
+    public class ServiceCreator<I, T> : IServiceCreator<I>
     {
         public virtual object Create(Func<Type, object[], object> creator, params object[] parameters)
         {

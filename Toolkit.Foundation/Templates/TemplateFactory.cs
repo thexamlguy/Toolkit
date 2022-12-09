@@ -30,7 +30,7 @@ namespace Toolkit.Foundation
 
             if (provider.Get(data.GetType()) is ITemplateDescriptor descriptor)
             {
-                template = serviceFactory.Get<object>(descriptor.TemplateType);
+                template = serviceFactory.Create(descriptor.TemplateType);
                 if (template is ICache cache)
                 {
                     this.cache[data] = cache;
