@@ -1,29 +1,19 @@
 ﻿using Mediator;
-using System.Diagnostics;
 
 namespace Toolkit.Foundation;
 
 public class InitializeHandler : IRequestHandler<Initialize>
 {
-    private readonly IEnumerable<IInitializable?> initializers;
+    private readonly IInitialization initialization;
 
-    public InitializeHandler(IEnumerable<IInitializable?> initializers)
+    public InitializeHandler(IInitialization initialization)
     {
-        this.initializers = initializers;
+        this.initialization = initialization;
     }
 
     public async ValueTask<Unit> Handle(Initialize request, CancellationToken cancellationToken)
     {
-        foreach (IInitializable? initializer in initializers)
-        {
-            if (initializer is not null)
-            {
-                Trace.WriteLine(initializer.GetType());
-                await initializer.InitializeAsync();
-                Trace.WriteLine("Done");
-            }
-        }
-
+        await initialization.InitializeAsync();
         return default;
     }
 }
