@@ -21,7 +21,7 @@
 
         public ITemplateDescriptor? Get(Type type)
         {
-            if (descriptors.FirstOrDefault(x => x.DataType == type) is ITemplateDescriptor descriptor)
+            if (descriptors.FirstOrDefault(x => x.ContentType == type) is ITemplateDescriptor descriptor)
             {
                 return descriptor;
             }
@@ -31,7 +31,7 @@
 
         public ITemplateDescriptor? Get<T>()
         {
-            if (descriptors.FirstOrDefault(x => x.DataType == typeof(T)) is ITemplateDescriptor descriptor)
+            if (descriptors.FirstOrDefault(x => x.ContentType == typeof(T)) is ITemplateDescriptor descriptor)
             {
                 return descriptor;
             }

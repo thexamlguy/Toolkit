@@ -4,7 +4,7 @@ namespace Toolkit.Foundation
 {
     public interface ITemplateDescriptor
     {
-        Type DataType { get; }
+        Type ContentType { get; }
 
         ServiceLifetime Lifetime { get; }
 

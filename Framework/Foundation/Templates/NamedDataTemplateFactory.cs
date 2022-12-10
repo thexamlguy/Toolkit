@@ -23,7 +23,7 @@
 
             if (descriptors.FirstOrDefault(x => x.Name == name) is ITemplateDescriptor descriptor)
             {
-                data = parameters is { Length: > 0 } ? serviceFactory.Create<object>(descriptor.DataType, parameters) : serviceFactory.Create(descriptor.DataType);
+                data = parameters is { Length: > 0 } ? serviceFactory.Create<object>(descriptor.ContentType, parameters) : serviceFactory.Create(descriptor.ContentType);
                 if (data is ICache cache)
                 {
                     this.cache[name] = cache;

@@ -12,18 +12,9 @@ namespace Toolkit.Foundation.Avalonia
                 async void HandleButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
                 {
                     ContentDialogButtonClickDeferral defferal = args.GetDeferral();
-
-                    if (sender.DataContext is INavigationConfirmationAsync confirmationAsync)
-                    {
-                        if (!await confirmationAsync.CanConfirmAsync())
-                        {
-                            args.Cancel = true;
-                        }
-                    }
-
                     if (sender.DataContext is INavigationConfirmation confirmation)
                     {
-                        if (!confirmation.CanConfirm())
+                        if (!await confirmation.CanConfirm())
                         {
                             args.Cancel = true;
                         }

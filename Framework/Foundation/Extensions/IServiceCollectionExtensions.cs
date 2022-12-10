@@ -11,6 +11,7 @@ public static class IServiceCollectionExtensions
         return serviceCollection;
     }
 
+
     public static IServiceCollection AddFoundation(this IServiceCollection serviceCollection)
     {
         serviceCollection.AddSingleton<IServiceFactory>(provider => new ServiceFactory(provider.GetService, (instanceType, parameters) => ActivatorUtilities.CreateInstance(provider, instanceType, parameters!)))

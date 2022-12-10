@@ -65,29 +65,38 @@ namespace Toolkit.Foundation.Avalonia
 
             if (template is not null)
             {
-                object? route = null;
+                object? target = null;
                 if (descriptors.FirstOrDefault(x => request.Route is string { } name && name == x.Name) is NavigationRouteDescriptor descriptor)
                 {
-                    route = descriptor.Route;
+                    target = descriptor.Route;
                 }
                 else
                 {
-                    route = template;
+                    target = template;
                 }
 
-                if (route is Frame frame)
+                bool hasNavigated = false;
+                if (target is Frame frame)
                 {
-                    await mediator.Send(new FrameNavigation(frame, content, template, keyedParameters));
+                    hasNavigated = await mediator.Send(new FrameNavigation(frame, content, template, keyedParameters));
                 }
 
-                if (route is ContentDialog dialog)
+                if (target is ContentDialog dialog)
                 {
-                    await mediator.Send(new ContentDialogNavigation(dialog, content, template, keyedParameters));
+                    hasNavigated = await mediator.Send(new ContentDialogNavigation(dialog, content, template, keyedParameters));
                 }
 
-                if (route is ContentControl contentControl)
+                if (target is ContentControl contentControl)
                 {
-                    await mediator.Send(new ContentControlNavigation(contentControl, content, template, keyedParameters));
+                    hasNavigated = await mediator.Send(new ContentControlNavigation(contentControl, content, template, keyedParameters));
+                }
+
+                if (hasNavigated)
+                {
+                    if (content is INavigated navigated)
+                    {
+                        await navigated.Navigated();
+                    }
                 }
             }
             else

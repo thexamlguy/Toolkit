@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Mediator;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 
@@ -24,7 +25,7 @@ namespace Toolkit.Foundation.Avalonia
                 foreach (ITemplateDescriptor? descriptor in builder.Descriptors)
                 {
                     serviceCollection.Add(new ServiceDescriptor(descriptor.TemplateType, descriptor.TemplateType, descriptor.Lifetime));
-                    serviceCollection.Add(new ServiceDescriptor(descriptor.DataType, descriptor.DataType, descriptor.Lifetime));
+                    serviceCollection.Add(new ServiceDescriptor(descriptor.ContentType, descriptor.ContentType, descriptor.Lifetime));
                 }
             });
 

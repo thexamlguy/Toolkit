@@ -10,7 +10,7 @@ namespace Toolkit.Foundation
             ServiceLifetime lifetime = ServiceLifetime.Transient)
         {
             TemplateType = templateType;
-            DataType = dataType;
+            ContentType = dataType;
             Name = name;
             Lifetime = lifetime;
         }
@@ -19,7 +19,7 @@ namespace Toolkit.Foundation
 
         public Type TemplateType { get; }
 
-        public Type DataType { get; }
+        public Type ContentType { get; }
 
         public string? Name { get; }
     }

@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net7.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<AssemblyName>Toolkit.Controls.Avalonia</AssemblyName>
+		<RootNamespace>Toolkit.Controls.Avalonia</RootNamespace>
+	</PropertyGroup>
+	<ItemGroup>
+	  <PackageReference Include="FluentAvaloniaUI" Version="2.0.0-preview4" />
+	</ItemGroup>
+</Project>
