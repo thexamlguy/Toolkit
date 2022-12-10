@@ -2,37 +2,36 @@
 using Avalonia.Controls.Templates;
 using Toolkit.Framework.Foundation;
 
-namespace Toolkit.Foundation.Avalonia
+namespace Toolkit.Foundation.Avalonia;
+
+public class TemplateSelector : IDataTemplate, ITemplateSelector
 {
-    public class TemplateSelector : IDataTemplate, ITemplateSelector
+    private readonly Dictionary<object, IControl> dataTracking = new();
+
+    private readonly ITemplateFactory templateFactory;
+
+    public TemplateSelector(ITemplateFactory templateFactory)
     {
-        private readonly Dictionary<object, IControl> dataTracking = new();
+        this.templateFactory = templateFactory;
+    }
 
-        private readonly ITemplateFactory templateFactory;
-
-        public TemplateSelector(ITemplateFactory templateFactory)
+    public IControl? Build(object? item)
+    {
+        if (item is not null)
         {
-            this.templateFactory = templateFactory;
-        }
-
-        public IControl? Build(object? item)
-        {
-            if (item is not null)
+            if (dataTracking.TryGetValue(item, out IControl? control))
             {
-                if (dataTracking.TryGetValue(item, out IControl? control))
-                {
-                    return control;
-                }
-
-                return (IControl?)templateFactory.Create(item);
+                return control;
             }
 
-            return null;
+            return (IControl?)templateFactory.Create(item);
         }
 
-        public bool Match(object? data)
-        {
-            return true;
-        }
+        return null;
+    }
+
+    public bool Match(object? data)
+    {
+        return true;
     }
 }

@@ -1,7 +1,7 @@
 ﻿using Avalonia.Controls;
 using FluentAvalonia.UI.Controls;
 
-namespace Toolkit.Foundation.Avalonia;
+namespace Toolkit.Framework.Avalonia;
 
 internal class NavigationPageFactory : INavigationPageFactory
 {

@@ -5,7 +5,7 @@ using Avalonia.Markup.Xaml;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
-namespace Toolkit.Foundation.Avalonia;
+namespace Toolkit.Framework.Avalonia;
 
 public class InvokeExtension : TriggerExtension
 {

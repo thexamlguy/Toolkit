@@ -1,6 +1,6 @@
 ﻿using FluentAvalonia.UI.Controls;
 
-namespace Toolkit.Foundation.Avalonia;
+namespace Toolkit.Framework.Avalonia;
 
 public record ContentDialogNavigation : Navigation<ContentDialog>
 {

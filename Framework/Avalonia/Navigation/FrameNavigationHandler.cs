@@ -2,7 +2,7 @@
 using FluentAvalonia.UI.Navigation;
 using Mediator;
 
-namespace Toolkit.Foundation.Avalonia;
+namespace Toolkit.Framework.Avalonia;
 
 public class FrameNavigationHandler : IRequestHandler<FrameNavigation, bool>
 {

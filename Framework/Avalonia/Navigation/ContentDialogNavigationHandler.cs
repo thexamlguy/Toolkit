@@ -1,7 +1,7 @@
 ﻿using FluentAvalonia.UI.Controls;
 using Mediator;
 
-namespace Toolkit.Foundation.Avalonia;
+namespace Toolkit.Framework.Avalonia;
 
 public class ContentDialogNavigationHandler : IRequestHandler<ContentDialogNavigation, bool>
 {

@@ -2,7 +2,7 @@
 using Avalonia.Markup.Xaml;
 using System.Reflection;
 
-namespace Toolkit.Foundation.Avalonia;
+namespace Toolkit.Framework.Avalonia;
 
 public class TriggerExtension : MarkupExtension
 {

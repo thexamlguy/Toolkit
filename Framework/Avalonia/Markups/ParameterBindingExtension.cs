@@ -4,7 +4,7 @@ using Avalonia.Data;
 using Avalonia.Markup.Xaml;
 using Toolkit.Framework.Foundation;
 
-namespace Toolkit.Foundation.Avalonia;
+namespace Toolkit.Framework.Avalonia;
 
 public class ParameterBindingExtension : MarkupExtension, IParameter
 {

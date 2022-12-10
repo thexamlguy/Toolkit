@@ -7,7 +7,7 @@ using Avalonia.Markup.Xaml;
 using Mediator;
 using Toolkit.Framework.Foundation;
 
-namespace Toolkit.Foundation.Avalonia;
+namespace Toolkit.Framework.Avalonia;
 
 public class NavigationRouteExtension : MarkupExtension
 {

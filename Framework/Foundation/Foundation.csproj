@@ -4,8 +4,8 @@
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <AssemblyName>Toolkit.Foundation</AssemblyName>
-    <RootNamespace>Toolkit.Foundation</RootNamespace>
+    <AssemblyName>Toolkit.Framework.Foundation</AssemblyName>
+    <RootNamespace>Toolkit.Framework.Foundation</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

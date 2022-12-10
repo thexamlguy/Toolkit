@@ -1,6 +1,6 @@
 ﻿using Avalonia.Controls;
 
-namespace Toolkit.Foundation.Avalonia;
+namespace Toolkit.Framework.Avalonia;
 
 public record ContentControlNavigation : Navigation<ContentControl>
 {

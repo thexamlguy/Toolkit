@@ -1,7 +1,7 @@
 ﻿using Avalonia.Data.Converters;
 using Avalonia.Markup.Xaml;
 
-namespace Toolkit.Foundation.Avalonia;
+namespace Toolkit.Framework.Avalonia;
 
 public class EventParameterExtension : MarkupExtension, IEventParameter
 {

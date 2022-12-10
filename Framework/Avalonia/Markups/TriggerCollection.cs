@@ -1,6 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 
-namespace Toolkit.Foundation.Avalonia;
+namespace Toolkit.Framework.Avalonia;
 
 public class TriggerCollection : Collection<Delegate>
 {

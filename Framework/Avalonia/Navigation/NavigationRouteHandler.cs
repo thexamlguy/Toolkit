@@ -3,7 +3,7 @@ using Avalonia.Interactivity;
 using Mediator;
 using Toolkit.Framework.Foundation;
 
-namespace Toolkit.Foundation.Avalonia;
+namespace Toolkit.Framework.Avalonia;
 
 public class NavigationRouteHandler : IRequestHandler<NavigationRoute>
 {

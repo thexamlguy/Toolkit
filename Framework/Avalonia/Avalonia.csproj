@@ -3,8 +3,8 @@
 		<TargetFramework>net7.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<AssemblyName>Toolkit.Foundation.Avalonia</AssemblyName>
-		<RootNamespace>Toolkit.Foundation.Avalonia</RootNamespace>
+		<AssemblyName>Toolkit.Framework.Avalonia</AssemblyName>
+		<RootNamespace>Toolkit.Framework.Avalonia</RootNamespace>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Avalonia" Version="11.0.0-preview4" />

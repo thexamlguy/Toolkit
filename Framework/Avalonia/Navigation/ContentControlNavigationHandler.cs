@@ -1,7 +1,7 @@
 ﻿using Avalonia.Controls.Primitives;
 using Mediator;
 
-namespace Toolkit.Foundation.Avalonia;
+namespace Toolkit.Framework.Avalonia;
 
 public class ContentControlNavigationHandler : IRequestHandler<ContentControlNavigation, bool>
 {

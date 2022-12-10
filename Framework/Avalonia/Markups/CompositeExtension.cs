@@ -1,6 +1,6 @@
 ﻿using Avalonia.Markup.Xaml;
 
-namespace Toolkit.Foundation.Avalonia;
+namespace Toolkit.Framework.Avalonia;
 
 public class CompositeExtension : TriggerExtension
 {

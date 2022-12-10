@@ -3,7 +3,7 @@ using FluentAvalonia.UI.Controls;
 using Mediator;
 using Toolkit.Framework.Foundation;
 
-namespace Toolkit.Foundation.Avalonia;
+namespace Toolkit.Framework.Avalonia;
 
 public class NavigateHandler : IRequestHandler<Navigate>
 {
