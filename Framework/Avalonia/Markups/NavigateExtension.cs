@@ -408,7 +408,6 @@ public class NavigateExtension : TriggerExtension
                 routeBinding = route.ToBinding();
             }
         }
-
     }
 
     protected override void OnInvoked(object sender, EventArgs args)
@@ -438,9 +437,11 @@ public class NavigateExtension : TriggerExtension
                                                 parameters.Add(keyValuePair);
                                             }
                                             break;
+
                                         case IEventParameter eventParameter:
                                             parameters.AddRange(eventParameter.GetValues(args));
                                             break;
+
                                         default:
                                             if (parameter.ToBinding() is Binding defaultDinding)
                                             {
@@ -475,7 +476,6 @@ public class NavigateExtension : TriggerExtension
                             }
                         }
                     }
-
                 }
 
                 base.OnInvoked(sender, args);

@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Toolkit.Framework.Foundation;
 
 namespace Toolkit.Foundation.Avalonia
-{ 
+{
     public static class IServiceCollectionExtensions
     {
         public static IServiceCollection AddNavigation(this IServiceCollection serviceCollection)

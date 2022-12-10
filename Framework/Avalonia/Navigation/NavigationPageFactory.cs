@@ -1,5 +1,5 @@
-﻿using FluentAvalonia.UI.Controls;
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
+using FluentAvalonia.UI.Controls;
 
 namespace Toolkit.Foundation.Avalonia;
 
