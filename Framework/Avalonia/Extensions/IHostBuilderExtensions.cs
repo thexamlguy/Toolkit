@@ -1,7 +1,7 @@
-﻿using Mediator;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using Toolkit.Framework.Foundation;
 
 namespace Toolkit.Foundation.Avalonia
 {

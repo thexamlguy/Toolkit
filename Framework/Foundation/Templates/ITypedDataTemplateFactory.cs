@@ -1,7 +1,6 @@
-﻿namespace Toolkit.Foundation
+﻿namespace Toolkit.Framework.Foundation;
+
+public interface ITypedDataTemplateFactory
 {
-    public interface ITypedDataTemplateFactory
-    {
-        object? Create(Type type, params object[] parameters);
-    }
+    object? Create(Type type, params object[] parameters);
 }

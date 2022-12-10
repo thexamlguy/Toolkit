@@ -1,9 +1,8 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace Toolkit.Foundation
+namespace Toolkit.Framework.Foundation;
+
+public interface ITemplateFactory
 {
-    public interface ITemplateFactory
-    {
-        object? Create([MaybeNull] object? data);
-    }
+    object? Create([MaybeNull] object? data);
 }

@@ -1,39 +1,39 @@
 ﻿using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 using Mediator;
+using Toolkit.Framework.Foundation;
 
-namespace Toolkit.Foundation.Avalonia
+namespace Toolkit.Foundation.Avalonia;
+
+public class NavigationRouteHandler : IRequestHandler<NavigationRoute>
 {
-    public class NavigationRouteHandler : IRequestHandler<NavigationRoute>
+    private readonly INavigationRouteDescriptorCollection descriptors;
+
+    public NavigationRouteHandler(INavigationRouteDescriptorCollection descriptors)
     {
-        private readonly INavigationRouteDescriptorCollection descriptors;
+        this.descriptors = descriptors;
+    }
 
-        public NavigationRouteHandler(INavigationRouteDescriptorCollection descriptors)
+    public ValueTask<Unit> Handle(NavigationRoute request, CancellationToken cancellationToken)
+    {
+        if (request.Route is TemplatedControl control)
         {
-            this.descriptors = descriptors;
-        }
-
-        public ValueTask<Unit> Handle(NavigationRoute request, CancellationToken cancellationToken)
-        {
-            if (request.Route is TemplatedControl control)
+            void HandleUnloaded(object? sender, RoutedEventArgs args)
             {
-                void HandleUnloaded(object? sender, RoutedEventArgs args)
+                if (descriptors.FirstOrDefault(x => x.Route == sender) is INavigationRouteDescriptor descriptor)
                 {
-                    if (descriptors.FirstOrDefault(x => x.Route == sender) is INavigationRouteDescriptor descriptor)
-                    {
-                        descriptors.Remove(descriptor);
-                    }
+                    descriptors.Remove(descriptor);
                 }
-                control.Unloaded += HandleUnloaded;
             }
-
-            if (descriptors.FirstOrDefault(x => x.Name == request.Name) is INavigationRouteDescriptor descriptor)
-            {
-                descriptors.Remove(descriptor);
-            }
-
-            descriptors.Add(new NavigationRouteDescriptor(request.Name, request.Route));
-            return default;
+            control.Unloaded += HandleUnloaded;
         }
+
+        if (descriptors.FirstOrDefault(x => x.Name == request.Name) is INavigationRouteDescriptor descriptor)
+        {
+            descriptors.Remove(descriptor);
+        }
+
+        descriptors.Add(new NavigationRouteDescriptor(request.Name, request.Route));
+        return default;
     }
 }

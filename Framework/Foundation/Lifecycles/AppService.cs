@@ -1,7 +1,7 @@
 ﻿using Mediator;
 using Microsoft.Extensions.Hosting;
 
-namespace Toolkit.Foundation;
+namespace Toolkit.Framework.Foundation;
 
 public class AppService : IHostedService
 {

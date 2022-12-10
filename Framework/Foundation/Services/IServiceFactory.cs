@@ -1,9 +1,8 @@
-﻿namespace Toolkit.Foundation
-{
-    public interface IServiceFactory
-    {
-        object? Create(Type type, params object?[] parameters);
+﻿namespace Toolkit.Framework.Foundation;
 
-        T? Create<T>(Type type, params object?[] parameters);
-    }
+public interface IServiceFactory
+{
+    object? Create(Type type, params object?[] parameters);
+
+    T? Create<T>(Type type, params object?[] parameters);
 }

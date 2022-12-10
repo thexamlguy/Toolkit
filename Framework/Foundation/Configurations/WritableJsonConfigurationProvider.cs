@@ -3,13 +3,12 @@ using Microsoft.Extensions.FileProviders;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace Toolkit.Foundation;
+namespace Toolkit.Framework.Foundation;
 
 public class WritableJsonConfigurationProvider : JsonConfigurationProvider, IWritableConfigurationProvider
 {
     public WritableJsonConfigurationProvider(JsonConfigurationSource source) : base(source)
     {
-
     }
 
     public void Write<TValue>(string section, TValue value) where TValue : class, new()

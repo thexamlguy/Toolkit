@@ -1,8 +1,8 @@
-﻿using Microsoft.Extensions.Configuration.Json;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.Json;
 using Microsoft.Extensions.FileProviders;
 
-namespace Toolkit.Foundation;
+namespace Toolkit.Framework.Foundation;
 
 public class WritableJsonConfigurationSource : JsonConfigurationSource
 {

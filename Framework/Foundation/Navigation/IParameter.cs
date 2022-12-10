@@ -1,9 +1,8 @@
-﻿namespace Toolkit.Foundation
-{
-    public interface IParameter
-    {
-        string? Key { get; }
+﻿namespace Toolkit.Framework.Foundation;
 
-        KeyValuePair<string, object>? GetValue(object target);
-    }
+public interface IParameter
+{
+    string? Key { get; }
+
+    KeyValuePair<string, object>? GetValue(object target);
 }

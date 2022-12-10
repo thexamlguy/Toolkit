@@ -1,42 +1,42 @@
-﻿using Avalonia.Controls;
-using Avalonia;
+﻿using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Markup.Xaml;
+using Toolkit.Framework.Foundation;
 
-namespace Toolkit.Foundation.Avalonia
+namespace Toolkit.Foundation.Avalonia;
+
+public class ParameterBindingExtension : MarkupExtension, IParameter
 {
-    public class ParameterBindingExtension : MarkupExtension, IParameter
+    private static readonly AttachedProperty<object> ValueProperty =
+        AvaloniaProperty.RegisterAttached<ParameterBindingExtension, Control, object>("Value");
+
+    private readonly Binding? valueBinding;
+
+    public ParameterBindingExtension(string key, object value)
     {
-        private static readonly AttachedProperty<object> ValueProperty =
-            AvaloniaProperty.RegisterAttached<ParameterBindingExtension, Control, object>("Value");
+        Key = key;
+        valueBinding = value.ToBinding();
+    }
 
-        private readonly Binding? valueBinding;
+    public string? Key { get; }
 
-        public ParameterBindingExtension(string key, object value)
+    public KeyValuePair<string, object>? GetValue(object target)
+    {
+        if (target is AvaloniaObject avaloniaObject)
         {
-            Key = key;
-            valueBinding = value.ToBinding();
-        }
-
-        public string? Key { get; }
-
-        public KeyValuePair<string, object>? GetValue(object target)
-        {
-            if (target is AvaloniaObject avaloniaObject)
+            if (valueBinding is not null)
             {
-                if (valueBinding is not null)
-                {
-                    avaloniaObject.Bind(ValueProperty, valueBinding);
-                    return new KeyValuePair<string, object>(Key, (dynamic)avaloniaObject.GetValue(ValueProperty));
-                }
+                avaloniaObject.Bind(ValueProperty, valueBinding);
+                return new KeyValuePair<string, object>(Key, (dynamic)avaloniaObject.GetValue(ValueProperty));
             }
-
-            return default;
         }
 
-        public override object ProvideValue(IServiceProvider serviceProvider)
-        {
-            return this;
-        }
+        return default;
+    }
+
+    public override object ProvideValue(IServiceProvider serviceProvider)
+    {
+        return this;
     }
 }

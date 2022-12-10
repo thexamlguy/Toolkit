@@ -1,12 +1,10 @@
-﻿namespace Toolkit.Foundation
+﻿namespace Toolkit.Framework.Foundation;
+
+public interface ITemplateDescriptorProvider
 {
+    ITemplateDescriptor? Get(string name);
 
-    public interface ITemplateDescriptorProvider
-    {
-        ITemplateDescriptor? Get(string name);
+    ITemplateDescriptor? Get(Type type);
 
-        ITemplateDescriptor? Get(Type type);
-
-        ITemplateDescriptor? Get<T>();
-    }
+    ITemplateDescriptor? Get<T>();
 }

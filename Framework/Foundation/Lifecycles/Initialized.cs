@@ -1,5 +1,5 @@
 ﻿using Mediator;
 
-namespace Toolkit.Foundation;
+namespace Toolkit.Framework.Foundation;
 
 public record class Initialized : IRequest;

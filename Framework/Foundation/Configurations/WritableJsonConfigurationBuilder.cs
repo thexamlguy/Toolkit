@@ -1,16 +1,13 @@
 ﻿using Json.Patch;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
-namespace Toolkit.Foundation;
+namespace Toolkit.Framework.Foundation;
 
 public class WritableJsonConfigurationBuilder : IWritableJsonConfigurationBuilder
 {

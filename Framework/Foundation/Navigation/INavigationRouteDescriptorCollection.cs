@@ -1,8 +1,5 @@
-﻿using System.Collections.Generic;
+﻿namespace Toolkit.Framework.Foundation;
 
-namespace Toolkit.Foundation
+public interface INavigationRouteDescriptorCollection : IList<INavigationRouteDescriptor>
 {
-    public interface INavigationRouteDescriptorCollection : IList<INavigationRouteDescriptor>
-    {
-    }
 }

@@ -1,36 +1,35 @@
-﻿namespace Toolkit.Foundation
+﻿namespace Toolkit.Framework.Foundation;
+
+public class NamedDataTemplateFactory : INamedDataTemplateFactory
 {
-    public class NamedDataTemplateFactory : INamedDataTemplateFactory
+    private readonly Dictionary<string, object> cache = new();
+
+    private readonly IReadOnlyCollection<ITemplateDescriptor> descriptors;
+    private readonly IServiceFactory serviceFactory;
+
+    public NamedDataTemplateFactory(IReadOnlyCollection<ITemplateDescriptor> descriptors,
+        IServiceFactory serviceFactory)
     {
-        private readonly Dictionary<string, object> cache = new();
+        this.descriptors = descriptors;
+        this.serviceFactory = serviceFactory;
+    }
 
-        private readonly IReadOnlyCollection<ITemplateDescriptor> descriptors;
-        private readonly IServiceFactory serviceFactory;
-
-        public NamedDataTemplateFactory(IReadOnlyCollection<ITemplateDescriptor> descriptors,
-            IServiceFactory serviceFactory)
+    public virtual object? Create(string name, params object[] parameters)
+    {
+        if (cache.TryGetValue(name, out object? data))
         {
-            this.descriptors = descriptors;
-            this.serviceFactory = serviceFactory;
-        }
-
-        public virtual object? Create(string name, params object[] parameters)
-        {
-            if (cache.TryGetValue(name, out object? data))
-            {
-                return data;
-            }
-
-            if (descriptors.FirstOrDefault(x => x.Name == name) is ITemplateDescriptor descriptor)
-            {
-                data = parameters is { Length: > 0 } ? serviceFactory.Create<object>(descriptor.ContentType, parameters) : serviceFactory.Create(descriptor.ContentType);
-                if (data is ICache cache)
-                {
-                    this.cache[name] = cache;
-                }
-            }
-
             return data;
         }
+
+        if (descriptors.FirstOrDefault(x => x.Name == name) is ITemplateDescriptor descriptor)
+        {
+            data = parameters is { Length: > 0 } ? serviceFactory.Create<object>(descriptor.ContentType, parameters) : serviceFactory.Create(descriptor.ContentType);
+            if (data is ICache cache)
+            {
+                this.cache[name] = cache;
+            }
+        }
+
+        return data;
     }
 }

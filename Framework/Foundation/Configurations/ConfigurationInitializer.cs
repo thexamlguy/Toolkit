@@ -1,6 +1,6 @@
 ﻿using Mediator;
 
-namespace Toolkit.Foundation;
+namespace Toolkit.Framework.Foundation;
 
 public class ConfigurationInitializer<TConfiguration> : IInitializable where TConfiguration : class, new()
 {

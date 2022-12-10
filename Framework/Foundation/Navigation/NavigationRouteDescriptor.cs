@@ -1,15 +1,14 @@
-﻿namespace Toolkit.Foundation
+﻿namespace Toolkit.Framework.Foundation;
+
+public record NavigationRouteDescriptor : INavigationRouteDescriptor
 {
-    public record NavigationRouteDescriptor : INavigationRouteDescriptor
+    public NavigationRouteDescriptor(string name, object route)
     {
-        public NavigationRouteDescriptor(string name, object route)
-        {
-            Name = name;
-            Route = route;
-        }
-
-        public string Name { get; }
-
-        public object Route { get; }
+        Name = name;
+        Route = route;
     }
+
+    public string Name { get; }
+
+    public object Route { get; }
 }

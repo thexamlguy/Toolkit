@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace Toolkit.Foundation;
+namespace Toolkit.Framework.Foundation;
 
 public class Initialization : IInitialization
 {

@@ -1,9 +1,8 @@
-﻿namespace Toolkit.Foundation
-{
-    public interface INavigationRouteDescriptor
-    {
-        object Route { get; }
+﻿namespace Toolkit.Framework.Foundation;
 
-        string? Name { get; }
-    }
+public interface INavigationRouteDescriptor
+{
+    object Route { get; }
+
+    string? Name { get; }
 }

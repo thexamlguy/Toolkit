@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace Toolkit.Foundation;
+namespace Toolkit.Framework.Foundation;
 
 public static class IServiceCollectionExtensions
 {
@@ -10,7 +10,6 @@ public static class IServiceCollectionExtensions
         serviceCollection.TryAdd(new ServiceDescriptor(typeof(TRequestHandler), typeof(TRequestHandler), ServiceLifetime.Transient));
         return serviceCollection;
     }
-
 
     public static IServiceCollection AddFoundation(this IServiceCollection serviceCollection)
     {

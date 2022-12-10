@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Hosting;
 
-namespace Toolkit.Foundation;
+namespace Toolkit.Framework.Foundation;
 
 public static class IHostBuilderExtensions
 {

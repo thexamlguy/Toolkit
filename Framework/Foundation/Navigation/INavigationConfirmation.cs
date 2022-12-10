@@ -1,13 +1,11 @@
-﻿
-namespace Toolkit.Foundation
-{
-    public interface INavigationConfirmation
-    {
-        ValueTask<bool> CanConfirm();
-    }
+﻿namespace Toolkit.Foundation;
 
-    public interface INavigated
-    {
-        ValueTask Navigated();
-    }
+public interface INavigationConfirmation
+{
+    ValueTask<bool> CanConfirm();
+}
+
+public interface INavigated
+{
+    ValueTask Navigated();
 }

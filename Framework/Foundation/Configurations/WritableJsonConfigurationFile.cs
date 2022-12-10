@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Text.Json;
 
-namespace Toolkit.Foundation;
+namespace Toolkit.Framework.Foundation;
 
 internal class WritableJsonConfigurationFile
 {

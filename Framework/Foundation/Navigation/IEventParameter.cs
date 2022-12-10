@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace Toolkit.Foundation;
 
-namespace Toolkit.Foundation
+public interface IEventParameter
 {
-    public interface IEventParameter
-    {
-        List<object> GetValues(EventArgs args);
-    }
+    List<object> GetValues(EventArgs args);
 }

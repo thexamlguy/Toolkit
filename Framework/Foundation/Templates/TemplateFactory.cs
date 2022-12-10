@@ -1,43 +1,42 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace Toolkit.Foundation
+namespace Toolkit.Framework.Foundation;
+
+public class TemplateFactory : ITemplateFactory
 {
-    public class TemplateFactory : ITemplateFactory
+    private readonly Dictionary<object, object> cache = new();
+
+    private readonly ITemplateDescriptorProvider provider;
+    private readonly IServiceFactory serviceFactory;
+
+    public TemplateFactory(ITemplateDescriptorProvider provider,
+        IServiceFactory serviceFactory)
     {
-        private readonly Dictionary<object, object> cache = new();
+        this.provider = provider;
+        this.serviceFactory = serviceFactory;
+    }
 
-        private readonly ITemplateDescriptorProvider provider;
-        private readonly IServiceFactory serviceFactory;
-
-        public TemplateFactory(ITemplateDescriptorProvider provider,
-            IServiceFactory serviceFactory)
+    public virtual object? Create([MaybeNull] object? data)
+    {
+        if (data is null)
         {
-            this.provider = provider;
-            this.serviceFactory = serviceFactory;
+            return null;
         }
 
-        public virtual object? Create([MaybeNull] object? data)
+        if (cache.TryGetValue(data, out object? template))
         {
-            if (data is null)
-            {
-                return null;
-            }
-
-            if (cache.TryGetValue(data, out object? template))
-            {
-                return template;
-            }
-
-            if (provider.Get(data.GetType()) is ITemplateDescriptor descriptor)
-            {
-                template = serviceFactory.Create(descriptor.TemplateType);
-                if (template is ICache cache)
-                {
-                    this.cache[data] = cache;
-                }
-            }
-
             return template;
         }
+
+        if (provider.Get(data.GetType()) is ITemplateDescriptor descriptor)
+        {
+            template = serviceFactory.Create(descriptor.TemplateType);
+            if (template is ICache cache)
+            {
+                this.cache[data] = cache;
+            }
+        }
+
+        return template;
     }
 }

@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileProviders;
 
-namespace Toolkit.Foundation;
+namespace Toolkit.Framework.Foundation;
 
 public static class WritableJsonConfigurationExtensions
 {

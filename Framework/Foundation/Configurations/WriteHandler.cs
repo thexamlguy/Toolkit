@@ -1,6 +1,6 @@
 ﻿using Mediator;
 
-namespace Toolkit.Foundation;
+namespace Toolkit.Framework.Foundation;
 
 public class WriteHandler<TConfiguration> : IRequestHandler<Write<TConfiguration>> where TConfiguration : class
 {

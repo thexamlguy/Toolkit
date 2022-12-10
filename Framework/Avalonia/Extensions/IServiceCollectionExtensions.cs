@@ -2,6 +2,7 @@
 using FluentAvalonia.UI.Controls;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Toolkit.Framework.Foundation;
 
 namespace Toolkit.Foundation.Avalonia
 { 
