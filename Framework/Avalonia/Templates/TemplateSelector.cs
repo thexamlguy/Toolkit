@@ -2,7 +2,7 @@
 using Avalonia.Controls.Templates;
 using Toolkit.Framework.Foundation;
 
-namespace Toolkit.Foundation.Avalonia;
+namespace Toolkit.Framework.Avalonia;
 
 public class TemplateSelector : IDataTemplate, ITemplateSelector
 {

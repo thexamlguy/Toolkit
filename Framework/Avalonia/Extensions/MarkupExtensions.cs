@@ -1,6 +1,6 @@
 ﻿using Avalonia.Data;
 
-namespace Toolkit.Foundation.Avalonia;
+namespace Toolkit.Framework.Avalonia;
 
 public static class MarkupExtensions
 {

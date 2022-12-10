@@ -1,6 +1,5 @@
 ﻿using Avalonia.Data.Converters;
 using Avalonia.Markup.Xaml;
-using Toolkit.Foundation.Avalonia;
 using Toolkit.Framework.Foundation;
 
 namespace Toolkit.Framework.Avalonia;
