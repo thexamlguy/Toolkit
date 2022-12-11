@@ -1,5 +1,6 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Controls.Templates;
+using System.Diagnostics;
 using Toolkit.Framework.Foundation;
 
 namespace Toolkit.Framework.Avalonia;
