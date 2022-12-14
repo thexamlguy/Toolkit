@@ -2,7 +2,7 @@
 
 namespace Toolkit.Framework.Foundation;
 
-public interface ITemplateDescriptor
+public interface IContentTemplateDescriptor
 {
     Type ContentType { get; }
 

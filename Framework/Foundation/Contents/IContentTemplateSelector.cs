@@ -1,5 +1,5 @@
 ﻿namespace Toolkit.Framework.Foundation;
 
-public interface ITemplateSelector
+public interface IContentTemplateSelector
 {
 }

@@ -1,39 +1,37 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Data;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Mediator;
+using System.Diagnostics;
 using Toolkit.Framework.Foundation;
 
 namespace Toolkit.Framework.Avalonia;
-public class NavigateExtension : TriggerExtension
+
+public class ContentExtension : MarkupExtension
 {
     private static readonly AttachedProperty<IMediator> MediatorProperty =
-        AvaloniaProperty.RegisterAttached<NavigateExtension, Control, IMediator>("Mediator");
+        AvaloniaProperty.RegisterAttached<ContentExtension, AvaloniaObject, IMediator>("Mediator");
 
     private static readonly AttachedProperty<object> ParameterProperty =
-        AvaloniaProperty.RegisterAttached<NavigateExtension, Control, object>("Parameter");
-
-    private static readonly AvaloniaProperty RouteProperty =
-        AvaloniaProperty.RegisterAttached<NavigateExtension, Control, object>("Route");
+        AvaloniaProperty.RegisterAttached<ContentExtension, AvaloniaObject, object>("Parameter");
 
     private static readonly AvaloniaProperty ToProperty =
-        AvaloniaProperty.RegisterAttached<NavigateExtension, Control, object>("To");
+        AvaloniaProperty.RegisterAttached<ContentExtension, AvaloniaObject, object>("To");
 
     private readonly Binding? mediatorBinding;
     private readonly List<object?> parameters = new();
     private readonly Binding? toBinding;
-    private object? route;
-    private Binding? routeBinding;
 
-    public NavigateExtension(object mediator,
+    public ContentExtension(object mediator,
         object to)
     {
         mediatorBinding = mediator.ToBinding();
         this.toBinding = to is Binding toBinding ? toBinding : to.ToBinding();
     }
 
-    public NavigateExtension(object mediator,
+    public ContentExtension(object mediator,
         object to,
         object args1)
     {
@@ -43,7 +41,7 @@ public class NavigateExtension : TriggerExtension
         parameters.Add(args1 is MarkupExtension ? args1 : args1.ToBinding());
     }
 
-    public NavigateExtension(object mediator,
+    public ContentExtension(object mediator,
         object to,
         object args1,
         object args2)
@@ -55,7 +53,7 @@ public class NavigateExtension : TriggerExtension
         parameters.Add(args2 is MarkupExtension ? args2 : args2.ToBinding());
     }
 
-    public NavigateExtension(object mediator,
+    public ContentExtension(object mediator,
         object to,
         object args1,
         object args2,
@@ -69,7 +67,7 @@ public class NavigateExtension : TriggerExtension
         parameters.Add(args3 is MarkupExtension ? args3 : args3.ToBinding());
     }
 
-    public NavigateExtension(object mediator,
+    public ContentExtension(object mediator,
         object to,
         object args1,
         object args2,
@@ -85,7 +83,7 @@ public class NavigateExtension : TriggerExtension
         parameters.Add(args4 is MarkupExtension ? args4 : args4.ToBinding());
     }
 
-    public NavigateExtension(object mediator,
+    public ContentExtension(object mediator,
         object to,
         object args1,
         object args2,
@@ -103,7 +101,7 @@ public class NavigateExtension : TriggerExtension
         parameters.Add(args5 is MarkupExtension ? args5 : args5.ToBinding());
     }
 
-    public NavigateExtension(object mediator,
+    public ContentExtension(object mediator,
         object to,
         object args1,
         object args2,
@@ -123,7 +121,7 @@ public class NavigateExtension : TriggerExtension
         parameters.Add(args6 is MarkupExtension ? args6 : args6.ToBinding());
     }
 
-    public NavigateExtension(object mediator,
+    public ContentExtension(object mediator,
         object to,
         object args1,
         object args2,
@@ -145,7 +143,7 @@ public class NavigateExtension : TriggerExtension
         parameters.Add(args7 is MarkupExtension ? args7 : args7.ToBinding());
     }
 
-    public NavigateExtension(object mediator,
+    public ContentExtension(object mediator,
         object to,
         object args1,
         object args2,
@@ -169,7 +167,7 @@ public class NavigateExtension : TriggerExtension
         parameters.Add(args8 is MarkupExtension ? args8 : args8.ToBinding());
     }
 
-    public NavigateExtension(object mediator,
+    public ContentExtension(object mediator,
         object to,
         object args1,
         object args2,
@@ -195,7 +193,7 @@ public class NavigateExtension : TriggerExtension
         parameters.Add(args9 is MarkupExtension ? args9 : args9.ToBinding());
     }
 
-    public NavigateExtension(object mediator,
+    public ContentExtension(object mediator,
         object to,
         object args1,
         object args2,
@@ -223,7 +221,7 @@ public class NavigateExtension : TriggerExtension
         parameters.Add(args10 is MarkupExtension ? args10 : args10.ToBinding());
     }
 
-    public NavigateExtension(object mediator,
+    public ContentExtension(object mediator,
         object to,
         object args1,
         object args2,
@@ -253,7 +251,7 @@ public class NavigateExtension : TriggerExtension
         parameters.Add(args11 is MarkupExtension ? args11 : args11.ToBinding());
     }
 
-    public NavigateExtension(object mediator,
+    public ContentExtension(object mediator,
         object to,
         object args1,
         object args2,
@@ -285,7 +283,7 @@ public class NavigateExtension : TriggerExtension
         parameters.Add(args12 is MarkupExtension ? args12 : args12.ToBinding());
     }
 
-    public NavigateExtension(object mediator,
+    public ContentExtension(object mediator,
         object to,
         object args1,
         object args2,
@@ -319,7 +317,7 @@ public class NavigateExtension : TriggerExtension
         parameters.Add(args13 is MarkupExtension ? args13 : args13.ToBinding());
     }
 
-    public NavigateExtension(object mediator,
+    public ContentExtension(object mediator,
         object to,
         object args1,
         object args2,
@@ -355,7 +353,7 @@ public class NavigateExtension : TriggerExtension
         parameters.Add(args14 is MarkupExtension ? args14 : args14.ToBinding());
     }
 
-    public NavigateExtension(object mediator,
+    public ContentExtension(object mediator,
         object to,
         object args1,
         object args2,
@@ -393,89 +391,101 @@ public class NavigateExtension : TriggerExtension
         parameters.Add(args15 is MarkupExtension ? args15 : args15.ToBinding());
     }
 
-    public object? Route
+    public override object? ProvideValue(IServiceProvider serviceProvider)
     {
-        get
+        if (serviceProvider.GetService(typeof(IProvideValueTarget)) is IProvideValueTarget target)
         {
-            return route;
-        }
-        set
-        {
-            route = value;
-            if (route is not null)
+            AvaloniaObject? targetObject = null;
+            if (target.TargetObject is AvaloniaObject avaloniaObject)
             {
-                routeBinding = route.ToBinding();
+                targetObject = avaloniaObject;
             }
-        }
-    }
-
-    protected override void OnInvoked(object sender, EventArgs args)
-    {
-        if (TargetObject is not null && mediatorBinding is not null)
-        {
-            TargetObject.Bind(MediatorProperty, mediatorBinding);
-            if (TargetObject.GetValue(MediatorProperty) is IMediator mediator)
+            else if (serviceProvider.GetService(typeof(IRootObjectProvider)) is IRootObjectProvider root)
             {
-                if (toBinding is not null)
+                targetObject = (AvaloniaObject)root.RootObject;
+            }
+
+            if (targetObject is not null && toBinding is not null && mediatorBinding is not null)
+            {
+                if (target.TargetProperty is StyledProperty<object> targetProperty)
                 {
-                    TargetObject.Bind(ToProperty, toBinding);
-                    if (TargetObject.GetValue(ToProperty) is { } to)
+                    if (targetObject is Control control)
                     {
-                        List<object>? parameters = new();
-                        foreach (object? parameter in this.parameters)
+                        void SetContent()
                         {
-                            if (parameter is not null)
+                            targetObject.Bind(MediatorProperty, mediatorBinding);
+                            if (targetObject.GetValue(MediatorProperty) is IMediator mediator)
                             {
-                                switch (parameter)
+                                targetObject.Bind(ToProperty, toBinding);
+                                if (targetObject.GetValue(ToProperty) is { } to)
                                 {
-                                    case IParameter keyedParameter:
-                                        if (keyedParameter.GetValue(TargetObject) is KeyValuePair<string, object> keyValuePair)
+                                    List<object>? parameters = new();
+                                    foreach (object? parameter in this.parameters)
+                                    {
+                                        if (parameter is not null)
                                         {
-                                            parameters.Add(keyValuePair);
+                                            switch (parameter)
+                                            {
+                                                case IParameter keyedParameter:
+                                                    if (keyedParameter.GetValue(targetObject) is KeyValuePair<string, object> keyValuePair)
+                                                    {
+                                                        parameters.Add(keyValuePair);
+                                                    }
+                                                    break;
+
+                                                default:
+                                                    if (parameter.ToBinding() is Binding defaultDinding)
+                                                    {
+                                                        targetObject.Bind(ParameterProperty, defaultDinding);
+                                                        parameters.Add((dynamic)targetObject.GetValue(ParameterProperty));
+                                                    }
+                                                    break;
+                                            }
                                         }
-                                        break;
+                                    }
 
-                                    case IEventParameter eventParameter:
-                                        parameters.AddRange(eventParameter.GetValues(args));
-                                        break;
+                                    if (to is string name)
+                                    {
+                                        Trace.WriteLine(name);
 
-                                    default:
-                                        if (parameter.ToBinding() is Binding defaultDinding)
+                                        ValueTask<object?> namedTask = mediator.Send(new Content(name, parameters.ToArray()));
+                                        if (namedTask is ValueTask<object?> { Result: object result })
                                         {
-                                            TargetObject.Bind(ParameterProperty, defaultDinding);
-                                            parameters.Add((dynamic)TargetObject.GetValue(ParameterProperty));
+                                            control.SetValue(targetProperty, result);
                                         }
-                                        break;
+                                    }
+
+                                    if (to is Type type)
+                                    {
+                                        ValueTask<object?> typedTask = mediator.Send(new Content(type, parameters.ToArray()));
+                                        if (typedTask is ValueTask<object?> { Result: object result })
+                                        {
+                                            control.SetValue(targetProperty, result);
+                                        }
+                                    }
                                 }
                             }
                         }
 
-                        object? route = null;
-                        if (routeBinding is not null)
+                        if (!control.IsLoaded)
                         {
-                            TargetObject.Bind(RouteProperty, routeBinding);
-                            route = TargetObject.GetValue(RouteProperty);
-                        }
-
-                        if (to is string name)
-                        {
-                            if (toBinding?.StringFormat is string format)
+                            void HandleLoaded(object? sender, RoutedEventArgs args)
                             {
-                                name = string.Format(format, name);
+                                control.Loaded -= HandleLoaded;
+                                SetContent();
                             }
 
-                            mediator.Send(new Navigate(name, parameters.ToArray()) { Route = route });
+                            control.Loaded += HandleLoaded;
                         }
-
-                        if (to is Type type)
+                        else
                         {
-                            mediator.Send(new Navigate(type, parameters.ToArray()) { Route = route });
+                            SetContent();
                         }
                     }
                 }
             }
-
-            base.OnInvoked(sender, args);
         }
+
+        return default;
     }
 }

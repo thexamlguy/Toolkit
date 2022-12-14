@@ -2,9 +2,9 @@
 
 namespace Toolkit.Framework.Foundation;
 
-public class TemplateDescriptor : ITemplateDescriptor
+public class ContentTemplateDescriptor : IContentTemplateDescriptor
 {
-    public TemplateDescriptor(Type dataType,
+    public ContentTemplateDescriptor(Type dataType,
         Type templateType,
         string? name = null,
         ServiceLifetime lifetime = ServiceLifetime.Transient)

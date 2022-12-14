@@ -2,14 +2,14 @@
 
 namespace Toolkit.Framework.Foundation;
 
-public class TemplateFactory : ITemplateFactory
+public class ContentTemplateFactory : IContentTemplateFactory
 {
     private readonly Dictionary<object, object> cache = new();
 
-    private readonly ITemplateDescriptorProvider provider;
+    private readonly IContentTemplateDescriptorProvider provider;
     private readonly IServiceFactory serviceFactory;
 
-    public TemplateFactory(ITemplateDescriptorProvider provider,
+    public ContentTemplateFactory(IContentTemplateDescriptorProvider provider,
         IServiceFactory serviceFactory)
     {
         this.provider = provider;
@@ -28,7 +28,7 @@ public class TemplateFactory : ITemplateFactory
             return template;
         }
 
-        if (provider.Get(data.GetType()) is ITemplateDescriptor descriptor)
+        if (provider.Get(data.GetType()) is IContentTemplateDescriptor descriptor)
         {
             template = serviceFactory.Create(descriptor.TemplateType);
             if (template is ICache cache)

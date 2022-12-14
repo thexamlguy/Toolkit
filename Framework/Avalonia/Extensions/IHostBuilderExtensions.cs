@@ -7,22 +7,22 @@ namespace Toolkit.Framework.Avalonia;
 
 public static class IHostBuilderExtensions
 {
-    public static IHostBuilder ConfigureTemplates(this IHostBuilder hostBuilder, Action<ITemplateBuilder> builderDelegate)
+    public static IHostBuilder ConfigureTemplates(this IHostBuilder hostBuilder, Action<IContentTemplateBuilder> builderDelegate)
     {
         hostBuilder.ConfigureServices((hostBuilderContext, serviceCollection) =>
         {
-            TemplateBuilder? builder = new();
+            ContentTemplateBuilder? builder = new();
             builderDelegate?.Invoke(builder);
 
             serviceCollection.TryAddSingleton(builder.Descriptors);
-            serviceCollection.TryAddSingleton<ITemplateDescriptorProvider, TemplateDescriptorProvider>();
-            serviceCollection.TryAddSingleton<ITemplateFactory, TemplateFactory>();
-            serviceCollection.TryAddSingleton<INamedTemplateFactory, NamedTemplateFactory>();
-            serviceCollection.TryAddSingleton<ITypedDataTemplateFactory, TypedDataTemplateFactory>();
-            serviceCollection.TryAddSingleton<INamedDataTemplateFactory, NamedDataTemplateFactory>();
-            serviceCollection.TryAddSingleton<ITemplateSelector, TemplateSelector>();
+            serviceCollection.TryAddSingleton<IContentTemplateDescriptorProvider, ContentTemplateDescriptorProvider>();
+            serviceCollection.TryAddSingleton<IContentTemplateFactory, ContentTemplateFactory>();
+            serviceCollection.TryAddSingleton<INamedContentFactory, NamedContentFactory>();
+            serviceCollection.TryAddSingleton<ITypedContentFactory, TypedContentFactory>();
+            serviceCollection.TryAddSingleton<INamedContentTemplateFactory, NamedContentTemplateFactory>();
+            serviceCollection.TryAddSingleton<IContentTemplateSelector, ContentTemplateSelector>();
 
-            foreach (ITemplateDescriptor? descriptor in builder.Descriptors)
+            foreach (IContentTemplateDescriptor? descriptor in builder.Descriptors)
             {
                 serviceCollection.Add(new ServiceDescriptor(descriptor.TemplateType, descriptor.TemplateType, descriptor.Lifetime));
                 serviceCollection.Add(new ServiceDescriptor(descriptor.ContentType, descriptor.ContentType, descriptor.Lifetime));

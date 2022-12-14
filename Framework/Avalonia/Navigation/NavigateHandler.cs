@@ -9,23 +9,23 @@ public class NavigateHandler : IRequestHandler<Navigate>
 {
     private readonly INavigationRouteDescriptorCollection descriptors;
     private readonly IMediator mediator;
-    private readonly INamedDataTemplateFactory namedDataTemplateFactory;
-    private readonly INamedTemplateFactory namedTemplateFactory;
-    private readonly ITemplateFactory templateFactory;
-    private readonly ITypedDataTemplateFactory typedDataTemplateFactory;
+    private readonly INamedContentTemplateFactory namedContentTemplateFactory;
+    private readonly INamedContentFactory namedContentFactory;
+    private readonly IContentTemplateFactory contentTemplateFactory;
+    private readonly ITypedContentFactory typedContentFactory;
 
     public NavigateHandler(IMediator mediator,
-        ITemplateFactory templateFactory,
-        INamedTemplateFactory namedTemplateFactory,
-        INamedDataTemplateFactory namedDataTemplateFactory,
-        ITypedDataTemplateFactory typedDataTemplateFactory,
+        IContentTemplateFactory contentTemplateFactory,
+        INamedContentFactory namedContentFactory,
+        INamedContentTemplateFactory namedContentTemplateFactory,
+        ITypedContentFactory typedContentFactory,
         INavigationRouteDescriptorCollection descriptors)
     {
         this.mediator = mediator;
-        this.templateFactory = templateFactory;
-        this.namedTemplateFactory = namedTemplateFactory;
-        this.namedDataTemplateFactory = namedDataTemplateFactory;
-        this.typedDataTemplateFactory = typedDataTemplateFactory;
+        this.contentTemplateFactory = contentTemplateFactory;
+        this.namedContentFactory = namedContentFactory;
+        this.namedContentTemplateFactory = namedContentTemplateFactory;
+        this.typedContentFactory = typedContentFactory;
         this.descriptors = descriptors;
     }
 
@@ -54,14 +54,14 @@ public class NavigateHandler : IRequestHandler<Navigate>
 
         if (request.Name is { Length: > 0 } name)
         {
-            content = namedDataTemplateFactory.Create(name, parameters.ToArray());
-            template = namedTemplateFactory.Create(name);
+            content = namedContentFactory.Create(name, parameters.ToArray());
+            template = namedContentTemplateFactory.Create(name);
         }
 
         if (request.Type is Type type)
         {
-            content = typedDataTemplateFactory.Create(type, parameters.ToArray());
-            template = templateFactory.Create(content);
+            content = typedContentFactory.Create(type, parameters.ToArray());
+            template = contentTemplateFactory.Create(content);
         }
 
         if (template is not null)

@@ -1,17 +1,16 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Controls.Templates;
-using System.Diagnostics;
 using Toolkit.Framework.Foundation;
 
 namespace Toolkit.Framework.Avalonia;
 
-public class TemplateSelector : IDataTemplate, ITemplateSelector
+public class ContentTemplateSelector : IDataTemplate, IContentTemplateSelector
 {
     private readonly Dictionary<object, IControl> dataTracking = new();
 
-    private readonly ITemplateFactory templateFactory;
+    private readonly IContentTemplateFactory templateFactory;
 
-    public TemplateSelector(ITemplateFactory templateFactory)
+    public ContentTemplateSelector(IContentTemplateFactory templateFactory)
     {
         this.templateFactory = templateFactory;
     }

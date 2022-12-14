@@ -37,39 +37,35 @@ public class NavigationRouteExtension : MarkupExtension
             {
                 if (!TryGetBinding(control, out object? binding))
                 {
-                    void HandleDataContextChanged(object? sender, EventArgs args)
+                    void AddRoute(TemplatedControl control)
                     {
-                        if (TryGetBinding(control, out binding))
+                        if (mediatorBinding is not null)
                         {
-                            control.Loaded -= HandleLoaded;
-                            if (mediatorBinding is not null)
+                            control.Bind(MediatorProperty, mediatorBinding);
+                            if (control.GetValue(MediatorProperty) is IMediator mediator)
                             {
-                                control.Bind(MediatorProperty, mediatorBinding);
-                                if (control.GetValue(MediatorProperty) is IMediator mediator)
-                                {
-                                    mediator.Send(new NavigationRoute(name, control));
-                                    control.ClearValue(MediatorProperty);
-                                }
+                                mediator.Send(new NavigationRoute(name, control));
+                                control.ClearValue(MediatorProperty);
                             }
                         }
                     }
 
-                    control.DataContextChanged += HandleDataContextChanged;
+                    void HandleDataContextChanged(object? sender, EventArgs args)
+                    {
+                        control.Loaded -= HandleLoaded;
+                        if (TryGetBinding(control, out binding))
+                        {
+                            AddRoute(control);
+                        }
+                    }
 
+                    control.DataContextChanged += HandleDataContextChanged;
                     void HandleLoaded(object? sender, RoutedEventArgs args)
                     {
                         control.Loaded -= HandleLoaded;
                         if (TryGetBinding(control, out binding))
                         {
-                            if (mediatorBinding is not null)
-                            {
-                                control.Bind(MediatorProperty, mediatorBinding);
-                                if (control.GetValue(MediatorProperty) is IMediator mediator)
-                                {
-                                    mediator.Send(new NavigationRoute(name, control));
-                                    control.ClearValue(MediatorProperty);
-                                }
-                            }
+                            AddRoute(control);
                         }
                     }
 

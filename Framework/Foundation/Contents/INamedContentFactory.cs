@@ -1,6 +1,6 @@
 ﻿namespace Toolkit.Framework.Foundation;
 
-public interface INamedTemplateFactory
+public interface INamedContentTemplateFactory
 {
     object? Create(string name);
 }

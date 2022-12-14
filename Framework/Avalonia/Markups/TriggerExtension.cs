@@ -31,7 +31,6 @@ public class TriggerExtension : MarkupExtension
             if (TargetObject is not null)
             {
                 string? targetName = target.TargetProperty as string;
-
                 TargetInvoke = target.TargetProperty;
                 OnAttached(serviceProvider);
 
@@ -59,7 +58,7 @@ public class TriggerExtension : MarkupExtension
             }
         }
 
-        return null;
+        return default;
     }
 
     protected virtual void OnAttached(IServiceProvider serviceProvider)
