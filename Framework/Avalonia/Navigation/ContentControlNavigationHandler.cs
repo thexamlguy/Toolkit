@@ -5,7 +5,7 @@ namespace Toolkit.Framework.Avalonia;
 
 public class ContentControlNavigationHandler : IRequestHandler<ContentControlNavigation, bool>
 {
-    public async ValueTask<bool> Handle(ContentControlNavigation request, CancellationToken cancellationToken)
+    public ValueTask<bool> Handle(ContentControlNavigation request, CancellationToken cancellationToken)
     {
         if (request.Template is TemplatedControl control)
         {
@@ -13,6 +13,6 @@ public class ContentControlNavigationHandler : IRequestHandler<ContentControlNav
             request.Route.Content = control;
         }
 
-        return await Task.FromResult(true);
+        return new ValueTask<bool>(true);
     }
 }

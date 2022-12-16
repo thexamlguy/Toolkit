@@ -1,6 +1,5 @@
 ﻿using Avalonia;
 using Mediator;
-using System.Diagnostics;
 using Toolkit.Framework.Foundation;
 
 namespace Toolkit.Framework.Avalonia;

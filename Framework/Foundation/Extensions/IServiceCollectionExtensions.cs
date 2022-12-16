@@ -37,6 +37,7 @@ public static class IServiceCollectionExtensions
             .AddSingleton<IMediator, Mediator>()
             .AddHandler<InitializeHandler>()
             .AddSingleton<IServiceFactory>(provider => new ServiceFactory(provider.GetService, (instanceType, parameters) => ActivatorUtilities.CreateInstance(provider, instanceType, parameters!)))
+            .AddHandler<ServiceFactoryHandler>()
             .AddSingleton<IInitialization, Initialization>(provider => new Initialization(() =>
             {
                 return serviceCollection.Where(x => x.ServiceType.GetInterfaces()
