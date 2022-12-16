@@ -1,34 +1,20 @@
 ﻿using Mediator;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 
 namespace Toolkit.Framework.Foundation;
 
 public static class IServiceCollectionExtensions
 {
-    public static IServiceCollection AddHandler<TRequestHandler>(this IServiceCollection services) where TRequestHandler : notnull
+    public static IServiceCollection AddConfiguration<TConfiguration>(this IServiceCollection serviceCollection, IConfiguration configuration) where TConfiguration : class, new()
     {
-        if (typeof(TRequestHandler).GetInterface(typeof(IRequestHandler<,>).Name) is { } contract)
-        {
-            if (contract.GetGenericArguments() is { Length: 2 } arguments)
-            {
-                Type requestType = arguments[0];
-                Type responseType = arguments[1];
-                Type wrapperType = typeof(RequestClassHandlerWrapper<,>).MakeGenericType(requestType, responseType);
+        serviceCollection.Configure<TConfiguration>(configuration);
+        serviceCollection.AddTransient(provider => provider.GetService<IOptionsMonitor<TConfiguration>>()!.CurrentValue);
+        serviceCollection.AddTransient<ConfigurationInitializer<TConfiguration>>();
 
-                services.TryAdd(new ServiceDescriptor(typeof(TRequestHandler), typeof(TRequestHandler), ServiceLifetime.Transient));
-                services.Add(new ServiceDescriptor(wrapperType,
-                    sp =>
-                    {
-                        return sp.GetService<IServiceFactory>()?.Create(wrapperType, sp.GetRequiredService<TRequestHandler>(), sp.GetServices(typeof(IPipelineBehavior<,>).MakeGenericType(requestType, responseType)))!;
-                    },
-                    ServiceLifetime.Transient
-                ));
-
-            }
-        }
-
-        return services;
+        return serviceCollection;
     }
 
     public static IServiceCollection AddFoundation(this IServiceCollection serviceCollection)
@@ -47,6 +33,82 @@ public static class IServiceCollectionExtensions
                     .SelectMany(x => provider.GetServices(x.ServiceType)
                     .Select(x => (IInitializable?)x)).ToList();
             }));
+
+        return serviceCollection;
+    }
+
+    public static IServiceCollection AddHandler<THandler>(this IServiceCollection services, ServiceLifetime lifetime = ServiceLifetime.Transient) where THandler : notnull
+    {
+        if (typeof(THandler).GetInterface(typeof(IRequestHandler<,>).Name) is { } requestContract)
+        {
+            if (requestContract.GetGenericArguments() is { Length: 2 } arguments)
+            {
+                Type requestType = arguments[0];
+                Type responseType = arguments[1];
+
+                Type wrapperType = typeof(RequestClassHandlerWrapper<,>).MakeGenericType(requestType, responseType);
+
+                services.TryAdd(new ServiceDescriptor(typeof(THandler), typeof(THandler), lifetime));
+                services.Add(new ServiceDescriptor(wrapperType,
+                    sp =>
+                    {
+                        return sp.GetService<IServiceFactory>()?.Create(wrapperType, sp.GetRequiredService<THandler>(), sp.GetServices(typeof(IPipelineBehavior<,>).MakeGenericType(requestType, responseType)))!;
+                    },
+                    lifetime
+                ));
+
+            }
+        }
+
+        if (typeof(THandler).GetInterface(typeof(ICommandHandler<,>).Name) is { } commandContract)
+        {
+            if (commandContract.GetGenericArguments() is { Length: 2 } arguments)
+            {
+                Type requestType = arguments[0];
+                Type responseType = arguments[1];
+
+                Type wrapperType = typeof(CommandClassHandlerWrapper<,>).MakeGenericType(requestType, responseType);
+
+                services.TryAdd(new ServiceDescriptor(typeof(THandler), typeof(THandler), lifetime));
+                services.Add(new ServiceDescriptor(wrapperType,
+                    sp =>
+                    {
+                        return sp.GetService<IServiceFactory>()?.Create(wrapperType, sp.GetRequiredService<THandler>(), sp.GetServices(typeof(IPipelineBehavior<,>).MakeGenericType(requestType, responseType)))!;
+                    },
+                    lifetime
+                ));
+            }
+        }
+
+        if (typeof(THandler).GetInterface(typeof(IQueryHandler<,>).Name) is { } queryContract)
+        {
+            if (queryContract.GetGenericArguments() is { Length: 2 } arguments)
+            {
+                Type requestType = arguments[0];
+                Type responseType = arguments[1];
+
+                Type wrapperType = typeof(QueryClassHandlerWrapper<,>).MakeGenericType(requestType, responseType);
+
+                services.TryAdd(new ServiceDescriptor(typeof(THandler), typeof(THandler), lifetime));
+                services.Add(new ServiceDescriptor(wrapperType,
+                    sp =>
+                    {
+                        return sp.GetService<IServiceFactory>()?.Create(wrapperType, sp.GetRequiredService<THandler>(), sp.GetServices(typeof(IPipelineBehavior<,>).MakeGenericType(requestType, responseType)))!;
+                    },
+                    lifetime
+                ));
+            }
+        }
+        return services;
+    }
+
+    public static IServiceCollection AddWritableConfiguration<TConfiguration>(this IServiceCollection serviceCollection, IConfiguration configuration) where TConfiguration : class, new()
+    {
+        serviceCollection.Configure<TConfiguration>(configuration);
+        serviceCollection.AddTransient<IConfigurationWriter<TConfiguration>, ConfigurationWriter<TConfiguration>>();
+        serviceCollection.AddTransient(provider => provider.GetService<IOptionsMonitor<TConfiguration>>()!.CurrentValue);
+        serviceCollection.AddHandler<WriteHandler<TConfiguration>>();
+        serviceCollection.AddTransient<ConfigurationInitializer<TConfiguration>>();
 
         return serviceCollection;
     }
