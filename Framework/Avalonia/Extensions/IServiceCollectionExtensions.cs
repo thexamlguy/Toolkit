@@ -1,6 +1,4 @@
-﻿using Avalonia.Controls;
-using FluentAvalonia.UI.Controls;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Toolkit.Framework.Foundation;
 
@@ -12,9 +10,11 @@ public static class IServiceCollectionExtensions
     {
         serviceCollection.TryAddSingleton<INavigationRouteDescriptorCollection, NavigationRouteDescriptorCollection>();
 
-        serviceCollection.TryAddTransient<Navigation<Frame>, FrameNavigation>();
-        serviceCollection.TryAddTransient<Navigation<ContentDialog>, ContentDialogNavigation>();
-        serviceCollection.TryAddTransient<Navigation<ContentControl>, ContentControlNavigation>();
+        serviceCollection.AddHandler<NavigationRouteHandler>();
+        serviceCollection.AddHandler<NavigateHandler>();
+        serviceCollection.AddHandler<FrameNavigationHandler>();
+        serviceCollection.AddHandler<ContentDialogNavigationHandler>();
+        serviceCollection.AddHandler<ContentControlNavigationHandler>();
 
         return serviceCollection;
     }

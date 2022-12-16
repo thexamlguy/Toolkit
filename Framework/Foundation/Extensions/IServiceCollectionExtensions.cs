@@ -1,19 +1,42 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Mediator;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Toolkit.Framework.Foundation;
 
 public static class IServiceCollectionExtensions
 {
-    public static IServiceCollection AddHandler<TRequestHandler>(this IServiceCollection serviceCollection)
+    public static IServiceCollection AddHandler<TRequestHandler>(this IServiceCollection services) where TRequestHandler : notnull
     {
-        serviceCollection.TryAdd(new ServiceDescriptor(typeof(TRequestHandler), typeof(TRequestHandler), ServiceLifetime.Transient));
-        return serviceCollection;
+        if (typeof(TRequestHandler).GetInterface(typeof(IRequestHandler<,>).Name) is { } contract)
+        {
+            if (contract.GetGenericArguments() is { Length: 2 } arguments)
+            {
+                Type requestType = arguments[0];
+                Type responseType = arguments[1];
+                Type wrapperType = typeof(RequestClassHandlerWrapper<,>).MakeGenericType(requestType, responseType);
+
+                services.TryAdd(new ServiceDescriptor(typeof(TRequestHandler), typeof(TRequestHandler), ServiceLifetime.Transient));
+                services.Add(new ServiceDescriptor(wrapperType,
+                    sp =>
+                    {
+                        return sp.GetService<IServiceFactory>()?.Create(wrapperType, sp.GetRequiredService<TRequestHandler>(), sp.GetServices(typeof(IPipelineBehavior<,>).MakeGenericType(requestType, responseType)))!;
+                    },
+                    ServiceLifetime.Transient
+                ));
+
+            }
+        }
+
+        return services;
     }
 
     public static IServiceCollection AddFoundation(this IServiceCollection serviceCollection)
     {
-        serviceCollection.AddSingleton<IServiceFactory>(provider => new ServiceFactory(provider.GetService, (instanceType, parameters) => ActivatorUtilities.CreateInstance(provider, instanceType, parameters!)))
+        serviceCollection
+            .AddSingleton<IMediator, Mediator>()
+            .AddHandler<InitializeHandler>()
+            .AddSingleton<IServiceFactory>(provider => new ServiceFactory(provider.GetService, (instanceType, parameters) => ActivatorUtilities.CreateInstance(provider, instanceType, parameters!)))
             .AddSingleton<IInitialization, Initialization>(provider => new Initialization(() =>
             {
                 return serviceCollection.Where(x => x.ServiceType.GetInterfaces()

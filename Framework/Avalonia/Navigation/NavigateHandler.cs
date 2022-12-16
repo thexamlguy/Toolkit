@@ -1,6 +1,7 @@
 ﻿using Avalonia.Controls;
 using FluentAvalonia.UI.Controls;
 using Mediator;
+using System.Diagnostics;
 using Toolkit.Framework.Foundation;
 
 namespace Toolkit.Framework.Avalonia;

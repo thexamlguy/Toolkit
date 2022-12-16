@@ -2,6 +2,7 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using Avalonia.LogicalTree;
+using Avalonia.Metadata;
 
 namespace Toolkit.Controls.Avalonia;
 
@@ -10,13 +11,14 @@ public class ContentIcon : FluentAvalonia.UI.Controls.FAIconElement
     public static readonly StyledProperty<IDataTemplate> IconTemplateProperty =
         AvaloniaProperty.Register<ContentIcon, IDataTemplate>("IconTemplate");
 
-    public static readonly StyledProperty<object> IconProperty = 
-        AvaloniaProperty.Register<ContentIcon, object>("Icon");
+    public static readonly StyledProperty<object> ContentProperty = 
+        AvaloniaProperty.Register<ContentIcon, object>("Content");
 
-    public object Icon
+    [Content]
+    public object Content
     {
-        get => GetValue(IconProperty);
-        set => SetValue(IconProperty, value);
+        get => GetValue(ContentProperty);
+        set => SetValue(ContentProperty, value);
     }
 
     private ContentControl? content;
@@ -64,7 +66,7 @@ public class ContentIcon : FluentAvalonia.UI.Controls.FAIconElement
     {
         content = new ContentControl();
 
-        content.Bind(ContentControl.ContentProperty, this.GetBindingObservable(IconProperty));
+        content.Bind(ContentControl.ContentProperty, this.GetBindingObservable(ContentProperty));
         content.Bind(ContentControl.ContentTemplateProperty, this.GetBindingObservable(IconTemplateProperty));
 
         LogicalChildren.Add(content);
