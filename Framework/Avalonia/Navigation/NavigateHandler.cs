@@ -1,7 +1,6 @@
 ﻿using Avalonia.Controls;
 using FluentAvalonia.UI.Controls;
 using Mediator;
-using System.Diagnostics;
 using Toolkit.Framework.Foundation;
 
 namespace Toolkit.Framework.Avalonia;
@@ -91,14 +90,6 @@ public class NavigateHandler : IRequestHandler<Navigate>
             if (target is ContentControl contentControl)
             {
                 hasNavigated = await mediator.Send(new ContentControlNavigation(contentControl, content, template, keyedParameters));
-            }
-
-            if (hasNavigated)
-            {
-                if (content is INavigated navigated)
-                {
-                    await navigated.Navigated();
-                }
             }
         }
         else

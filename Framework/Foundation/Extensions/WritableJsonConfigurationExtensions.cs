@@ -1,11 +1,12 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Hosting;
 
 namespace Toolkit.Framework.Foundation;
 
 public static class WritableJsonConfigurationExtensions
 {
-    public static IConfigurationBuilder AddWritableJsonFile(this IConfigurationBuilder builder,
+    public static IConfigurationBuilder AddWritableJsonFile(this IConfigurationBuilder builder, 
         string path)
     {
         return builder.AddWritableJsonFile(null, path, false, false, null);
@@ -38,7 +39,7 @@ public static class WritableJsonConfigurationExtensions
         bool optional,
         bool reloadOnChange)
     {
-        return builder.AddWritableJsonFile(null, path, optional, reloadOnChange, null);
+        return builder.AddWritableJsonFile( null, path, optional, reloadOnChange, null);
     }
 
     public static IConfigurationBuilder AddWritableJsonFile(this IConfigurationBuilder builder,

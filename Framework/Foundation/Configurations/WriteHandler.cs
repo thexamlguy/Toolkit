@@ -20,7 +20,7 @@ public class WriteHandler<TConfiguration> : IRequestHandler<Write<TConfiguration
     public async ValueTask<Unit> Handle(Write<TConfiguration> request, CancellationToken cancellationToken)
     {
         request.UpdateDelegate.Invoke(configuration);
-        writer.Write(request.Section, configuration);
+        writer.Write(configuration);
 
         await mediator.Send(new ConfigurationChanged<TConfiguration>(configuration), cancellationToken);
 

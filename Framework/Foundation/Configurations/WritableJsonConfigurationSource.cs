@@ -20,7 +20,7 @@ public class WritableJsonConfigurationSource : JsonConfigurationSource
 
         if (FileProvider is PhysicalFileProvider physicalFileProvider)
         {
-            string? outputFile = System.IO.Path.Combine(physicalFileProvider.Root, Path);
+            string? outputFile = System.IO.Path.Combine(physicalFileProvider.Root, Path!);
             Factory?.Build(outputFile);
         }
     }

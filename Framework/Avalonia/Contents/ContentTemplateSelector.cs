@@ -15,16 +15,20 @@ public class ContentTemplateSelector : IDataTemplate, IContentTemplateSelector
         this.templateFactory = templateFactory;
     }
 
-    public IControl? Build(object? item)
+    public IControl? Build(object? content)
     {
-        if (item is not null)
+        if (content is not null)
         {
-            if (dataTracking.TryGetValue(item, out IControl? control))
+            if (dataTracking.TryGetValue(content, out IControl? control))
             {
                 return control;
             }
+            else
+            {
+                control = (IControl?)templateFactory.Create(content);
+            }
 
-            return (IControl?)templateFactory.Create(item);
+            return control;
         }
 
         return null;

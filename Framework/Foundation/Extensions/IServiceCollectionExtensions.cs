@@ -105,11 +105,11 @@ public static class IServiceCollectionExtensions
     public static IServiceCollection AddWritableConfiguration<TConfiguration>(this IServiceCollection serviceCollection, IConfiguration configuration) where TConfiguration : class, new()
     {
         serviceCollection.Configure<TConfiguration>(configuration);
-        serviceCollection.AddTransient<IConfigurationWriter<TConfiguration>, ConfigurationWriter<TConfiguration>>();
+        serviceCollection.AddTransient<IConfigurationWriter<TConfiguration>>(provider => provider.GetService<IServiceFactory>()?.Create< ConfigurationWriter<TConfiguration>>(configuration is IConfigurationSection section ? section.Path : "")!);
         serviceCollection.AddTransient(provider => provider.GetService<IOptionsMonitor<TConfiguration>>()!.CurrentValue);
         serviceCollection.AddHandler<WriteHandler<TConfiguration>>();
         serviceCollection.AddTransient<ConfigurationInitializer<TConfiguration>>();
-
+        
         return serviceCollection;
     }
 }

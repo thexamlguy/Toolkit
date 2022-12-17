@@ -9,6 +9,7 @@ public class WritableJsonConfigurationProvider : JsonConfigurationProvider, IWri
 {
     public WritableJsonConfigurationProvider(JsonConfigurationSource source) : base(source)
     {
+
     }
 
     public void Write<TValue>(string section, TValue value) where TValue : class, new()
