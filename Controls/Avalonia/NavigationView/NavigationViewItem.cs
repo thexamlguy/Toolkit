@@ -9,7 +9,7 @@ public class NavigationViewItem : FluentAvalonia.UI.Controls.NavigationViewItem,
 {
     private NavigationView? navigationView;
 
-    public event EventHandler<NavigationViewItemInvokedEventArgs> Invoked;
+    public event EventHandler<NavigationViewItemInvokedEventArgs>? Invoked;
 
     Type IStyleable.StyleKey => typeof(FluentAvalonia.UI.Controls.NavigationViewItem);
 
