@@ -1,5 +1,4 @@
 ﻿using Avalonia;
-using Mediator;
 using Toolkit.Framework.Foundation;
 
 namespace Toolkit.Framework.Avalonia;

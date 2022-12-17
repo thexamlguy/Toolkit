@@ -2,7 +2,6 @@
 using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Markup.Xaml;
-using Mediator;
 using Toolkit.Framework.Foundation;
 
 namespace Toolkit.Framework.Avalonia;

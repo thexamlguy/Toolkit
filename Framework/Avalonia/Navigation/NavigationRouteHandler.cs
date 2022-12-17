@@ -1,6 +1,5 @@
 ﻿using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
-using Mediator;
 using Toolkit.Framework.Foundation;
 
 namespace Toolkit.Framework.Avalonia;

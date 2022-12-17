@@ -14,7 +14,7 @@ public class TypedContentFactory : ITypedContentFactory
         this.serviceFactory = serviceFactory;
     }
 
-    public virtual object? Create(Type type, params object[] parameters)
+    public object? Create(Type type, params object?[] parameters)
     {
         if (cache.TryGetValue(type, out object? data))
         {

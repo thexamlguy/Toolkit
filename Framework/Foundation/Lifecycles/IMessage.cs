@@ -1,3 +1,3 @@
 ﻿namespace Toolkit.Framework.Foundation;
 
-public record class Initialized : IRequest;
+public interface IMessage { }

@@ -1,6 +1,4 @@
-﻿using Mediator;
-
-namespace Toolkit.Framework.Foundation;
+﻿namespace Toolkit.Framework.Foundation;
 
 public class QueryClassHandlerWrapper<TRequest, TResponse> where TRequest : class, IQuery<TResponse>
 {

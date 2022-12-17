@@ -1,6 +1,4 @@
-﻿using Mediator;
-
-namespace Toolkit.Framework.Foundation;
+﻿namespace Toolkit.Framework.Foundation;
 
 public class ServiceFactoryHandler : IRequestHandler<Create, object?>
 {

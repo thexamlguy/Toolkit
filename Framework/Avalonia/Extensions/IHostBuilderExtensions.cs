@@ -7,7 +7,7 @@ namespace Toolkit.Framework.Avalonia;
 
 public static class IHostBuilderExtensions
 {
-    public static IHostBuilder ConfigureTemplates(this IHostBuilder hostBuilder, Action<IContentTemplateBuilder> builderDelegate)
+    public static IHostBuilder ConfigureContents(this IHostBuilder hostBuilder, Action<IContentTemplateBuilder> builderDelegate)
     {
         hostBuilder.ConfigureServices((hostBuilderContext, serviceCollection) =>
         {

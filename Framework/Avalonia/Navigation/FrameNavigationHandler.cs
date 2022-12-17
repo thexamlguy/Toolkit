@@ -1,6 +1,6 @@
 ﻿using Avalonia.Controls.Primitives;
 using FluentAvalonia.UI.Navigation;
-using Mediator;
+using Toolkit.Framework.Foundation;
 
 namespace Toolkit.Framework.Avalonia;
 

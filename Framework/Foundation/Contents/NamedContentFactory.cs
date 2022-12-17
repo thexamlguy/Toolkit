@@ -14,7 +14,7 @@ public class NamedContentFactory : INamedContentFactory
         this.serviceFactory = serviceFactory;
     }
 
-    public virtual object? Create(string name, params object[] parameters)
+    public virtual object? Create(string name, params object?[] parameters)
     {
         if (cache.TryGetValue(name, out object? data))
         {

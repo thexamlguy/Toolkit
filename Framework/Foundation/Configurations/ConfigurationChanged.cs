@@ -1,3 +1,3 @@
 ﻿namespace Toolkit.Framework.Foundation;
 
-public record ConfigurationChanged<TConfiguration>(TConfiguration Configuration) where TConfiguration : class;
+public record ConfigurationChanged<TConfiguration>(TConfiguration Configuration) : INotification where TConfiguration : class;

@@ -1,6 +1,4 @@
-﻿using Mediator;
-
-namespace Toolkit.Framework.Foundation;
+﻿namespace Toolkit.Framework.Foundation;
 
 public class CommandClassHandlerWrapper<TRequest, TResponse> where TRequest : class, ICommand<TResponse>
 {

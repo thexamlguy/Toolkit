@@ -3,7 +3,6 @@ using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using Mediator;
 using System.Diagnostics;
 using Toolkit.Framework.Foundation;
 

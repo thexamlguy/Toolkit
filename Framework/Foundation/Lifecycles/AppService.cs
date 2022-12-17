@@ -1,5 +1,4 @@
-﻿using Mediator;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Hosting;
 
 namespace Toolkit.Framework.Foundation;
 
