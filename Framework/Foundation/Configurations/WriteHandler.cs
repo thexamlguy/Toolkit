@@ -1,4 +1,6 @@
-﻿namespace Toolkit.Framework.Foundation;
+﻿using System.Diagnostics;
+
+namespace Toolkit.Framework.Foundation;
 
 public class WriteHandler<TConfiguration> : IRequestHandler<Write<TConfiguration>> where TConfiguration : class
 {
@@ -20,7 +22,7 @@ public class WriteHandler<TConfiguration> : IRequestHandler<Write<TConfiguration
         request.UpdateDelegate.Invoke(configuration);
         writer.Write(configuration);
 
-        await mediator.Send(new ConfigurationChanged<TConfiguration>(configuration), cancellationToken);
+        await mediator.Publish(new ConfigurationChanged<TConfiguration>(configuration), cancellationToken);
 
         return default;
     }

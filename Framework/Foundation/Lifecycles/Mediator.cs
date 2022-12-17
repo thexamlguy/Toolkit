@@ -1,17 +1,35 @@
-﻿namespace Toolkit.Framework.Foundation;
+﻿using Microsoft.Extensions.DependencyInjection;
+
+namespace Toolkit.Framework.Foundation;
 
 public class Mediator : IMediator
 {
-    private readonly IServiceFactory factory;
+    private readonly IServiceProvider factory;
 
-    public Mediator(IServiceFactory factory)
+    public Mediator(IServiceProvider factory)
     {
         this.factory = factory;
     }
 
+    public ValueTask Publish<TNotification>(TNotification notification, CancellationToken cancellationToken = default) where TNotification : INotification
+    {
+        List<INotificationHandler<TNotification>> handlers = factory.GetServices<INotificationHandler<TNotification>>().ToList();
+
+        if (handlers.Count == 0)
+        {
+            return default;
+        }
+        else if (handlers.Count == 1)
+        {
+            return handlers[0].Handle(notification, cancellationToken);
+        }
+
+        return default;
+    }
+
     public ValueTask<TResponse> Send<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default)
     {
-        dynamic? handler = factory.Create(typeof(RequestClassHandlerWrapper<,>).MakeGenericType(request.GetType(), typeof(TResponse)));  
+        dynamic? handler = factory.GetService(typeof(RequestClassHandlerWrapper<,>).MakeGenericType(request.GetType(), typeof(TResponse)));  
         if (handler is not null)
         {
             return handler.Handle((dynamic)request, cancellationToken);
@@ -22,7 +40,7 @@ public class Mediator : IMediator
 
     public ValueTask<TResponse> Send<TResponse>(ICommand<TResponse> command, CancellationToken cancellationToken = default)
     {
-        dynamic? handler = factory.Create(typeof(CommandClassHandlerWrapper<,>).MakeGenericType(command.GetType(), typeof(TResponse)));
+        dynamic? handler = factory.GetService(typeof(CommandClassHandlerWrapper<,>).MakeGenericType(command.GetType(), typeof(TResponse)));
         if (handler is not null)
         {
             return handler.Handle((dynamic)command, cancellationToken);
@@ -33,7 +51,7 @@ public class Mediator : IMediator
 
     public ValueTask<TResponse> Send<TResponse>(IQuery<TResponse> query, CancellationToken cancellationToken = default)
     {
-        dynamic? handler = factory.Create(typeof(QueryClassHandlerWrapper<,>).MakeGenericType(query.GetType(), typeof(TResponse)));
+        dynamic? handler = factory.GetService(typeof(QueryClassHandlerWrapper<,>).MakeGenericType(query.GetType(), typeof(TResponse)));
         if (handler is not null)
         {
             return handler.Handle((dynamic)query, cancellationToken);
@@ -50,7 +68,7 @@ public class Mediator : IMediator
             {
                 Type responseType = arguments[0];
 
-                dynamic? handler = factory.Create(typeof(RequestClassHandlerWrapper<,>).MakeGenericType(message.GetType(), responseType));
+                dynamic? handler = factory.GetService(typeof(RequestClassHandlerWrapper<,>).MakeGenericType(message.GetType(), responseType));
                 if (handler is not null)
                 {
                     return handler.Handle((dynamic)message, cancellationToken);
@@ -64,7 +82,7 @@ public class Mediator : IMediator
             {
                 Type responseType = arguments[0];
 
-                dynamic? handler = factory.Create(typeof(CommandClassHandlerWrapper<,>).MakeGenericType(message.GetType(), responseType));
+                dynamic? handler = factory.GetService(typeof(CommandClassHandlerWrapper<,>).MakeGenericType(message.GetType(), responseType));
                 if (handler is not null)
                 {
                     return handler.Handle((dynamic)message, cancellationToken);
@@ -78,7 +96,7 @@ public class Mediator : IMediator
             {
                 Type responseType = arguments[0];
 
-                dynamic? handler = factory.Create(typeof(QueryClassHandlerWrapper<,>).MakeGenericType(message.GetType(), responseType));
+                dynamic? handler = factory.GetService(typeof(QueryClassHandlerWrapper<,>).MakeGenericType(message.GetType(), responseType));
                 if (handler is not null)
                 {
                     return handler.Handle((dynamic)message, cancellationToken);

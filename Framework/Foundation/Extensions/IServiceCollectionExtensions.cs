@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
+using System.Diagnostics;
 
 namespace Toolkit.Framework.Foundation;
 
@@ -38,6 +39,17 @@ public static class IServiceCollectionExtensions
 
     public static IServiceCollection AddHandler<THandler>(this IServiceCollection services, ServiceLifetime lifetime = ServiceLifetime.Transient) where THandler : notnull
     {
+        if (typeof(THandler).GetInterface(typeof(INotificationHandler<>).Name) is { } notificationContract)
+        {
+            if (notificationContract.GetGenericArguments() is { Length: 1 } arguments)
+            {
+                Type notificationType = arguments[0];
+
+                services.TryAdd(new ServiceDescriptor(typeof(THandler), typeof(THandler), ServiceLifetime.Singleton));
+                services.Add(new ServiceDescriptor(typeof(INotificationHandler<>).MakeGenericType(notificationType), sp => sp.GetRequiredService<THandler>(), ServiceLifetime.Singleton));
+            }
+        }
+  
         if (typeof(THandler).GetInterface(typeof(IRequestHandler<,>).Name) is { } requestContract)
         {
             if (requestContract.GetGenericArguments() is { Length: 2 } arguments)
