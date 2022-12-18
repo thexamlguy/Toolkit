@@ -22,7 +22,7 @@ public static class IServiceCollectionExtensions
         serviceCollection
             .AddSingleton<IMediator, Mediator>()
             .AddHandler<InitializeHandler>()
-            .AddSingleton<IServiceFactory>(provider => new ServiceFactory(provider.GetService, (instanceType, parameters) => ActivatorUtilities.CreateInstance(provider, instanceType, parameters!)))
+            .AddSingleton<IServiceFactory>(provider => new ServiceFactory(provider.GetService, (type, parameters) => ActivatorUtilities.CreateInstance(provider, type, parameters!)))
             .AddHandler<ServiceFactoryHandler>()
             .AddSingleton<IInitialization, Initialization>(provider => new Initialization(() =>
             {
@@ -37,7 +37,7 @@ public static class IServiceCollectionExtensions
         return serviceCollection;
     }
 
-    public static IServiceCollection AddHandler<THandler>(this IServiceCollection services, ServiceLifetime lifetime = ServiceLifetime.Transient) where THandler : notnull
+    public static IServiceCollection AddHandler<THandler>(this IServiceCollection serviceCollection, ServiceLifetime lifetime = ServiceLifetime.Transient) where THandler : notnull
     {
         if (typeof(THandler).GetInterface(typeof(INotificationHandler<>).Name) is { } notificationContract)
         {
@@ -45,8 +45,9 @@ public static class IServiceCollectionExtensions
             {
                 Type notificationType = arguments[0];
 
-                services.TryAdd(new ServiceDescriptor(typeof(THandler), typeof(THandler), ServiceLifetime.Singleton));
-                services.Add(new ServiceDescriptor(typeof(INotificationHandler<>).MakeGenericType(notificationType), sp => sp.GetRequiredService<THandler>(), ServiceLifetime.Singleton));
+                serviceCollection.TryAdd(new ServiceDescriptor(typeof(THandler), typeof(THandler), ServiceLifetime.Singleton));
+
+                serviceCollection.Add(new ServiceDescriptor(typeof(INotificationHandler<>).MakeGenericType(notificationType), sp => sp.GetRequiredService<THandler>(), lifetime));
             }
         }
   
@@ -59,8 +60,8 @@ public static class IServiceCollectionExtensions
 
                 Type wrapperType = typeof(RequestClassHandlerWrapper<,>).MakeGenericType(requestType, responseType);
 
-                services.TryAdd(new ServiceDescriptor(typeof(THandler), typeof(THandler), lifetime));
-                services.Add(new ServiceDescriptor(wrapperType,
+                serviceCollection.TryAdd(new ServiceDescriptor(typeof(THandler), typeof(THandler), lifetime));
+                serviceCollection.Add(new ServiceDescriptor(wrapperType,
                     sp =>
                     {
                         return sp.GetService<IServiceFactory>()?.Create(wrapperType, sp.GetRequiredService<THandler>(), sp.GetServices(typeof(IPipelineBehavior<,>).MakeGenericType(requestType, responseType)))!;
@@ -80,8 +81,8 @@ public static class IServiceCollectionExtensions
 
                 Type wrapperType = typeof(CommandClassHandlerWrapper<,>).MakeGenericType(requestType, responseType);
 
-                services.TryAdd(new ServiceDescriptor(typeof(THandler), typeof(THandler), lifetime));
-                services.Add(new ServiceDescriptor(wrapperType,
+                serviceCollection.TryAdd(new ServiceDescriptor(typeof(THandler), typeof(THandler), lifetime));
+                serviceCollection.Add(new ServiceDescriptor(wrapperType,
                     sp =>
                     {
                         return sp.GetService<IServiceFactory>()?.Create(wrapperType, sp.GetRequiredService<THandler>(), sp.GetServices(typeof(IPipelineBehavior<,>).MakeGenericType(requestType, responseType)))!;
@@ -100,8 +101,8 @@ public static class IServiceCollectionExtensions
 
                 Type wrapperType = typeof(QueryClassHandlerWrapper<,>).MakeGenericType(requestType, responseType);
 
-                services.TryAdd(new ServiceDescriptor(typeof(THandler), typeof(THandler), lifetime));
-                services.Add(new ServiceDescriptor(wrapperType,
+                serviceCollection.TryAdd(new ServiceDescriptor(typeof(THandler), typeof(THandler), lifetime));
+                serviceCollection.Add(new ServiceDescriptor(wrapperType,
                     sp =>
                     {
                         return sp.GetService<IServiceFactory>()?.Create(wrapperType, sp.GetRequiredService<THandler>(), sp.GetServices(typeof(IPipelineBehavior<,>).MakeGenericType(requestType, responseType)))!;
@@ -110,7 +111,7 @@ public static class IServiceCollectionExtensions
                 ));
             }
         }
-        return services;
+        return serviceCollection;
     }
 
     public static IServiceCollection AddWritableConfiguration<TConfiguration>(this IServiceCollection serviceCollection, IConfiguration configuration) where TConfiguration : class, new()

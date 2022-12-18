@@ -11,4 +11,6 @@ public interface IMediator
     ValueTask<TResponse> Send<TResponse>(IQuery<TResponse> query, CancellationToken cancellationToken = default);
 
     ValueTask<object?> Send(object message, CancellationToken cancellationToken = default);
+
+    void Subscribe(object subscriber);
 }

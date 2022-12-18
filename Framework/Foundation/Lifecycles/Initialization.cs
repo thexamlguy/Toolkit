@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-namespace Toolkit.Framework.Foundation;
+﻿namespace Toolkit.Framework.Foundation;
 
 public class Initialization : IInitialization
 {
@@ -17,9 +15,7 @@ public class Initialization : IInitialization
         {
             if (initializer is not null)
             {
-                Trace.WriteLine(initializer.GetType());
                 await initializer.InitializeAsync();
-                Trace.WriteLine("Done");
             }
         }
     }

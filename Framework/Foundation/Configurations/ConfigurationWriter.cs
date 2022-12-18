@@ -1,6 +1,4 @@
 ﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
-using System.Diagnostics;
 
 namespace Toolkit.Framework.Foundation;
 
@@ -11,7 +9,6 @@ public class ConfigurationWriter<TConfiguration> : IConfigurationWriter<TConfigu
 
     public ConfigurationWriter(IConfiguration rootConfiguration, string section)
     {
-        Trace.WriteLine(section);
         this.rootConfiguration = rootConfiguration;
         this.section = section;
     }

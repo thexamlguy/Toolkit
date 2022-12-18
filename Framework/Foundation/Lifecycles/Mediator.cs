@@ -1,10 +1,12 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using System.Collections.Concurrent;
 
 namespace Toolkit.Framework.Foundation;
 
 public class Mediator : IMediator
 {
     private readonly IServiceProvider factory;
+    private readonly ConcurrentDictionary<Type, HashSet<dynamic>> subscriptions = new();
 
     public Mediator(IServiceProvider factory)
     {
@@ -14,6 +16,11 @@ public class Mediator : IMediator
     public ValueTask Publish<TNotification>(TNotification notification, CancellationToken cancellationToken = default) where TNotification : INotification
     {
         List<INotificationHandler<TNotification>> handlers = factory.GetServices<INotificationHandler<TNotification>>().ToList();
+
+        foreach (dynamic handler in subscriptions[typeof(TNotification)])
+        {
+            handlers.Add(handler);
+        }
 
         if (handlers.Count == 0)
         {
@@ -29,7 +36,7 @@ public class Mediator : IMediator
 
     public ValueTask<TResponse> Send<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default)
     {
-        dynamic? handler = factory.GetService(typeof(RequestClassHandlerWrapper<,>).MakeGenericType(request.GetType(), typeof(TResponse)));  
+        dynamic? handler = factory.GetService(typeof(RequestClassHandlerWrapper<,>).MakeGenericType(request.GetType(), typeof(TResponse)));
         if (handler is not null)
         {
             return handler.Handle((dynamic)request, cancellationToken);
@@ -62,9 +69,9 @@ public class Mediator : IMediator
 
     public ValueTask<object?> Send(object message, CancellationToken cancellationToken = default)
     {
-        if (message.GetType().GetInterface(typeof(IRequest<>).Name) is { } requestInterface)
+        if (message.GetType().GetInterface(typeof(IRequest<>).Name) is { } requestType)
         {
-            if (requestInterface.GetGenericArguments() is { Length: 1 } arguments)
+            if (requestType.GetGenericArguments() is { Length: 1 } arguments)
             {
                 Type responseType = arguments[0];
 
@@ -76,9 +83,9 @@ public class Mediator : IMediator
             }
         }
 
-        if (message.GetType().GetInterface(typeof(ICommand<>).Name) is { } commandInterface)
+        if (message.GetType().GetInterface(typeof(ICommand<>).Name) is { } commandType)
         {
-            if (commandInterface.GetGenericArguments() is { Length: 1 } arguments)
+            if (commandType.GetGenericArguments() is { Length: 1 } arguments)
             {
                 Type responseType = arguments[0];
 
@@ -90,9 +97,9 @@ public class Mediator : IMediator
             }
         }
 
-        if (message.GetType().GetInterface(typeof(IQuery<>).Name) is { } queryInterface)
+        if (message.GetType().GetInterface(typeof(IQuery<>).Name) is { } queryType)
         {
-            if (queryInterface.GetGenericArguments() is { Length: 1 } arguments)
+            if (queryType.GetGenericArguments() is { Length: 1 } arguments)
             {
                 Type responseType = arguments[0];
 
@@ -105,5 +112,26 @@ public class Mediator : IMediator
         }
 
         return default;
+    }
+
+    public void Subscribe(object subscriber)
+    {
+        Type[] interfaceTypes = subscriber.GetType().GetInterfaces();
+        foreach (Type interfaceType in interfaceTypes.Where(x => x.IsGenericType))
+        {
+            if (interfaceType.GetGenericTypeDefinition() == typeof(INotificationHandler<>))
+            {
+                if (interfaceType.GetGenericArguments() is { Length: 1 } arguments)
+                {
+                    Type notificationType = arguments[0];
+
+                    subscriptions.AddOrUpdate(notificationType, new HashSet<dynamic> { subscriber }, (type, hashSet) =>
+                    {
+                        hashSet.Add(subscriber);
+                        return hashSet;
+                    });
+                }
+            }
+        }
     }
 }
