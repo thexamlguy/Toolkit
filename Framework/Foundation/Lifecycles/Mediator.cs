@@ -1,12 +1,13 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using System.Collections.Concurrent;
+using System.Runtime.CompilerServices;
 
 namespace Toolkit.Framework.Foundation;
 
 public class Mediator : IMediator
 {
     private readonly IServiceProvider factory;
-    private readonly ConcurrentDictionary<Type, HashSet<dynamic>> subscriptions = new();
+
+    private readonly ConditionalWeakTable<Type, dynamic> handlers = new();
 
     public Mediator(IServiceProvider factory)
     {
@@ -16,10 +17,13 @@ public class Mediator : IMediator
     public ValueTask Publish<TNotification>(TNotification notification, CancellationToken cancellationToken = default) where TNotification : INotification
     {
         List<INotificationHandler<TNotification>> handlers = factory.GetServices<INotificationHandler<TNotification>>().ToList();
-
-        foreach (dynamic handler in subscriptions[typeof(TNotification)])
+   
+        foreach (KeyValuePair<Type, dynamic> handler in this.handlers)
         {
-            handlers.Add(handler);
+            if (handler.Key == typeof(TNotification))
+            {
+                handlers.Add(handler.Value);
+            }
         }
 
         if (handlers.Count == 0)
@@ -114,9 +118,9 @@ public class Mediator : IMediator
         return default;
     }
 
-    public void Subscribe(object subscriber)
+    public void Subscribe(object subject)
     {
-        Type[] interfaceTypes = subscriber.GetType().GetInterfaces();
+        Type[] interfaceTypes = subject.GetType().GetInterfaces();
         foreach (Type interfaceType in interfaceTypes.Where(x => x.IsGenericType))
         {
             if (interfaceType.GetGenericTypeDefinition() == typeof(INotificationHandler<>))
@@ -124,12 +128,7 @@ public class Mediator : IMediator
                 if (interfaceType.GetGenericArguments() is { Length: 1 } arguments)
                 {
                     Type notificationType = arguments[0];
-
-                    subscriptions.AddOrUpdate(notificationType, new HashSet<dynamic> { subscriber }, (type, hashSet) =>
-                    {
-                        hashSet.Add(subscriber);
-                        return hashSet;
-                    });
+                    handlers.Add(notificationType, subject);
                 }
             }
         }
