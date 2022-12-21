@@ -463,12 +463,12 @@ public class NavigateExtension : TriggerExtension
                                 name = string.Format(format, name);
                             }
 
-                            mediator.Send(new Navigate(name, parameters.ToArray()) { Route = route }).ConfigureAwait(false);
+                            mediator.Send(new Navigate(name, parameters.ToArray()) { Route = route });
                         }
 
                         if (to is Type type)
                         {
-                            mediator.Send(new Navigate(type, parameters.ToArray()) { Route = route }).ConfigureAwait(false);
+                            mediator.Send(new Navigate(type, parameters.ToArray()) { Route = route });
                         }
                     }
                 }
