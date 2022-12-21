@@ -8,7 +8,7 @@ public class RequestClassHandlerWrapper<TRequest, TResponse> where TRequest : cl
         IEnumerable<IPipelineBehavior<TRequest, TResponse>> pipelineBehaviours)
     {
         MessageHandlerDelegate<TRequest, TResponse> handler = concreteHandler.Handle;
-        foreach (var pipeline in pipelineBehaviours.Reverse())
+        foreach (IPipelineBehavior<TRequest, TResponse>? pipeline in pipelineBehaviours.Reverse())
         {
             MessageHandlerDelegate<TRequest, TResponse> handlerCopy = handler;
             IPipelineBehavior<TRequest, TResponse> pipelineCopy = pipeline;

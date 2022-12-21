@@ -4,9 +4,9 @@ using Toolkit.Framework.Foundation;
 
 namespace Toolkit.Framework.Avalonia;
 
-public class FrameNavigationHandler : IRequestHandler<FrameNavigation, bool>
+public class FrameNavigationHandler : IRequestHandler<FrameNavigation>
 {
-    public async ValueTask<bool> Handle(FrameNavigation request, CancellationToken cancellationToken)
+    public ValueTask<Unit> Handle(FrameNavigation request, CancellationToken cancellationToken)
     {
         request.Route.NavigationPageFactory = new NavigationPageFactory();
 
@@ -27,6 +27,6 @@ public class FrameNavigationHandler : IRequestHandler<FrameNavigation, bool>
             request.Route.NavigateFromObject(content);
         }
 
-        return await completionSource.Task;
+        return default;
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Avalonia.Controls;
-using FluentAvalonia.UI.Controls;
+using System.Diagnostics;
+using Toolkit.Controls.Avalonia;
 using Toolkit.Framework.Foundation;
 
 namespace Toolkit.Framework.Avalonia;
@@ -28,7 +29,7 @@ public class NavigateHandler : IRequestHandler<Navigate>
         this.descriptors = descriptors;
     }
 
-    public async ValueTask<Unit> Handle(Navigate request, CancellationToken cancellationToken)
+    public ValueTask<Unit> Handle(Navigate request, CancellationToken cancellationToken)
     {
         object? content = null;
         object? template = null;
@@ -75,20 +76,17 @@ public class NavigateHandler : IRequestHandler<Navigate>
                 target = template;
             }
 
-            bool hasNavigated = false;
             if (target is Frame frame)
             {
-                hasNavigated = await mediator.Send(new FrameNavigation(frame, content, template, keyedParameters));
+                mediator.Send(new FrameNavigation(frame, content, template, keyedParameters));
             }
-
-            if (target is ContentDialog dialog)
+            else if (target is ContentDialog dialog)
             {
-                hasNavigated = await mediator.Send(new ContentDialogNavigation(dialog, content, template, keyedParameters));
+                mediator.Send(new ContentDialogNavigation(dialog, content, template, keyedParameters));
             }
-
-            if (target is ContentControl contentControl)
+            else if (target is ContentControl contentControl)
             {
-                hasNavigated = await mediator.Send(new ContentControlNavigation(contentControl, content, template, keyedParameters));
+                mediator.Send(new ContentControlNavigation(contentControl, content, template, keyedParameters));
             }
         }
         else

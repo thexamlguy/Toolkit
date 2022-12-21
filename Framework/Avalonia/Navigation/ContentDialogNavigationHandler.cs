@@ -1,11 +1,12 @@
 ﻿using FluentAvalonia.UI.Controls;
+using System.Diagnostics;
 using Toolkit.Framework.Foundation;
 
 namespace Toolkit.Framework.Avalonia;
 
-public class ContentDialogNavigationHandler : IRequestHandler<ContentDialogNavigation, bool>
+public class ContentDialogNavigationHandler : IRequestHandler<ContentDialogNavigation>
 {
-    public async ValueTask<bool> Handle(ContentDialogNavigation request, CancellationToken cancellationToken)
+    public ValueTask<Unit> Handle(ContentDialogNavigation request, CancellationToken cancellationToken)
     {
         if (request.Template is ContentDialog contentDialog)
         {
@@ -35,9 +36,10 @@ public class ContentDialogNavigationHandler : IRequestHandler<ContentDialogNavig
             contentDialog.CloseButtonClick += HandleButtonClick;
 
             contentDialog.DataContext = request.Content;
-            await contentDialog.ShowAsync();
+
+            contentDialog.ShowAsync();
         }
 
-        return await Task.FromResult(true);
+        return default;
     }
 }

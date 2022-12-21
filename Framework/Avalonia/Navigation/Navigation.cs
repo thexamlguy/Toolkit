@@ -3,7 +3,7 @@ using Toolkit.Framework.Foundation;
 
 namespace Toolkit.Framework.Avalonia;
 
-public record Navigation<TRoute> : IRequest<bool> where TRoute : TemplatedControl
+public record Navigation<TRoute> : IRequest where TRoute : TemplatedControl
 {
     public TRoute Route { get; }
 
