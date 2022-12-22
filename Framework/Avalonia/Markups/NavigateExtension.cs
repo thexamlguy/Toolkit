@@ -2,6 +2,7 @@
 using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Markup.Xaml;
+using System.Xml.Linq;
 using Toolkit.Framework.Foundation;
 
 namespace Toolkit.Framework.Avalonia;
@@ -13,55 +14,50 @@ public class NavigateExtension : TriggerExtension
     private static readonly AttachedProperty<object> ParameterProperty =
         AvaloniaProperty.RegisterAttached<NavigateExtension, Control, object>("Parameter");
 
-    private static readonly AvaloniaProperty RouteProperty =
-        AvaloniaProperty.RegisterAttached<NavigateExtension, Control, object>("Route");
-
-    private static readonly AvaloniaProperty ToProperty =
-        AvaloniaProperty.RegisterAttached<NavigateExtension, Control, object>("To");
+    private static readonly AvaloniaProperty PathProperty =
+        AvaloniaProperty.RegisterAttached<NavigateExtension, Control, string>("Path");
 
     private readonly Binding? mediatorBinding;
     private readonly List<object?> parameters = new();
-    private readonly Binding? toBinding;
-    private object? route;
-    private Binding? routeBinding;
+    private readonly Binding? pathBinding;
 
     public NavigateExtension(object mediator,
-        object to)
+        object path)
     {
         mediatorBinding = mediator.ToBinding();
-        this.toBinding = to is Binding toBinding ? toBinding : to.ToBinding();
+        this.pathBinding = path is Binding pathBinding ? pathBinding : path.ToBinding();
     }
 
     public NavigateExtension(object mediator,
-        object to,
+        object path,
         object args1)
     {
         mediatorBinding = mediator.ToBinding();
-        this.toBinding = to is Binding toBinding ? toBinding : to.ToBinding();
+        this.pathBinding = path is Binding pathBinding ? pathBinding : path.ToBinding();
 
         parameters.Add(args1 is MarkupExtension ? args1 : args1.ToBinding());
     }
 
     public NavigateExtension(object mediator,
-        object to,
+        object path,
         object args1,
         object args2)
     {
         mediatorBinding = mediator.ToBinding();
-        this.toBinding = to is Binding toBinding ? toBinding : to.ToBinding();
+        this.pathBinding = path is Binding pathBinding ? pathBinding : path.ToBinding();
 
         parameters.Add(args1 is MarkupExtension ? args1 : args1.ToBinding());
         parameters.Add(args2 is MarkupExtension ? args2 : args2.ToBinding());
     }
 
     public NavigateExtension(object mediator,
-        object to,
+        object path,
         object args1,
         object args2,
         object args3)
     {
         mediatorBinding = mediator.ToBinding();
-        this.toBinding = to is Binding toBinding ? toBinding : to.ToBinding();
+        this.pathBinding = path is Binding pathBinding ? pathBinding : path.ToBinding();
 
         parameters.Add(args1 is MarkupExtension ? args1 : args1.ToBinding());
         parameters.Add(args2 is MarkupExtension ? args2 : args2.ToBinding());
@@ -69,14 +65,14 @@ public class NavigateExtension : TriggerExtension
     }
 
     public NavigateExtension(object mediator,
-        object to,
+        object path,
         object args1,
         object args2,
         object args3,
         object args4)
     {
         mediatorBinding = mediator.ToBinding();
-        this.toBinding = to is Binding toBinding ? toBinding : to.ToBinding();
+        this.pathBinding = path is Binding pathBinding ? pathBinding : path.ToBinding();
 
         parameters.Add(args1 is MarkupExtension ? args1 : args1.ToBinding());
         parameters.Add(args2 is MarkupExtension ? args2 : args2.ToBinding());
@@ -85,7 +81,7 @@ public class NavigateExtension : TriggerExtension
     }
 
     public NavigateExtension(object mediator,
-        object to,
+        object path,
         object args1,
         object args2,
         object args3,
@@ -93,7 +89,7 @@ public class NavigateExtension : TriggerExtension
         object args5)
     {
         mediatorBinding = mediator.ToBinding();
-        this.toBinding = to is Binding toBinding ? toBinding : to.ToBinding();
+        this.pathBinding = path is Binding pathBinding ? pathBinding : path.ToBinding();
 
         parameters.Add(args1 is MarkupExtension ? args1 : args1.ToBinding());
         parameters.Add(args2 is MarkupExtension ? args2 : args2.ToBinding());
@@ -103,7 +99,7 @@ public class NavigateExtension : TriggerExtension
     }
 
     public NavigateExtension(object mediator,
-        object to,
+        object path,
         object args1,
         object args2,
         object args3,
@@ -112,7 +108,7 @@ public class NavigateExtension : TriggerExtension
         object args6)
     {
         mediatorBinding = mediator.ToBinding();
-        this.toBinding = to is Binding toBinding ? toBinding : to.ToBinding();
+        this.pathBinding = path is Binding pathBinding ? pathBinding : path.ToBinding();
 
         parameters.Add(args1 is MarkupExtension ? args1 : args1.ToBinding());
         parameters.Add(args2 is MarkupExtension ? args2 : args2.ToBinding());
@@ -123,7 +119,7 @@ public class NavigateExtension : TriggerExtension
     }
 
     public NavigateExtension(object mediator,
-        object to,
+        object path,
         object args1,
         object args2,
         object args3,
@@ -133,7 +129,7 @@ public class NavigateExtension : TriggerExtension
         object args7)
     {
         mediatorBinding = mediator.ToBinding();
-        this.toBinding = to is Binding toBinding ? toBinding : to.ToBinding();
+        this.pathBinding = path is Binding pathBinding ? pathBinding : path.ToBinding();
 
         parameters.Add(args1 is MarkupExtension ? args1 : args1.ToBinding());
         parameters.Add(args2 is MarkupExtension ? args2 : args2.ToBinding());
@@ -145,7 +141,7 @@ public class NavigateExtension : TriggerExtension
     }
 
     public NavigateExtension(object mediator,
-        object to,
+        object path,
         object args1,
         object args2,
         object args3,
@@ -156,7 +152,7 @@ public class NavigateExtension : TriggerExtension
         object args8)
     {
         mediatorBinding = mediator.ToBinding();
-        this.toBinding = to is Binding toBinding ? toBinding : to.ToBinding();
+        this.pathBinding = path is Binding pathBinding ? pathBinding : path.ToBinding();
 
         parameters.Add(args1 is MarkupExtension ? args1 : args1.ToBinding());
         parameters.Add(args2 is MarkupExtension ? args2 : args2.ToBinding());
@@ -169,7 +165,7 @@ public class NavigateExtension : TriggerExtension
     }
 
     public NavigateExtension(object mediator,
-        object to,
+        object path,
         object args1,
         object args2,
         object args3,
@@ -181,7 +177,7 @@ public class NavigateExtension : TriggerExtension
         object args9)
     {
         mediatorBinding = mediator.ToBinding();
-        this.toBinding = to is Binding toBinding ? toBinding : to.ToBinding();
+        this.pathBinding = path is Binding pathBinding ? pathBinding : path.ToBinding();
 
         parameters.Add(args1 is MarkupExtension ? args1 : args1.ToBinding());
         parameters.Add(args2 is MarkupExtension ? args2 : args2.ToBinding());
@@ -195,7 +191,7 @@ public class NavigateExtension : TriggerExtension
     }
 
     public NavigateExtension(object mediator,
-        object to,
+        object path,
         object args1,
         object args2,
         object args3,
@@ -208,7 +204,7 @@ public class NavigateExtension : TriggerExtension
         object args10)
     {
         mediatorBinding = mediator.ToBinding();
-        this.toBinding = to is Binding toBinding ? toBinding : to.ToBinding();
+        this.pathBinding = path is Binding pathBinding ? pathBinding : path.ToBinding();
 
         parameters.Add(args1 is MarkupExtension ? args1 : args1.ToBinding());
         parameters.Add(args2 is MarkupExtension ? args2 : args2.ToBinding());
@@ -223,7 +219,7 @@ public class NavigateExtension : TriggerExtension
     }
 
     public NavigateExtension(object mediator,
-        object to,
+        object path,
         object args1,
         object args2,
         object args3,
@@ -237,7 +233,7 @@ public class NavigateExtension : TriggerExtension
         object args11)
     {
         mediatorBinding = mediator.ToBinding();
-        this.toBinding = to is Binding toBinding ? toBinding : to.ToBinding();
+        this.pathBinding = path is Binding pathBinding ? pathBinding : path.ToBinding();
 
         parameters.Add(args1 is MarkupExtension ? args1 : args1.ToBinding());
         parameters.Add(args2 is MarkupExtension ? args2 : args2.ToBinding());
@@ -253,7 +249,7 @@ public class NavigateExtension : TriggerExtension
     }
 
     public NavigateExtension(object mediator,
-        object to,
+        object path,
         object args1,
         object args2,
         object args3,
@@ -268,7 +264,7 @@ public class NavigateExtension : TriggerExtension
         object args12)
     {
         mediatorBinding = mediator.ToBinding();
-        this.toBinding = to is Binding toBinding ? toBinding : to.ToBinding();
+        this.pathBinding = path is Binding pathBinding ? pathBinding : path.ToBinding();
 
         parameters.Add(args1 is MarkupExtension ? args1 : args1.ToBinding());
         parameters.Add(args2 is MarkupExtension ? args2 : args2.ToBinding());
@@ -285,7 +281,7 @@ public class NavigateExtension : TriggerExtension
     }
 
     public NavigateExtension(object mediator,
-        object to,
+        object path,
         object args1,
         object args2,
         object args3,
@@ -301,7 +297,7 @@ public class NavigateExtension : TriggerExtension
         object args13)
     {
         mediatorBinding = mediator.ToBinding();
-        this.toBinding = to is Binding toBinding ? toBinding : to.ToBinding();
+        this.pathBinding = path is Binding pathBinding ? pathBinding : path.ToBinding();
 
         parameters.Add(args1 is MarkupExtension ? args1 : args1.ToBinding());
         parameters.Add(args2 is MarkupExtension ? args2 : args2.ToBinding());
@@ -319,7 +315,7 @@ public class NavigateExtension : TriggerExtension
     }
 
     public NavigateExtension(object mediator,
-        object to,
+        object path,
         object args1,
         object args2,
         object args3,
@@ -336,7 +332,7 @@ public class NavigateExtension : TriggerExtension
         object args14)
     {
         mediatorBinding = mediator.ToBinding();
-        this.toBinding = to is Binding toBinding ? toBinding : to.ToBinding();
+        this.pathBinding = path is Binding pathBinding ? pathBinding : path.ToBinding();
 
         parameters.Add(args1 is MarkupExtension ? args1 : args1.ToBinding());
         parameters.Add(args2 is MarkupExtension ? args2 : args2.ToBinding());
@@ -355,7 +351,7 @@ public class NavigateExtension : TriggerExtension
     }
 
     public NavigateExtension(object mediator,
-        object to,
+        object path,
         object args1,
         object args2,
         object args3,
@@ -373,7 +369,7 @@ public class NavigateExtension : TriggerExtension
         object args15)
     {
         mediatorBinding = mediator.ToBinding();
-        this.toBinding = to is Binding toBinding ? toBinding : to.ToBinding();
+        this.pathBinding = path is Binding pathBinding ? pathBinding : path.ToBinding();
 
         parameters.Add(args1 is MarkupExtension ? args1 : args1.ToBinding());
         parameters.Add(args2 is MarkupExtension ? args2 : args2.ToBinding());
@@ -392,22 +388,6 @@ public class NavigateExtension : TriggerExtension
         parameters.Add(args15 is MarkupExtension ? args15 : args15.ToBinding());
     }
 
-    public object? Route
-    {
-        get
-        {
-            return route;
-        }
-        set
-        {
-            route = value;
-            if (route is not null)
-            {
-                routeBinding = route.ToBinding();
-            }
-        }
-    }
-
     protected override void OnInvoked(object sender, EventArgs args)
     {
         if (TargetObject is not null && mediatorBinding is not null)
@@ -415,10 +395,10 @@ public class NavigateExtension : TriggerExtension
             TargetObject.Bind(MediatorProperty, mediatorBinding);
             if (TargetObject.GetValue(MediatorProperty) is IMediator mediator)
             {
-                if (toBinding is not null)
+                if (pathBinding is not null)
                 {
-                    TargetObject.Bind(ToProperty, toBinding);
-                    if (TargetObject.GetValue(ToProperty) is { } to)
+                    TargetObject.Bind(PathProperty, pathBinding);
+                    if (TargetObject.GetValue(PathProperty) is string path)
                     {
                         List<object>? parameters = new();
                         foreach (object? parameter in this.parameters)
@@ -449,27 +429,12 @@ public class NavigateExtension : TriggerExtension
                             }
                         }
 
-                        object? route = null;
-                        if (routeBinding is not null)
+                        if (pathBinding?.StringFormat is string format)
                         {
-                            TargetObject.Bind(RouteProperty, routeBinding);
-                            route = TargetObject.GetValue(RouteProperty);
+                            path = string.Format(format, path);
                         }
 
-                        if (to is string name)
-                        {
-                            if (toBinding?.StringFormat is string format)
-                            {
-                                name = string.Format(format, name);
-                            }
-
-                            mediator.Send(new Navigate(name, parameters.ToArray()) { Route = route });
-                        }
-
-                        if (to is Type type)
-                        {
-                            mediator.Send(new Navigate(type, parameters.ToArray()) { Route = route });
-                        }
+                        mediator.Send(new Navigate(path, parameters.ToArray()));
                     }
                 }
             }

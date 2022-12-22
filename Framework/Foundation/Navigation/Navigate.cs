@@ -3,23 +3,13 @@ namespace Toolkit.Framework.Foundation;
 
 public record Navigate : IRequest
 {
-    public Navigate(string name, params object?[] parameters)
+    public Navigate(string path, params object?[] parameters)
     {
-        Name = name;
+        Path = path;
         Parameters = parameters;
     }
 
-    public Navigate(Type type, params object?[] parameters)
-    {
-        Type = type;
-        Parameters = parameters;
-    }
-
-    public Type? Type { get; }
-
-    public object? Route { get; init; }
-
-    public string? Name { get; }
+    public string? Path { get; }
 
     public object?[] Parameters { get; }
 }

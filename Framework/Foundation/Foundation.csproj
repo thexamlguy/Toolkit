@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
     <AssemblyName>Toolkit.Framework.Foundation</AssemblyName>
     <RootNamespace>Toolkit.Framework.Foundation</RootNamespace>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
