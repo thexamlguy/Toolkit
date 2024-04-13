@@ -1,7 +1,6 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
-using HyperX.UI.Windows;
 using System.Reflection;
 using Toolkit.Foundation;
 
