@@ -8,7 +8,7 @@ namespace Toolkit.Avalonia;
 
 public static class IServiceCollectionExtensions
 {
-    public static IServiceCollection AddComponentConfigurationTemplate<TConfiguration, TValue, THeader,
+    public static IServiceCollection AddConfigurationTemplate<TConfiguration, TValue, THeader,
         TDescription, TAction>(this IServiceCollection services,
         params object[]? parameters)
         where TConfiguration : class
@@ -45,7 +45,7 @@ public static class IServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection AddComponentConfigurationTemplate<TConfiguration, TValue, TAction>(this IServiceCollection services,
+    public static IServiceCollection AddConfigurationTemplate<TConfiguration, TValue, TAction>(this IServiceCollection services,
         Func<TConfiguration, TValue> valueDelegate,
         object header,
         object description,
@@ -82,7 +82,7 @@ public static class IServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection AddComponentConfigurationTemplate<TConfiguration, TValue,
+    public static IServiceCollection AddConfigurationTemplate<TConfiguration, TValue,
         TDescription, TAction>(this IServiceCollection services,
         Func<TConfiguration, TValue> valueDelegate,
         object description,
