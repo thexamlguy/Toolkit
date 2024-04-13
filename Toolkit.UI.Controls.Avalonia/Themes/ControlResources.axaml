@@ -1,0 +1,12 @@
+<Styles xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Styles.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <MergeResourceInclude Source="../CarouselView/CarouselView.axaml" />
+                <MergeResourceInclude Source="../ContentDialog/ContentDialog.axaml" />
+                <MergeResourceInclude Source="../SettingsExpander/SettingsExpander.axaml" />
+                <MergeResourceInclude Source="../SettingsExpander/SettingsExpanderItem.axaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Styles.Resources>
+</Styles>
