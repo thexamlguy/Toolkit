@@ -7,7 +7,7 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Avalonia" Version="11.1.0-beta1" />
-		<PackageReference Include="Avalonia.Labs.Controls" Version="11.0.3" />
-		<PackageReference Include="FluentAvaloniaUI" Version="2.0.5" />
+		<PackageReference Include="Avalonia.Labs.Controls" Version="11.0.10.1" />
+		<PackageReference Include="FluentAvaloniaUI" Version="2.1.0-preview1" />
 	</ItemGroup>
 </Project>
