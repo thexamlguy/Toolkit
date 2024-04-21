@@ -135,11 +135,26 @@ public class ConfigurationSource<TConfiguration>(IConfigurationFile<TConfigurati
                 using StreamReader? reader = new(stream);
 
                 string? content = reader.ReadToEnd();
+                JsonNode? rootNode = JsonNode.Parse(content);
 
-                using JsonDocument jsonDocument = JsonDocument.Parse(content);
-                if (jsonDocument.RootElement.TryGetProperty(section, out JsonElement sectionValue))
+                string[] segments = section.Split(':');
+                JsonNode? currentNode = rootNode;
+                int lastIndex = segments.Length - 1;
+
+                for (int i = 0; i < lastIndex; i++)
                 {
-                    value = JsonSerializer.Deserialize<TConfiguration>(sectionValue.ToString(), serializerOptions ?? defaultSerializerOptions());
+                    if (currentNode is null)
+                    {
+                        value = default;
+                        return false;
+                    }
+
+                    currentNode = currentNode[segments[i]];
+                }
+
+                if (currentNode is not null)
+                {
+                    value = JsonSerializer.Deserialize<TConfiguration>(currentNode[segments[lastIndex]], serializerOptions ?? defaultSerializerOptions());
                     return true;
                 }
             }
