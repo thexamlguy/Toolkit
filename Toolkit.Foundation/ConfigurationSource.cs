@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.FileProviders;
+using System;
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
 namespace Toolkit.Foundation;
@@ -35,7 +37,6 @@ public class ConfigurationSource<TConfiguration>(IConfigurationFile<TConfigurati
         lock (lockingObject)
         {
             IFileInfo fileInfo = configurationFile.FileInfo;
-
             if (!File.Exists(fileInfo.PhysicalPath))
             {
                 string? fileDirectoryPath = Path.GetDirectoryName(fileInfo.PhysicalPath);
@@ -47,53 +48,71 @@ public class ConfigurationSource<TConfiguration>(IConfigurationFile<TConfigurati
                 File.WriteAllText(fileInfo.PhysicalPath!, "{}");
             }
 
-            static Stream OpenReadWrite(IFileInfo fileInfo)
-            {
-                return fileInfo.PhysicalPath is not null
-                    ? new FileStream(fileInfo.PhysicalPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite)
+            using Stream stream = fileInfo.PhysicalPath is not null
+                    ? new FileStream(fileInfo.PhysicalPath, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite)
                     : fileInfo.CreateReadStream();
-            }
 
-            using Stream stream = OpenReadWrite(fileInfo);
             using StreamReader? reader = new(stream);
 
             string? content = reader.ReadToEnd();
-            using JsonDocument jsonDocument = JsonDocument.Parse(content);
+            stream.Seek(0, SeekOrigin.Begin);
 
-            using Stream stream2 = OpenReadWrite(fileInfo);
-            Utf8JsonWriter writer = new(stream2, new JsonWriterOptions()
-            {
-                Indented = true,
-                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-            });
-
-            writer.WriteStartObject();
-            bool isWritten = false;
-
-            JsonDocument optionsElement = JsonDocument.Parse(JsonSerializer.SerializeToUtf8Bytes(value,
+            JsonNode? rootNode = JsonNode.Parse(content);
+            JsonNode? valueNode = JsonNode.Parse(JsonSerializer.SerializeToUtf8Bytes(value,
                 serializerOptions ?? defaultSerializerOptions()));
 
-            foreach (JsonProperty element in jsonDocument.RootElement.EnumerateObject())
+            string[] segments = section.Split(':');
+            JsonNode? currentNode = rootNode;
+            int lastIndex = segments.Length - 1;
+
+            for (int i = 0; i < lastIndex; i++)
             {
-                if (element.Name != section)
+                if (currentNode is null)
                 {
-                    element.WriteTo(writer);
-                    continue;
+                    return;
                 }
-                writer.WritePropertyName(element.Name);
-                optionsElement.WriteTo(writer);
-                isWritten = true;
+
+                string currentKey = segments[i];
+                if (currentNode[currentKey] is null)
+                {
+                    if (int.TryParse(segments[i + 1], out int _))
+                    {
+                        currentNode[currentKey] = new JsonArray();
+                    }
+                    else
+                    {
+                        currentNode[currentKey] = new JsonObject();
+                    }
+                }
+
+                currentNode = currentNode[currentKey];
             }
 
-            if (!isWritten)
+            if (currentNode is not null)
             {
-                writer.WritePropertyName(section);
-                optionsElement.WriteTo(writer);
+                string lastKey = segments[lastIndex];
+                if (currentNode is JsonArray array && int.TryParse(lastKey, out int index))
+                {
+                    if (array.Count <= index)
+                    {
+                        array.Add(value);
+                    }
+                    else
+                    {
+                        array[index] = valueNode;
+                    }
+                }
+                else
+                {
+                    currentNode[lastKey] = valueNode;
+                }
             }
 
-            writer.WriteEndObject();
-            writer.Flush();
-            stream2.SetLength(stream2.Position);
+            using Stream stream2 = fileInfo.PhysicalPath is not null
+                    ? new FileStream(fileInfo.PhysicalPath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite)
+                    : fileInfo.CreateReadStream();
+
+            JsonSerializer.Serialize(stream, rootNode, serializerOptions ?? defaultSerializerOptions());
         }
     }
 

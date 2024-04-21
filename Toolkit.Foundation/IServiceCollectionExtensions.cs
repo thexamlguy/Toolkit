@@ -49,6 +49,11 @@ public static class IServiceCollectionExtensions
         return services;
     }
 
+    public static IServiceCollection AddConfiguration<TConfiguration>(this IServiceCollection services, 
+        string section)
+        where TConfiguration : class =>
+            services.AddConfiguration<TConfiguration>(section, "Settings.json", null);
+
     public static IServiceCollection AddConfiguration<TConfiguration>(this IServiceCollection services)
         where TConfiguration : class => 
             services.AddConfiguration<TConfiguration>(typeof(TConfiguration).Name, "Settings.json", null);
@@ -61,6 +66,17 @@ public static class IServiceCollectionExtensions
         configurationDelegate.Invoke(configuration);
 
         return services.AddConfiguration(typeof(TConfiguration).Name, "Settings.json", configuration);
+    }
+
+    public static IServiceCollection AddConfiguration<TConfiguration>(this IServiceCollection services,
+        Action<TConfiguration> configurationDelegate,
+        string section)
+        where TConfiguration : class, new()
+    {
+        TConfiguration configuration = new();
+        configurationDelegate.Invoke(configuration);
+
+        return services.AddConfiguration(section, "Settings.json", configuration);
     }
 
     public static IServiceCollection AddConfiguration<TConfiguration>(this IServiceCollection services,
@@ -81,20 +97,7 @@ public static class IServiceCollectionExtensions
         Action<JsonSerializerOptions>? serializerDelegate = null)
         where TConfiguration : class
     {
-        services.AddSingleton<IConfigurationSource<TConfiguration>>(provider =>
-        {
-            JsonSerializerOptions? defaultSerializer = null;
-            if (serializerDelegate is not null)
-            {
-                defaultSerializer = new JsonSerializerOptions();
-                serializerDelegate.Invoke(defaultSerializer);
-            }
-
-            return new ConfigurationSource<TConfiguration>(provider.GetRequiredService<IConfigurationFile<TConfiguration>>(),
-                section, defaultSerializer);
-        });
-
-        services.AddSingleton<IConfigurationFile<TConfiguration>>(provider =>
+        services.TryAddSingleton<IConfigurationFile<TConfiguration>>(provider =>
         {
             IFileInfo? fileInfo = null;
             if (provider.GetService<IHostEnvironment>() is IHostEnvironment hostEnvironment)
@@ -107,45 +110,44 @@ public static class IServiceCollectionExtensions
             return new ConfigurationFile<TConfiguration>(fileInfo);
         });
 
-        services.AddHostedService<ConfigurationMonitor<TConfiguration>>();
-        services.AddSingleton<IConfigurationReader<TConfiguration>, ConfigurationReader<TConfiguration>>();
-        services.AddSingleton<IConfigurationWriter<TConfiguration>, ConfigurationWriter<TConfiguration>>();
+        services.TryAddKeyedSingleton<IConfigurationSource<TConfiguration>>(section, (provider, KeyAccelerator) =>
+        {
+            JsonSerializerOptions? defaultSerializer = null;
+            if (serializerDelegate is not null)
+            {
+                defaultSerializer = new JsonSerializerOptions();
+                serializerDelegate.Invoke(defaultSerializer);
+            }
 
-        services.AddTransient<IConfigurationFactory<TConfiguration>>(provider => new ConfigurationFactory<TConfiguration>(() =>
-            configuration ?? provider.GetRequiredService<TConfiguration>()));
+            return new ConfigurationSource<TConfiguration>(provider.GetRequiredService<IConfigurationFile<TConfiguration>>(),
+                section, defaultSerializer);
+        });
 
-        services.AddTransient<IInitializer, ConfigurationInitializer<TConfiguration>>();
-        services.AddTransient<IConfigurationInitializer<TConfiguration>, ConfigurationInitializer<TConfiguration>>();
+        //services.AddHostedService<ConfigurationMonitor<TConfiguration>>();
+        services.TryAddKeyedTransient<IConfigurationReader<TConfiguration>>(section, (provider, key) =>
+            new ConfigurationReader<TConfiguration>(provider.GetRequiredKeyedService<IConfigurationSource<TConfiguration>>(key),
+                provider.GetRequiredKeyedService<IConfigurationFactory<TConfiguration>>(key)));
+
+        services.TryAddKeyedTransient<IConfigurationWriter<TConfiguration>>(section, (provider, key) =>
+            new ConfigurationWriter<TConfiguration>(provider.GetRequiredKeyedService<IConfigurationSource<TConfiguration>>(key)));
+
+        services.TryAddKeyedTransient<IConfigurationFactory<TConfiguration>>(section, (provider, key) => 
+            new ConfigurationFactory<TConfiguration>(() => configuration ?? provider.GetRequiredService<TConfiguration>()));
+
+        services.AddTransient<IInitializer, ConfigurationInitializer<TConfiguration>>(provider =>
+            new ConfigurationInitializer<TConfiguration>(section,
+                provider.GetRequiredKeyedService<IConfigurationReader<TConfiguration>>(section),
+                provider.GetRequiredKeyedService<IConfigurationWriter<TConfiguration>>(section),
+                provider.GetRequiredKeyedService<IConfigurationFactory<TConfiguration>>(section),
+                provider.GetRequiredService<IPublisher>()));
+
+        services.AddTransient<IConfigurationInitializer<TConfiguration>, ConfigurationInitializer<TConfiguration>>(provider =>
+            provider.GetRequiredService<IServiceFactory>().Create<ConfigurationInitializer<TConfiguration>>(section));
 
         services.AddTransient<IWritableConfiguration<TConfiguration>, WritableConfiguration<TConfiguration>>();
 
         services.AddTransient<IConfiguration<TConfiguration>, Configuration<TConfiguration>>();
         services.AddTransient(provider => provider.GetRequiredService<IConfiguration<TConfiguration>>().Value);
-
-        return services;
-    }
-
-    public static IServiceCollection AddTemplate<TViewModel, TView>(this IServiceCollection services,
-        object? key = null,
-        params object[]? parameters)
-    {
-        Type viewModelType = typeof(TViewModel);
-        Type viewType = typeof(TView);
-
-        key ??= viewModelType.Name.Replace("ViewModel", "");
-
-        services.AddTransient(viewModelType, provider => 
-            provider.GetRequiredService<IServiceFactory>().Create<TViewModel>(parameters)!);
-
-        services.AddTransient(viewType);
-
-        services.AddKeyedTransient(viewModelType, key, (provider, key) =>
-            provider.GetRequiredService<IServiceFactory>().Create<TViewModel>(parameters)!);
-
-        services.AddKeyedTransient(viewType, key);
-
-        services.AddTransient<IContentTemplateDescriptor>(provider => 
-            new ContentTemplateDescriptor(key, viewModelType, viewType, parameters));
 
         return services;
     }
@@ -169,7 +171,7 @@ public static class IServiceCollectionExtensions
                     services.TryAdd(new ServiceDescriptor(typeof(INotificationHandler<>)
                         .MakeGenericType(notificationType), typeof(THandler), lifetime));
 
-                    services.Add(new ServiceDescriptor(wrapperType, provider => 
+                    services.Add(new ServiceDescriptor(wrapperType, provider =>
                         provider.GetService<IServiceFactory>()?.Create(wrapperType,
                             provider.GetRequiredService(typeof(INotificationHandler<>).MakeGenericType(notificationType)),
                             provider.GetServices(typeof(IPipelineBehavior<>)
@@ -185,10 +187,10 @@ public static class IServiceCollectionExtensions
                     Type wrapperType = typeof(HandlerWrapper<,>)
                         .MakeGenericType(requestType, responseType);
 
-                    services.TryAdd(new ServiceDescriptor(typeof(THandler), 
+                    services.TryAdd(new ServiceDescriptor(typeof(THandler),
                         typeof(THandler), lifetime));
 
-                    services.Add(new ServiceDescriptor(wrapperType, provider => 
+                    services.Add(new ServiceDescriptor(wrapperType, provider =>
                         provider.GetService<IServiceFactory>()?.Create(wrapperType,
                                 provider.GetRequiredService<THandler>(),
                                 provider.GetServices(typeof(IPipelineBehavior<,>)
@@ -203,7 +205,7 @@ public static class IServiceCollectionExtensions
     }
 
     public static IServiceCollection AddInitializer<TInitializer>(this IServiceCollection services)
-        where TInitializer : class, 
+        where TInitializer : class,
         IInitializer
     {
         services.AddTransient<IInitializer, TInitializer>();
@@ -211,7 +213,7 @@ public static class IServiceCollectionExtensions
     }
 
     public static IServiceCollection AddNavigateHandler<THandler>(this IServiceCollection services)
-        where THandler : INavigateHandler, 
+        where THandler : INavigateHandler,
         IHandler
     {
         IEnumerable<Type> contracts = typeof(THandler).GetInterfaces()
@@ -231,6 +233,7 @@ public static class IServiceCollectionExtensions
         services.AddHandler<THandler>();
         return services;
     }
+
     public static IServiceCollection AddRange(this IServiceCollection services,
         IServiceCollection fromServices)
     {
@@ -238,6 +241,31 @@ public static class IServiceCollectionExtensions
         {
             services.Add(service);
         }
+
+        return services;
+    }
+
+    public static IServiceCollection AddTemplate<TViewModel, TView>(this IServiceCollection services,
+                        object? key = null,
+        params object[]? parameters)
+    {
+        Type viewModelType = typeof(TViewModel);
+        Type viewType = typeof(TView);
+
+        key ??= viewModelType.Name.Replace("ViewModel", "");
+
+        services.AddTransient(viewModelType, provider => 
+            provider.GetRequiredService<IServiceFactory>().Create<TViewModel>(parameters)!);
+
+        services.AddTransient(viewType);
+
+        services.AddKeyedTransient(viewModelType, key, (provider, key) =>
+            provider.GetRequiredService<IServiceFactory>().Create<TViewModel>(parameters)!);
+
+        services.AddKeyedTransient(viewType, key);
+
+        services.AddTransient<IContentTemplateDescriptor>(provider => 
+            new ContentTemplateDescriptor(key, viewModelType, viewType, parameters));
 
         return services;
     }
