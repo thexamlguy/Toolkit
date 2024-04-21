@@ -51,11 +51,11 @@ public static class IServiceCollectionExtensions
 
     public static IServiceCollection AddConfiguration<TConfiguration>(this IServiceCollection services, 
         string section)
-        where TConfiguration : class =>
+        where TConfiguration : class, new() =>
             services.AddConfiguration<TConfiguration>(section, "Settings.json", null);
 
     public static IServiceCollection AddConfiguration<TConfiguration>(this IServiceCollection services)
-        where TConfiguration : class => 
+        where TConfiguration : class, new() => 
             services.AddConfiguration<TConfiguration>(typeof(TConfiguration).Name, "Settings.json", null);
 
     public static IServiceCollection AddConfiguration<TConfiguration>(this IServiceCollection services,
@@ -81,21 +81,21 @@ public static class IServiceCollectionExtensions
 
     public static IServiceCollection AddConfiguration<TConfiguration>(this IServiceCollection services,
         TConfiguration configuration)
-        where TConfiguration : class =>
+        where TConfiguration : class, new() =>
             services.AddConfiguration(configuration.GetType().Name, "Settings.json", configuration);
 
     public static IServiceCollection AddConfiguration<TConfiguration>(this IServiceCollection services,
         object configuration)
-        where TConfiguration : class => 
+        where TConfiguration : class, new() => 
             services.AddConfiguration(configuration.GetType().Name,
                 "Settings.json", (TConfiguration?)configuration);
 
     public static IServiceCollection AddConfiguration<TConfiguration>(this IServiceCollection services,
         string section,
         string path = "Settings.json",
-        TConfiguration? configuration = null,
+        TConfiguration? defaultConfiguration = null,
         Action<JsonSerializerOptions>? serializerDelegate = null)
-        where TConfiguration : class
+        where TConfiguration : class, new()
     {
         services.TryAddSingleton<IConfigurationFile<TConfiguration>>(provider =>
         {
@@ -132,11 +132,10 @@ public static class IServiceCollectionExtensions
             new ConfigurationWriter<TConfiguration>(provider.GetRequiredKeyedService<IConfigurationSource<TConfiguration>>(key)));
 
         services.TryAddKeyedTransient<IConfigurationFactory<TConfiguration>>(section, (provider, key) => 
-            new ConfigurationFactory<TConfiguration>(() => configuration ?? provider.GetRequiredService<TConfiguration>()));
+            new ConfigurationFactory<TConfiguration>(() => defaultConfiguration ?? new TConfiguration()));
 
         services.AddTransient<IInitializer, ConfigurationInitializer<TConfiguration>>(provider =>
-            new ConfigurationInitializer<TConfiguration>(section,
-                provider.GetRequiredKeyedService<IConfigurationReader<TConfiguration>>(section),
+            new ConfigurationInitializer<TConfiguration>(provider.GetRequiredKeyedService<IConfigurationReader<TConfiguration>>(section),
                 provider.GetRequiredKeyedService<IConfigurationWriter<TConfiguration>>(section),
                 provider.GetRequiredKeyedService<IConfigurationFactory<TConfiguration>>(section),
                 provider.GetRequiredService<IPublisher>()));
@@ -146,8 +145,11 @@ public static class IServiceCollectionExtensions
 
         services.AddTransient<IWritableConfiguration<TConfiguration>, WritableConfiguration<TConfiguration>>();
 
-        services.AddTransient<IConfiguration<TConfiguration>, Configuration<TConfiguration>>();
-        services.AddTransient(provider => provider.GetRequiredService<IConfiguration<TConfiguration>>().Value);
+        services.TryAddKeyedTransient<IConfiguration<TConfiguration>>(section, (provider, key) =>
+            new Configuration<TConfiguration>(section, provider.GetRequiredKeyedService<IConfigurationReader<TConfiguration>>(key)));
+
+        services.AddTransient(provider => provider.GetRequiredKeyedService<IConfiguration<TConfiguration>>(section));
+        services.AddTransient(provider => provider.GetRequiredKeyedService<IConfiguration<TConfiguration>>(section).Value);
 
         return services;
     }

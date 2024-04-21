@@ -5,4 +5,6 @@ public interface IConfiguration<out TConfiguration>
     class
 {
     TConfiguration Value { get; }
+
+    string Section { get; }
 }

@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.FileProviders;
-using System;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -154,7 +153,8 @@ public class ConfigurationSource<TConfiguration>(IConfigurationFile<TConfigurati
 
                 if (currentNode is not null)
                 {
-                    value = JsonSerializer.Deserialize<TConfiguration>(currentNode[segments[lastIndex]], serializerOptions ?? defaultSerializerOptions());
+                    value = JsonSerializer.Deserialize<TConfiguration>(currentNode[segments[lastIndex]], 
+                        serializerOptions ?? defaultSerializerOptions());
                     return true;
                 }
             }

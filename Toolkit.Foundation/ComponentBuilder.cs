@@ -53,6 +53,15 @@ public class ComponentBuilder :
     public IComponentBuilder AddConfiguration<TConfiguration>(Action<TConfiguration> configurationDelegate)
         where TConfiguration : ComponentConfiguration, new()
     {
+        AddConfiguration(typeof(TConfiguration).Name, configurationDelegate);
+        return this;
+    }
+
+    public IComponentBuilder AddConfiguration<TConfiguration>(string section,
+        Action<TConfiguration>? configurationDelegate = null) 
+        where TConfiguration :
+        ComponentConfiguration, new()
+    {
         if (configurationRegistered)
         {
             return this;
@@ -68,8 +77,8 @@ public class ComponentBuilder :
 
         hostBuilder.ConfigureServices(services =>
         {
-            services.AddConfiguration<ComponentConfiguration>(section: configuration.GetType().Name,
-                configuration: configuration);
+            services.AddConfiguration<ComponentConfiguration>(section: section,
+                defaultConfiguration: configuration);
 
             services.AddConfiguration(configuration);
         });
@@ -77,15 +86,23 @@ public class ComponentBuilder :
         return this;
     }
 
-    public IComponentHost Build()
+    public IComponentBuilder AddConfiguration<TConfiguration>(string section) 
+        where TConfiguration : 
+        ComponentConfiguration, new()
     {
-        IHost host = hostBuilder.Build();
-        return host.Services.GetRequiredService<IComponentHost>();
+        AddConfiguration<TConfiguration>(section, null);
+        return this;
     }
 
     public IComponentBuilder AddServices(Action<IServiceCollection> configureDelegate)
     {
         hostBuilder.ConfigureServices(configureDelegate);
         return this;
+    }
+
+    public IComponentHost Build()
+    {
+        IHost host = hostBuilder.Build();
+        return host.Services.GetRequiredService<IComponentHost>();
     }
 }

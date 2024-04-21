@@ -1,7 +1,6 @@
 ﻿namespace Toolkit.Foundation;
 
-public class ConfigurationInitializer<TConfiguration>(string section,
-    IConfigurationReader<TConfiguration> reader, 
+public class ConfigurationInitializer<TConfiguration>(IConfigurationReader<TConfiguration> reader, 
     IConfigurationWriter<TConfiguration> writer,
     IConfigurationFactory<TConfiguration> factory,
     IPublisher publisher) :
@@ -12,7 +11,6 @@ public class ConfigurationInitializer<TConfiguration>(string section,
 {
     public async Task Initialize()
     {
-        var d = section;
         if (!reader.TryRead(out TConfiguration? configuration))
         {
             if (factory.Create() is object defaultConfiguration)
