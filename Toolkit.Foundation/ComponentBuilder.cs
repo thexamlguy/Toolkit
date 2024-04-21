@@ -53,12 +53,19 @@ public class ComponentBuilder :
     public IComponentBuilder AddConfiguration<TConfiguration>(Action<TConfiguration> configurationDelegate)
         where TConfiguration : ComponentConfiguration, new()
     {
-        AddConfiguration(typeof(TConfiguration).Name, configurationDelegate);
+        TConfiguration configuration = new();
+
+        if (configurationDelegate is not null)
+        {
+            configurationDelegate(configuration);
+        }
+
+        AddConfiguration(typeof(TConfiguration).Name, configuration);
         return this;
     }
 
     public IComponentBuilder AddConfiguration<TConfiguration>(string section,
-        Action<TConfiguration>? configurationDelegate = null) 
+        TConfiguration? configuration = null) 
         where TConfiguration :
         ComponentConfiguration, new()
     {
@@ -68,27 +75,21 @@ public class ComponentBuilder :
         }
 
         configurationRegistered = true;
-        TConfiguration configuration = new();
-
-        if (configurationDelegate is not null)
-        {
-            configurationDelegate(configuration);
-        }
 
         hostBuilder.ConfigureServices(services =>
         {
             services.AddConfiguration<ComponentConfiguration>(section: section,
                 defaultConfiguration: configuration);
 
-            services.AddConfiguration(configuration);
+            services.AddConfiguration(section: section,
+                defaultConfiguration: configuration);
         });
 
         return this;
     }
 
     public IComponentBuilder AddConfiguration<TConfiguration>(string section) 
-        where TConfiguration : 
-        ComponentConfiguration, new()
+        where TConfiguration : ComponentConfiguration, new()
     {
         AddConfiguration<TConfiguration>(section, null);
         return this;

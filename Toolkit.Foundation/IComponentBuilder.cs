@@ -8,7 +8,7 @@ public interface IComponentBuilder
         where TConfiguration : ComponentConfiguration, new();
 
     IComponentBuilder AddConfiguration<TConfiguration>(string section,
-        Action<TConfiguration>? configurationDelegate = null)
+        TConfiguration? configuration = null)
         where TConfiguration : ComponentConfiguration, new();
 
     IComponentBuilder AddConfiguration<TConfiguration>(string section)

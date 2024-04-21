@@ -49,8 +49,8 @@ public class ContentControlHandler(INavigationContext navigationContext) :
                 control.Loaded += HandleLoaded;
                 control.Unloaded += HandleUnloaded;
 
+                control.DataContext = args.Content;
                 contentControl.Content = control;
-                contentControl.DataContext = args.Content;
 
                 navigationContext.Set(control);
                 await taskCompletionSource.Task;
