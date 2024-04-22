@@ -1,8 +1,8 @@
 ﻿namespace Toolkit.Foundation;
 
-public class Configuration<TConfiguration>(string section,
+public class ConfigurationDescriptor<TConfiguration>(string section,
     IConfigurationReader<TConfiguration> reader) :
-    IConfiguration<TConfiguration>
+    IConfigurationDescriptor<TConfiguration>
     where TConfiguration :
     class
 {

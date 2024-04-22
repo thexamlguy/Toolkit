@@ -2,6 +2,6 @@
 
 public interface IComponentScopeProvider
 {
-    IServiceProvider? Get(string name);
+    ComponentScopeDescriptor? Get(string key);
 }
 

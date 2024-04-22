@@ -49,10 +49,11 @@ public class DefaultBuilder :
                 services.AddTransient<INavigationContextProvider, NavigationContextProvider>();
 
                 services.AddTransient<INavigationScope, NavigationScope>();
-         
+
+                services.AddSingleton(new ComponentScope("Root"));
                 services.AddScoped<IComponentScopeCollection, ComponentScopeCollection>(provider => new ComponentScopeCollection
                 {
-                    { "Default", provider.GetRequiredService<IServiceProvider>() }
+                    new ComponentScopeDescriptor("Root", provider.GetRequiredService<IServiceProvider>())
                 });
 
                 services.AddTransient<IComponentScopeProvider, ComponentScopeProvider>();

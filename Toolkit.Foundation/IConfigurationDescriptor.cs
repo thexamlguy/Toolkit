@@ -1,6 +1,6 @@
 ﻿namespace Toolkit.Foundation;
 
-public interface IConfiguration<out TConfiguration>
+public interface IConfigurationDescriptor<out TConfiguration>
     where TConfiguration :
     class
 {

@@ -3,10 +3,9 @@
 public class ComponentScopeProvider(IComponentScopeCollection scopes) :
     IComponentScopeProvider
 {
-    public IServiceProvider? Get(string name)
+    public ComponentScopeDescriptor? Get(string key)
     {
-        return scopes.TryGetValue(name, 
-            out IServiceProvider? scope) ? scope : default;
+        return scopes.FirstOrDefault(x => x.Key == key) is ComponentScopeDescriptor
+            descriptor ? descriptor : default;
     }
 }
-

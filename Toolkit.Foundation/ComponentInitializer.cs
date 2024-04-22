@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Toolkit.Foundation;
 
@@ -35,12 +36,14 @@ public class ComponentInitializer(IEnumerable<IComponent> components,
                     provider.GetRequiredService<IComponentScopeProvider>());
 
                 services.AddRange(typedServices.Services);
+
+                services.AddSingleton(new ComponentScope(component.GetType().Name));
             });
 
             IComponentHost host = builder.Build();
 
-            scopes.Add(component.GetType().Name,
-                host.Services.GetRequiredService<IServiceProvider>());
+            scopes.Add(new ComponentScopeDescriptor(component.GetType().Name,
+                provider.GetRequiredService<IServiceProvider>()));
 
             hosts.Add(host);
             await host.StartAsync();

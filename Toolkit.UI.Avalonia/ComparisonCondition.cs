@@ -2,6 +2,7 @@
 using Avalonia.Xaml.Interactivity;
 
 namespace Toolkit.UI.Avalonia;
+
 public class ComparisonCondition : 
     AvaloniaObject, 
     ICondition

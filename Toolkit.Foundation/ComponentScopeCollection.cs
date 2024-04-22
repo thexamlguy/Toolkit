@@ -1,4 +1,4 @@
 ﻿namespace Toolkit.Foundation;
 
-public class ComponentScopeCollection : Dictionary<string, IServiceProvider>, 
+public class ComponentScopeCollection : List<ComponentScopeDescriptor>, 
     IComponentScopeCollection;

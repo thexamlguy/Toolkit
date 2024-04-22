@@ -1,6 +1,4 @@
-﻿using System.Xml.Linq;
-
-namespace Toolkit.Foundation;
+﻿namespace Toolkit.Foundation;
 
 public class ContentTemplateDescriptorProvider(IEnumerable<IContentTemplateDescriptor> contentTemplates) :
     IContentTemplateDescriptorProvider

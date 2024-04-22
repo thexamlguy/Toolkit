@@ -8,10 +8,10 @@ public class NavigateBackHandler(IComponentScopeProvider provider) :
     public async Task Handle(NavigateBack args,
         CancellationToken cancellationToken)
     {
-        if (provider.Get(args.Scope ?? "Default")
-            is IServiceProvider scope)
+        if (provider.Get(args.Scope ?? "Root")
+            is ComponentScopeDescriptor descriptor)
         {
-            if (scope.GetService<INavigationScope>() is INavigationScope navigationScope)
+            if (descriptor?.Services?.GetService<INavigationScope>() is INavigationScope navigationScope)
             {
                 await navigationScope.NavigateBackAsync(args.Context, cancellationToken);
             }

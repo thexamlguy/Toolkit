@@ -3,9 +3,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.FileProviders.Physical;
 using Microsoft.Extensions.Hosting;
-using System;
 using System.Text.Json;
-using Toolkit.Foundation;
 
 namespace Toolkit.Foundation;
 
@@ -145,11 +143,11 @@ public static class IServiceCollectionExtensions
 
         services.AddTransient<IWritableConfiguration<TConfiguration>, WritableConfiguration<TConfiguration>>();
 
-        services.TryAddKeyedTransient<IConfiguration<TConfiguration>>(section, (provider, key) =>
-            new Configuration<TConfiguration>(section, provider.GetRequiredKeyedService<IConfigurationReader<TConfiguration>>(key)));
+        services.TryAddKeyedTransient<IConfigurationDescriptor<TConfiguration>>(section, (provider, key) =>
+            new ConfigurationDescriptor<TConfiguration>(section, provider.GetRequiredKeyedService<IConfigurationReader<TConfiguration>>(key)));
 
-        services.AddTransient(provider => provider.GetRequiredKeyedService<IConfiguration<TConfiguration>>(section));
-        services.AddTransient(provider => provider.GetRequiredKeyedService<IConfiguration<TConfiguration>>(section).Value);
+        services.AddTransient(provider => provider.GetRequiredKeyedService<IConfigurationDescriptor<TConfiguration>>(section));
+        services.AddTransient(provider => provider.GetRequiredKeyedService<IConfigurationDescriptor<TConfiguration>>(section).Value);
 
         return services;
     }
