@@ -32,8 +32,8 @@ public class FrameHandler(INavigationContext navigationContext) :
 
                         if (control.DataContext is object content)
                         {
-                            if (content is IPrimaryConfirmation confirmNavigation &&
-                                !await confirmNavigation.Confirm())
+                            if (content is IConfirmation confirmation &&
+                                !await confirmation.Confirm())
                             {
                                 args.Cancel = true;
                             }

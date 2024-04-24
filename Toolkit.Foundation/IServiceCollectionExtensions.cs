@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration.Json;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.FileProviders.Physical;
@@ -146,8 +147,11 @@ public static class IServiceCollectionExtensions
         services.TryAddKeyedTransient<IConfigurationDescriptor<TConfiguration>>(section, (provider, key) =>
             new ConfigurationDescriptor<TConfiguration>(section, provider.GetRequiredKeyedService<IConfigurationReader<TConfiguration>>(key)));
 
-        services.AddTransient(provider => provider.GetRequiredKeyedService<IConfigurationDescriptor<TConfiguration>>(section));
-        services.AddTransient(provider => provider.GetRequiredKeyedService<IConfigurationDescriptor<TConfiguration>>(section).Value);
+        services.AddTransient(provider => 
+            provider.GetRequiredKeyedService<IConfigurationDescriptor<TConfiguration>>(section));
+
+        services.AddTransient(provider =>
+            provider.GetRequiredKeyedService<IConfigurationDescriptor<TConfiguration>>(section).Value);
 
         return services;
     }

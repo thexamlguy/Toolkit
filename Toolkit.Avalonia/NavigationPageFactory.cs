@@ -6,13 +6,7 @@ namespace Toolkit.Avalonia;
 public class NavigationPageFactory : 
     INavigationPageFactory
 {
-    public Control? GetPage(Type srcType)
-    {
-        return default;
-    }
+    public Control? GetPage(Type srcType) => default;
 
-    public Control GetPageFromObject(object target)
-    {
-        return (Control)target;
-    }
+    public Control GetPageFromObject(object target) => (Control)target;
 }
