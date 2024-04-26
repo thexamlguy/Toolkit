@@ -4,7 +4,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace Toolkit.Foundation;
 
-public class ComponentBuilder : 
+public class ComponentBuilder :
     IComponentBuilder
 {
     private readonly IHostBuilder hostBuilder;
@@ -65,7 +65,7 @@ public class ComponentBuilder :
     }
 
     public IComponentBuilder AddConfiguration<TConfiguration>(string section,
-        TConfiguration? configuration = null) 
+        TConfiguration? configuration = null)
         where TConfiguration :
         ComponentConfiguration, new()
     {
@@ -88,7 +88,7 @@ public class ComponentBuilder :
         return this;
     }
 
-    public IComponentBuilder AddConfiguration<TConfiguration>(string section) 
+    public IComponentBuilder AddConfiguration<TConfiguration>(string section)
         where TConfiguration : ComponentConfiguration, new()
     {
         AddConfiguration<TConfiguration>(section, null);

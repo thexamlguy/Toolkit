@@ -1,5 +1,4 @@
 ﻿namespace Toolkit.Foundation;
 
-public interface IComponentScopeCollection : 
+public interface IComponentScopeCollection :
     IList<ComponentScopeDescriptor>;
-

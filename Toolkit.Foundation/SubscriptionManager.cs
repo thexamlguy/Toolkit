@@ -1,13 +1,11 @@
-﻿using System.Reflection;
-
-namespace Toolkit.Foundation;
+﻿namespace Toolkit.Foundation;
 
 public class SubscriptionManager(SubscriptionCollection subscriptions) :
     ISubscriptionManager
 {
     public IEnumerable<object?> GetHandlers(Type notificationType, object key)
     {
-        if (subscriptions.TryGetValue($"{(key is not null ? $"{key}:" : "")}{notificationType}", 
+        if (subscriptions.TryGetValue($"{(key is not null ? $"{key}:" : "")}{notificationType}",
             out List<WeakReference>? subscribers))
         {
             foreach (WeakReference weakRef in subscribers.ToArray())
@@ -72,7 +70,7 @@ public class SubscriptionManager(SubscriptionCollection subscriptions) :
             : null;
     }
 
-    private static IEnumerable<Type> GetHandlerInterfaces(Type handlerType) => 
+    private static IEnumerable<Type> GetHandlerInterfaces(Type handlerType) =>
         handlerType.GetInterfaces().Where(interfaceType => interfaceType.IsGenericType &&
         interfaceType.GetGenericTypeDefinition() == typeof(INotificationHandler<>));
 }

@@ -18,7 +18,7 @@ public static class ObjectExtensions
         return null;
     }
 
-    public static TAttribute? GetAttribute<TAttribute>(this object obj) 
+    public static TAttribute? GetAttribute<TAttribute>(this object obj)
         where TAttribute : Attribute
     {
         Type type = obj.GetType();

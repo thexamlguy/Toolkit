@@ -3,7 +3,7 @@ using FluentAvalonia.UI.Controls;
 
 namespace Toolkit.Avalonia;
 
-public class NavigationPageFactory : 
+public class NavigationPageFactory :
     INavigationPageFactory
 {
     public Control? GetPage(Type srcType) => default;

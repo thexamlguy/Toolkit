@@ -4,7 +4,7 @@ using Toolkit.Foundation;
 
 namespace Toolkit.Avalonia;
 
-public class ContentControlHandler(INavigationContext navigationContext) : 
+public class ContentControlHandler(INavigationContext navigationContext) :
     INavigateHandler<ContentControl>
 {
     public async Task Handle(Navigate<ContentControl> args,

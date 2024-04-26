@@ -2,7 +2,7 @@
 
 namespace Toolkit.Foundation;
 
-public class ConfigurationFile<TConfiguration>(IFileInfo fileInfo) : 
+public class ConfigurationFile<TConfiguration>(IFileInfo fileInfo) :
     IConfigurationFile<TConfiguration>
     where TConfiguration :
     class

@@ -18,5 +18,3 @@ public class NavigateBackHandler(IComponentScopeProvider provider) :
         }
     }
 }
-
-

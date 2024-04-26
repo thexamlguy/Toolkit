@@ -1,4 +1,4 @@
 ﻿namespace Toolkit.Foundation;
 
-public interface IObservableCollectionViewModel<TItem> : 
+public interface IObservableCollectionViewModel<TItem> :
     IObservableViewModel;

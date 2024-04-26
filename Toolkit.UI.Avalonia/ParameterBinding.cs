@@ -16,6 +16,7 @@ public class ParameterBinding :
         get => GetValue(KeyProperty);
         set => SetValue(KeyProperty, value);
     }
+
     public object Value
     {
         get => GetValue(ValueProperty);

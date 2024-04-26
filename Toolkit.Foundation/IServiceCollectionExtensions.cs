@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Configuration.Json;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.FileProviders.Physical;
@@ -29,7 +28,7 @@ public static class IServiceCollectionExtensions
     }
 
     public static IServiceCollection AddComponent<TComponent>(this IServiceCollection services)
-        where TComponent : class, 
+        where TComponent : class,
         IComponent
     {
         services.AddTransient<IComponent, TComponent>();
@@ -48,13 +47,13 @@ public static class IServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection AddConfiguration<TConfiguration>(this IServiceCollection services, 
+    public static IServiceCollection AddConfiguration<TConfiguration>(this IServiceCollection services,
         string section)
         where TConfiguration : class, new() =>
             services.AddConfiguration<TConfiguration>(section, "Settings.json", null);
 
     public static IServiceCollection AddConfiguration<TConfiguration>(this IServiceCollection services)
-        where TConfiguration : class, new() => 
+        where TConfiguration : class, new() =>
             services.AddConfiguration<TConfiguration>(typeof(TConfiguration).Name, "Settings.json", null);
 
     public static IServiceCollection AddConfiguration<TConfiguration>(this IServiceCollection services,
@@ -85,7 +84,7 @@ public static class IServiceCollectionExtensions
 
     public static IServiceCollection AddConfiguration<TConfiguration>(this IServiceCollection services,
         object configuration)
-        where TConfiguration : class, new() => 
+        where TConfiguration : class, new() =>
             services.AddConfiguration(configuration.GetType().Name,
                 "Settings.json", (TConfiguration?)configuration);
 
@@ -130,7 +129,7 @@ public static class IServiceCollectionExtensions
         services.TryAddKeyedTransient<IConfigurationWriter<TConfiguration>>(section, (provider, key) =>
             new ConfigurationWriter<TConfiguration>(provider.GetRequiredKeyedService<IConfigurationSource<TConfiguration>>(key)));
 
-        services.TryAddKeyedTransient<IConfigurationFactory<TConfiguration>>(section, (provider, key) => 
+        services.TryAddKeyedTransient<IConfigurationFactory<TConfiguration>>(section, (provider, key) =>
             new ConfigurationFactory<TConfiguration>(() => defaultConfiguration ?? new TConfiguration()));
 
         services.AddTransient<IInitializer, ConfigurationInitializer<TConfiguration>>(provider =>
@@ -147,7 +146,7 @@ public static class IServiceCollectionExtensions
         services.TryAddKeyedTransient<IConfigurationDescriptor<TConfiguration>>(section, (provider, key) =>
             new ConfigurationDescriptor<TConfiguration>(section, provider.GetRequiredKeyedService<IConfigurationReader<TConfiguration>>(key)));
 
-        services.AddTransient(provider => 
+        services.AddTransient(provider =>
             provider.GetRequiredKeyedService<IConfigurationDescriptor<TConfiguration>>(section));
 
         services.AddTransient(provider =>
@@ -258,7 +257,7 @@ public static class IServiceCollectionExtensions
 
         key ??= viewModelType.Name.Replace("ViewModel", "");
 
-        services.AddTransient(viewModelType, provider => 
+        services.AddTransient(viewModelType, provider =>
             provider.GetRequiredService<IServiceFactory>().Create<TViewModel>(parameters)!);
 
         services.AddTransient(viewType);
@@ -268,7 +267,7 @@ public static class IServiceCollectionExtensions
 
         services.AddKeyedTransient(viewType, key);
 
-        services.AddTransient<IContentTemplateDescriptor>(provider => 
+        services.AddTransient<IContentTemplateDescriptor>(provider =>
             new ContentTemplateDescriptor(key, viewModelType, viewType, parameters));
 
         return services;

@@ -6,10 +6,10 @@ public class NavigateHandler(ComponentScope scope,
     IComponentScopeProvider provider) :
     INotificationHandler<Navigate>
 {
-    public async Task Handle(Navigate args, 
+    public async Task Handle(Navigate args,
         CancellationToken cancellationToken)
     {
-        if (provider.Get(args.Scope ?? scope.Name) 
+        if (provider.Get(args.Scope ?? scope.Name)
             is ComponentScopeDescriptor descriptor)
         {
             if (descriptor?.Services?.GetService<INavigationScope>() is INavigationScope navigationScope)

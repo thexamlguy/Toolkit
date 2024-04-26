@@ -5,8 +5,8 @@ using System.Windows.Input;
 
 namespace Toolkit.UI.Avalonia;
 
-public class KeyBindingTriggerBehavior : 
-    Trigger<InputElement>, 
+public class KeyBindingTriggerBehavior :
+    Trigger<InputElement>,
     ICommand
 {
     public static readonly StyledProperty<KeyGesture> GestureProperty =
@@ -38,6 +38,6 @@ public class KeyBindingTriggerBehavior :
 
     public bool CanExecute(object? parameter) => true;
 
-    public void Execute(object? parameter) => 
+    public void Execute(object? parameter) =>
         Interaction.ExecuteActions(AssociatedObject, Actions, null);
 }

@@ -1,10 +1,10 @@
-﻿using System.Reactive.Disposables;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Concurrent;
+using System.Reactive.Disposables;
 
 namespace Toolkit.Foundation;
 
-public class Disposer : 
+public class Disposer :
     IDisposer
 {
     private readonly ConcurrentDictionary<object, CompositeDisposable> subjects = [];
@@ -45,10 +45,10 @@ public class Disposer :
         }
     }
 
-    public TDisposable Replace<TDisposable>(object subject, 
-        IDisposable disposer, 
+    public TDisposable Replace<TDisposable>(object subject,
+        IDisposable disposer,
         TDisposable replacement)
-        where TDisposable : 
+        where TDisposable :
         IDisposable
     {
         CompositeDisposable disposables = subjects.GetOrAdd(subject, args => new CompositeDisposable());
@@ -61,7 +61,7 @@ public class Disposer :
         return replacement;
     }
 
-    public void Remove(object subject, 
+    public void Remove(object subject,
         IDisposable disposer)
     {
         CompositeDisposable disposables = subjects.GetOrAdd(subject, args => new CompositeDisposable());

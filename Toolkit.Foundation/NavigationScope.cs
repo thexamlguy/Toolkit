@@ -7,16 +7,16 @@ public class NavigationScope(IPublisher publisher,
     IServiceFactory factory,
     INavigationProvider navigationProvider,
     INavigationContextProvider navigationContextProvider,
-    IContentTemplateDescriptorProvider contentTemplateDescriptorProvider) : 
+    IContentTemplateDescriptorProvider contentTemplateDescriptorProvider) :
     INavigationScope
 {
-    public async Task NavigateAsync(string route, object? sender = null, object? context = null, 
+    public async Task NavigateAsync(string route, object? sender = null, object? context = null,
         EventHandler? navigated = null, object[]? parameters = null, CancellationToken cancellationToken = default)
     {
         string[] segments = route.Split('/');
         int segmentCount = segments.Length;
         int currentSegmentIndex = 0;
-        
+
         foreach (object segment in segments)
         {
             currentSegmentIndex++;
@@ -79,7 +79,7 @@ public class NavigationScope(IPublisher publisher,
         }
     }
 
-    public async Task NavigateBackAsync(object? context, 
+    public async Task NavigateBackAsync(object? context,
         CancellationToken cancellationToken = default)
     {
         if (context is not null)
@@ -101,4 +101,3 @@ public class NavigationScope(IPublisher publisher,
         }
     }
 }
-

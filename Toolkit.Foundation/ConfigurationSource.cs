@@ -153,7 +153,7 @@ public class ConfigurationSource<TConfiguration>(IConfigurationFile<TConfigurati
 
                 if (currentNode is not null)
                 {
-                    value = JsonSerializer.Deserialize<TConfiguration>(currentNode[segments[lastIndex]], 
+                    value = JsonSerializer.Deserialize<TConfiguration>(currentNode[segments[lastIndex]],
                         serializerOptions ?? defaultSerializerOptions());
                     return true;
                 }

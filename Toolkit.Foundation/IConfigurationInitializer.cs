@@ -1,6 +1,6 @@
 ﻿namespace Toolkit.Foundation;
 
-public interface IConfigurationInitializer<TConfiguration> 
+public interface IConfigurationInitializer<TConfiguration>
     where TConfiguration :
     class
 {

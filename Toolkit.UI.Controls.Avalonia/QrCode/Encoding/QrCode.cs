@@ -8,21 +8,21 @@ namespace Gma.QrCodeNet.Encoding;
 /// </summary>
 public class QrCode
 {
-	internal QrCode(BitMatrix matrix)
-	{
-		Matrix = matrix;
-		IsContainMatrix = true;
-	}
+    internal QrCode(BitMatrix matrix)
+    {
+        Matrix = matrix;
+        IsContainMatrix = true;
+    }
 
-	public bool IsContainMatrix
-	{
-		get;
-		private set;
-	}
+    public bool IsContainMatrix
+    {
+        get;
+        private set;
+    }
 
-	public BitMatrix Matrix
-	{
-		get;
-		private set;
-	}
+    public BitMatrix Matrix
+    {
+        get;
+        private set;
+    }
 }

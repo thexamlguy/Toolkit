@@ -19,6 +19,7 @@ public interface IPublisher
         object key,
         CancellationToken cancellationToken = default)
         where TMessage : notnull;
+
     Task PublishUI<TMessage>(object key,
         CancellationToken cancellationToken = default)
         where TMessage : new();

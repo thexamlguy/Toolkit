@@ -18,7 +18,7 @@ public class NotificationHandlerWrapper<TMessage>(INotificationHandler<TMessage>
                 await behaviour.Handle(args, previousHandler, token);
             };
         }
-        
+
         await currentHandler(message, cancellationToken);
     }
 }

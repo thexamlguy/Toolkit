@@ -1,5 +1,3 @@
-using System;
-
 namespace Gma.QrCodeNet.Encoding;
 
 /// <summary>
@@ -7,11 +5,11 @@ namespace Gma.QrCodeNet.Encoding;
 /// </summary>
 public class InputOutOfBoundaryException : Exception
 {
-	public InputOutOfBoundaryException() : base()
-	{
-	}
+    public InputOutOfBoundaryException() : base()
+    {
+    }
 
-	public InputOutOfBoundaryException(string message) : base(message)
-	{
-	}
+    public InputOutOfBoundaryException(string message) : base(message)
+    {
+    }
 }

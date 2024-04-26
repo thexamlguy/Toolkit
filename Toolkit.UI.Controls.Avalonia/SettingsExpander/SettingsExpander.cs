@@ -4,7 +4,7 @@ namespace Toolkit.UI.Controls.Avalonia;
 
 public class SettingsExpander : FluentAvalonia.UI.Controls.SettingsExpander
 {
-    protected override Type StyleKeyOverride => 
+    protected override Type StyleKeyOverride =>
         typeof(SettingsExpander);
 
     public new static readonly StyledProperty<object> DescriptionProperty =

@@ -144,13 +144,13 @@ public static class Test
                 services.AddTransient(provider =>
                     provider.GetRequiredKeyedService<IConfigurationDescriptor<TConfiguration>>(section).Value);
             }
-
         });
 
         return builder;
     }
 }
-public class DefaultBuilder : 
+
+public class DefaultBuilder :
     HostBuilder
 {
     public static IHostBuilder Create()
@@ -166,7 +166,7 @@ public class DefaultBuilder :
                 services.AddScoped<IServiceFactory>(provider =>
                     new ServiceFactory((type, parameters) => ActivatorUtilities.CreateInstance(provider, type, parameters!)));
 
-                services.AddSingleton<IComponentHostCollection, 
+                services.AddSingleton<IComponentHostCollection,
                     ComponentHostCollection>();
 
                 services.AddScoped<SubscriptionCollection>();

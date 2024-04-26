@@ -1,4 +1,4 @@
 ﻿namespace Toolkit.Foundation;
 
-public class NavigationContextCollection : Dictionary<object, object?>, 
+public class NavigationContextCollection : Dictionary<object, object?>,
     INavigationContextCollection;

@@ -2,8 +2,8 @@
 
 namespace Toolkit.Foundation;
 
-public class AsyncLock(int initial = 1, 
-    int maximum = 1) : 
+public class AsyncLock(int initial = 1,
+    int maximum = 1) :
     IDisposable
 {
     private readonly SemaphoreSlim semaphore = new(initial, maximum);

@@ -4,12 +4,12 @@ namespace Toolkit.Foundation;
 
 public static class IHostBuilderExtensions
 {
-    public static IHostBuilder UseContentRoot(this IHostBuilder hostBuilder, 
+    public static IHostBuilder UseContentRoot(this IHostBuilder hostBuilder,
         string contentRoot,
         bool createDirectory)
     {
         if (createDirectory)
-        { 
+        {
             Directory.CreateDirectory(contentRoot);
         }
 

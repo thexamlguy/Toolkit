@@ -14,10 +14,10 @@ public interface ICache<TKey, TValue> :
     IEnumerable<KeyValuePair<TKey, TValue>>
     where TKey :
     notnull
-    where TValue : 
+    where TValue :
     notnull
 {
-    void Add(TKey key, 
+    void Add(TKey key,
         TValue value);
 
     void Clear();

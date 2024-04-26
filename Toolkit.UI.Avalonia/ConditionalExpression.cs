@@ -1,10 +1,9 @@
 ﻿using Avalonia;
 using Avalonia.Metadata;
-using Toolkit.UI.Avalonia;
 
 namespace Toolkit.UI.Avalonia;
 
-public class ConditionalExpression : 
+public class ConditionalExpression :
     AvaloniaObject,
     ICondition
 {
@@ -18,7 +17,7 @@ public class ConditionalExpression :
         SetValue(ConditionsProperty, []);
 
     [Content]
-    public ConditionCollection Conditions => 
+    public ConditionCollection Conditions =>
         GetValue(ConditionsProperty);
 
     public ForwardChaining ForwardChaining

@@ -9,4 +9,3 @@ public interface IConfirmation
 {
     Task<bool> Confirm();
 }
-

@@ -7,13 +7,13 @@ using Avalonia.Styling;
 
 namespace Toolkit.UI.Controls.Avalonia;
 
-public class FastRendererBackground : 
+public class FastRendererBackground :
     Image, IDisposable
 {
     private const int ImageWidth = 100;
     private const int ImageHeight = 100;
 
-    private readonly WriteableBitmap bitmap = new(new PixelSize(ImageWidth, ImageHeight), 
+    private readonly WriteableBitmap bitmap = new(new PixelSize(ImageWidth, ImageHeight),
         new Vector(96, 96), PixelFormat.Bgra8888);
 
     private readonly FastNoiseBackgroundRenderer renderer = new();
@@ -29,7 +29,7 @@ public class FastRendererBackground :
         base.EndInit();
         if (Application.Current?.ActualThemeVariant is ThemeVariant theme)
         {
-            renderer.UpdateValues((Color)Application.Current.FindResource("SystemAccentColorLight3"), 
+            renderer.UpdateValues((Color)Application.Current.FindResource("SystemAccentColorLight3"),
                 (Color)Application.Current.FindResource("SystemAccentColorDark3"), theme);
         }
 

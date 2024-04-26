@@ -3,7 +3,7 @@ using Toolkit.UI.Controls.Avalonia;
 
 namespace Toolkit.Avalonia;
 
-public class ContentDialogHandler(IDispatcher dispatcher) : 
+public class ContentDialogHandler(IDispatcher dispatcher) :
     INavigateHandler<ContentDialog>
 {
     public async Task Handle(Navigate<ContentDialog> args,
@@ -50,7 +50,7 @@ public class ContentDialogHandler(IDispatcher dispatcher) :
             async void HandleClosing(FluentAvalonia.UI.Controls.ContentDialog sender,
                  FluentAvalonia.UI.Controls.ContentDialogClosingEventArgs args)
             {
-                if (args.Result == FluentAvalonia.UI.Controls.ContentDialogResult.Primary || 
+                if (args.Result == FluentAvalonia.UI.Controls.ContentDialogResult.Primary ||
                     args.Result == FluentAvalonia.UI.Controls.ContentDialogResult.Secondary)
                 {
                     contentDialog.Closing -= HandleClosing;
@@ -93,12 +93,12 @@ public class ContentDialogHandler(IDispatcher dispatcher) :
                     }
 
                     if (content is IActivated activated)
-                    {           
+                    {
                         await activated.Activated();
                     }
                 }
             }
-            
+
             contentDialog.Opened += HandleOpened;
             contentDialog.Closing += HandleClosing;
             contentDialog.PrimaryButtonClick += HandlePrimaryButtonClick;

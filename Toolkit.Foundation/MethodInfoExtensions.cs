@@ -12,7 +12,7 @@ public static class MethodInfoExtensions
     }
 
     public static async Task InvokeAsync(this MethodInfo methodInfo,
-        object? obj, 
+        object? obj,
         params object[] parameters)
     {
         await (dynamic?)methodInfo.Invoke(obj, parameters);

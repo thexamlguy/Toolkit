@@ -4,7 +4,7 @@ using Avalonia.Xaml.Interactivity;
 
 namespace Toolkit.UI.Avalonia;
 
-public class ConditionAction : 
+public class ConditionAction :
     AvaloniaObject,
     IAction
 {

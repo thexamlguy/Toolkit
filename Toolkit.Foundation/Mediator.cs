@@ -12,7 +12,7 @@ public class Mediator(IServiceProvider provider) :
         Type handlerType = typeof(HandlerWrapper<,>).MakeGenericType(request.GetType(),
             typeof(TResponse));
 
-        if (provider.GetService(handlerType) 
+        if (provider.GetService(handlerType)
             is object handler)
         {
             if (handlerType.GetMethod("Handle") is MethodInfo handleMethod)
@@ -27,14 +27,14 @@ public class Mediator(IServiceProvider provider) :
     public Task<object?> Handle(object message,
         CancellationToken cancellationToken = default)
     {
-        if (message.GetType().GetInterface(typeof(IRequest<>).Name) is Type requestType &&
+        if (message.GetType().GetInterface(message.GetType().Name) is Type requestType &&
             requestType.GetGenericArguments().Length == 1)
         {
             Type responseType = requestType.GetGenericArguments()[0];
-            Type handlerType = typeof(HandlerWrapper<,>).MakeGenericType(message.GetType(), 
+            Type handlerType = typeof(HandlerWrapper<,>).MakeGenericType(message.GetType(),
                 responseType);
 
-            if (provider.GetService(handlerType) 
+            if (provider.GetService(handlerType)
                 is object handler)
             {
                 if (handlerType.GetMethod("Handle") is MethodInfo handleMethod)

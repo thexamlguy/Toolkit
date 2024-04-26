@@ -2,7 +2,7 @@
 
 namespace Toolkit.Foundation;
 
-public  partial class ObservableViewModel : 
+public partial class ObservableViewModel :
     ObservableObject,
     IObservableViewModel,
     IInitializer,

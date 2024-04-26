@@ -15,7 +15,6 @@ public partial class ValueViewModel<TValue>(IServiceProvider provider,
 
     protected virtual void OnChanged(TValue? value)
     {
-
     }
 
     partial void OnValueChanged(TValue? value) => OnChanged(value);

@@ -2,7 +2,7 @@
 
 namespace Toolkit.Foundation;
 
-public class ServiceScopeFactory<TService>(IServiceScopeFactory serviceScopeFactory, 
+public class ServiceScopeFactory<TService>(IServiceScopeFactory serviceScopeFactory,
     ICache<TService, IServiceScope> cache) :
     IServiceScopeFactory<TService>
     where TService : notnull

@@ -4,4 +4,3 @@ public interface IComponentScopeProvider
 {
     ComponentScopeDescriptor? Get(string key);
 }
-

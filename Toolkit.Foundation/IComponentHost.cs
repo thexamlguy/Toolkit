@@ -2,7 +2,7 @@
 
 namespace Toolkit.Foundation;
 
-public interface IComponentHost : 
+public interface IComponentHost :
     IHost
 {
     ComponentConfiguration? Configuration { get; }

@@ -54,7 +54,7 @@ public class ContentTemplate :
 
                         control.Loaded += HandleLoaded;
                         control.Unloaded += HandleUnloaded;
-                        
+
                         viewModelContentBinder?.Set(control);
 
                         return control;

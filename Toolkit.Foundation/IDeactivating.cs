@@ -5,7 +5,7 @@ public interface IDeactivating
     Task Deactivating();
 }
 
-public interface IDeactivating<TResult> 
+public interface IDeactivating<TResult>
 {
     Task<TResult> Deactivating();
 }

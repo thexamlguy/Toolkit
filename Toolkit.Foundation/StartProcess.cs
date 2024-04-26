@@ -1,3 +1,3 @@
 ﻿namespace Toolkit.Foundation;
 
-public record StartProcess(string Process) : IRequest;
+public record StartProcess(string Process);

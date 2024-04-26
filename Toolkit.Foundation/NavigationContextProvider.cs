@@ -6,7 +6,7 @@ public class NavigationContextProvider(INavigationContextCollection contexts) :
     public object? Get(object key) =>
         contexts.TryGetValue(key, out object? target) ? target : default;
 
-    public bool TryGet(object name, 
+    public bool TryGet(object name,
         out object? value)
     {
         if (contexts.TryGetValue(name,

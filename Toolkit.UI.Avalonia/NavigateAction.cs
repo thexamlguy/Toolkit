@@ -51,6 +51,7 @@ public class NavigateAction :
         get => GetValue(RouteProperty);
         set => SetValue(RouteProperty, value);
     }
+
     public string Scope
     {
         get => GetValue(ScopeProperty);
@@ -62,12 +63,13 @@ public class NavigateAction :
     {
         if (sender is TemplatedControl control)
         {
-            Dictionary<string, object> arguments = 
+            Dictionary<string, object> arguments =
                 new(StringComparer.InvariantCultureIgnoreCase);
 
             if (control.DataContext is IObservableViewModel observableViewModel)
             {
-                object[] parameters = [.. Parameters ?? Enumerable.Empty<object?>(), ..
+                object[] parameters = [.. Parameters ?? Enumerable.Empty<object?>(),
+                    ..
                     ParameterBindings is { Count: > 0 } ?
                     ParameterBindings.Select(binding => new KeyValuePair<string, object>(binding.Key, binding.Value)).ToArray() :
                     Enumerable.Empty<KeyValuePair<string, object>>()];

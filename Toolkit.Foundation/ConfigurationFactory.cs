@@ -1,7 +1,7 @@
 ﻿namespace Toolkit.Foundation;
 
 public class ConfigurationFactory<TConfiguration>(Func<TConfiguration> factory) :
-    IConfigurationFactory<TConfiguration> 
+    IConfigurationFactory<TConfiguration>
     where TConfiguration :
     class
 {

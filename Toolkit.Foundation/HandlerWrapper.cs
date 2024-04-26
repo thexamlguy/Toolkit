@@ -4,10 +4,10 @@ public class HandlerWrapper<TRequest, TResponse>(IHandler<TRequest, TResponse> h
     IEnumerable<IPipelineBehaviour<TRequest, TResponse>> pipelineBehaviours)
     where TRequest : class
 {
-    private readonly IEnumerable<IPipelineBehaviour<TRequest, TResponse>> pipelineBehaviours = 
+    private readonly IEnumerable<IPipelineBehaviour<TRequest, TResponse>> pipelineBehaviours =
         pipelineBehaviours.Reverse();
 
-    public async Task<TResponse> Handle(TRequest request, 
+    public async Task<TResponse> Handle(TRequest request,
         CancellationToken cancellationToken)
     {
         HandlerDelegate<TRequest, TResponse> currentHandler = handler.Handle;

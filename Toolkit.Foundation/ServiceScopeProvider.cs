@@ -6,7 +6,7 @@ public class ServiceScopeProvider<TService>(ICache<TService, IServiceScope> cach
     IServiceScopeProvider<TService>
     where TService : notnull
 {
-    public bool TryGet(TService service, 
+    public bool TryGet(TService service,
         out IServiceScope? serviceScope)
     {
         if (cache.TryGetValue(service, out IServiceScope? value))

@@ -10,9 +10,9 @@ public partial class CommandViewModel(IServiceProvider provider,
     IDisposer disposer) :
     ObservableViewModel(provider, factory, mediator, publisher, subscriber, disposer)
 {
-    public IRelayCommand InvokeCommand => 
+    public IRelayCommand InvokeCommand =>
         new AsyncRelayCommand(InvokeAsync);
 
-    protected virtual Task InvokeAsync() => 
+    protected virtual Task InvokeAsync() =>
         Task.CompletedTask;
 }

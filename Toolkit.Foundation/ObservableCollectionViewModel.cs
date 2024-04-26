@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.Reactive.Disposables;
 
 namespace Toolkit.Foundation;
+
 public partial class ObservableCollectionViewModel<TViewModel> :
     ObservableObject,
     IObservableCollectionViewModel<TViewModel>,
@@ -22,7 +23,7 @@ public partial class ObservableCollectionViewModel<TViewModel> :
     INotificationHandler<Insert<TViewModel>>,
     INotificationHandler<Move<TViewModel>>,
     INotificationHandler<Replace<TViewModel>>
-    where TViewModel : 
+    where TViewModel :
     notnull
 {
     private readonly ObservableCollection<TViewModel> collection = [];
@@ -113,7 +114,6 @@ public partial class ObservableCollectionViewModel<TViewModel> :
             }
             catch (InvalidCastException)
             {
-
             }
 
             this[index] = item!;
@@ -172,7 +172,6 @@ public partial class ObservableCollectionViewModel<TViewModel> :
         }
         catch (InvalidCastException)
         {
-
         }
 
         Add(item!);
@@ -280,7 +279,7 @@ public partial class ObservableCollectionViewModel<TViewModel> :
         return Task.CompletedTask;
     }
 
-    public Task Handle(Replace<TViewModel> args, 
+    public Task Handle(Replace<TViewModel> args,
         CancellationToken cancellationToken)
     {
         if (args.Value is TViewModel item)
@@ -366,7 +365,7 @@ public partial class ObservableCollectionViewModel<TViewModel> :
     public void RemoveAt(int index) =>
         RemoveItem(index);
 
-    public bool Replace(int index, 
+    public bool Replace(int index,
         TViewModel item)
     {
         if (index <= Count - 1)
@@ -409,12 +408,12 @@ public partial class ObservableCollectionViewModel<TViewModel> :
     private static bool IsCompatibleObject(object? value) =>
         (value is TViewModel) || (value == null && default(TViewModel) == null);
 
-    private void OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs args) => 
+    private void OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs args) =>
         CollectionChanged?.Invoke(this, args);
 }
 
 public class ObservableCollectionViewModel(IServiceProvider provider,
-    IServiceFactory factory, 
+    IServiceFactory factory,
     IMediator mediator,
     IPublisher publisher,
     ISubscriber subscriber,

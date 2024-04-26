@@ -11,7 +11,7 @@ public class ClassicDesktopStyleApplicationHandler(INavigationContext navigation
     public Task Handle(Navigate<IClassicDesktopStyleApplicationLifetime> args,
         CancellationToken cancellationToken = default)
     {
-        if (Application.Current?.ApplicationLifetime is 
+        if (Application.Current?.ApplicationLifetime is
             IClassicDesktopStyleApplicationLifetime lifeTime)
         {
             if (args.Template is Window window)

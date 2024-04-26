@@ -12,7 +12,6 @@ public class ConfigurationChangedHandler<TConfiguration, TValue>(ConfigurationVa
         {
             if (configurationValue.TryUpdate(configuration, out TValue value))
             {
-
             }
         }
 

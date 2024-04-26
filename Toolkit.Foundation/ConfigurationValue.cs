@@ -1,12 +1,12 @@
 ﻿namespace Toolkit.Foundation;
 
 public class ConfigurationValue<TConfiguration, TValue>(Func<TConfiguration, Action<TValue>> changed)
-    where TValue : 
+    where TValue :
     class, new()
 {
     private TValue? currentValue;
 
-    public bool TryUpdate(TConfiguration configuration, 
+    public bool TryUpdate(TConfiguration configuration,
         out TValue value)
     {
         TValue newValue = new();

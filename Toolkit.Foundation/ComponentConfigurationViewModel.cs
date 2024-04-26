@@ -8,17 +8,16 @@ public partial class ComponentConfigurationViewModel<TConfiguration, TValue, THe
     INotificationHandler<Changed<TConfiguration>>
     where TConfiguration : class
 {
-    public ComponentConfigurationViewModel(IServiceProvider provider, 
+    public ComponentConfigurationViewModel(IServiceProvider provider,
         IServiceFactory factory,
         IMediator mediator,
         IPublisher publisher,
-        ISubscriber subscriber, 
+        ISubscriber subscriber,
         IDisposer disposer,
         THeader header,
         TDescription description,
         TAction action) : base(provider, factory, mediator, publisher, subscriber, disposer)
     {
-
     }
 
     public Task Handle(Changed<TConfiguration> args,
@@ -58,6 +57,7 @@ public partial class ComponentConfigurationViewModel<TConfiguration, TValue, TAc
         Value = valueDelegate.Invoke(configuration);
         return base.Activated();
     }
+
     public Task Handle(Changed<TConfiguration> args,
         CancellationToken cancellationToken = default)
     {

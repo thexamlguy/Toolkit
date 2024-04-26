@@ -7,7 +7,7 @@ using Toolkit.UI.Controls.Avalonia;
 
 namespace Toolkit.Avalonia;
 
-public class FrameHandler(INavigationContext navigationContext) : 
+public class FrameHandler(INavigationContext navigationContext) :
     INavigateHandler<Frame>,
     INavigateBackHandler<Frame>
 {
@@ -19,13 +19,13 @@ public class FrameHandler(INavigationContext navigationContext) :
             frame.NavigationPageFactory ??= new NavigationPageFactory();
             if (args.Template is Control control)
             {
-                void NavigatingFrom(object? sender, 
+                void NavigatingFrom(object? sender,
                     Control control)
                 {
-                    async void HandleNavigatingFrom(object? _, 
+                    async void HandleNavigatingFrom(object? _,
                         NavigatingCancelEventArgs args)
                     {
-                        Dictionary<string,object> results = [];
+                        Dictionary<string, object> results = [];
 
                         control.RemoveHandler(Frame.NavigatingFromEvent, HandleNavigatingFrom);
                         NavigatedFrom(sender, control, () => results);
@@ -71,13 +71,13 @@ public class FrameHandler(INavigationContext navigationContext) :
                                     }
                                 }
                             }
-                        }      
+                        }
                     }
 
                     control.AddHandler(Frame.NavigatingFromEvent, HandleNavigatingFrom);
                 }
 
-                void NavigatedFrom(object? sender, 
+                void NavigatedFrom(object? sender,
                     Control control,
                     Func<Dictionary<string, object>> resultCallBack)
                 {
@@ -109,9 +109,9 @@ public class FrameHandler(INavigationContext navigationContext) :
                                             contract.GetGenericArguments() is { Length: 1 } arguments)
                                         {
                                             if (contentType.GetMethods().FirstOrDefault(x =>
-                                                x.Name == "NavigatedToAsync" && 
+                                                x.Name == "NavigatedToAsync" &&
                                                     x.GetCustomAttribute<NavigationContextAttribute>()
-                                                    is NavigationContextAttribute attribute && results.ContainsKey(attribute.Name)) 
+                                                    is NavigationContextAttribute attribute && results.ContainsKey(attribute.Name))
                                                 is MethodInfo methodInfo)
                                             {
                                                 if (methodInfo.GetCustomAttribute<NavigationContextAttribute>()
@@ -153,10 +153,10 @@ public class FrameHandler(INavigationContext navigationContext) :
                     control.AddHandler(Frame.NavigatedFromEvent, HandleNavigatedFrom);
                 }
 
-                void NavigatedTo(object? sender, 
+                void NavigatedTo(object? sender,
                     Control control)
                 {
-                    async void HandleNavigatedTo(object? _, 
+                    async void HandleNavigatedTo(object? _,
                         NavigationEventArgs __)
                     {
                         control.RemoveHandler(Frame.NavigatedToEvent, HandleNavigatedTo);

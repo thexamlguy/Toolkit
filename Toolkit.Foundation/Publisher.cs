@@ -5,18 +5,18 @@ namespace Toolkit.Foundation;
 
 public class Publisher(ISubscriptionManager subscriptionManager,
     IServiceProvider provider,
-    IDispatcher dispatcher) : 
+    IDispatcher dispatcher) :
     IPublisher
 {
     public Task Publish<TMessage>(object key,
         CancellationToken cancellationToken = default)
-        where TMessage : new() => 
+        where TMessage : new() =>
             Publish(new TMessage(), async args => await args(),
                 key, cancellationToken);
 
     public Task Publish<TMessage>(TMessage message,
         CancellationToken cancellationToken = default)
-        where TMessage : notnull => 
+        where TMessage : notnull =>
             Publish(message, async args => await args(),
                 null, cancellationToken);
 
@@ -24,7 +24,7 @@ public class Publisher(ISubscriptionManager subscriptionManager,
         object key,
         CancellationToken cancellationToken = default)
         where TMessage : notnull =>
-            Publish(message, async args => await args(), 
+            Publish(message, async args => await args(),
                 key, cancellationToken);
 
     public async Task Publish(object message,
@@ -65,31 +65,32 @@ public class Publisher(ISubscriptionManager subscriptionManager,
             async args => await args(),
                 null, cancellationToken);
 
-    public Task Publish<TMessage>(CancellationToken cancellationToken = default) 
-        where TMessage :  new() => 
+    public Task Publish<TMessage>(CancellationToken cancellationToken = default)
+        where TMessage : new() =>
             Publish(new TMessage(), async args => await args(),
                 null, cancellationToken);
 
     public Task PublishUI<TMessage>(object key,
         CancellationToken cancellationToken = default)
-        where TMessage : new() => 
-            Publish(new TMessage(), args =>  dispatcher.InvokeAsync(async () => await args()),
+        where TMessage : new() =>
+            Publish(new TMessage(), args => dispatcher.InvokeAsync(async () => await args()),
                 key, cancellationToken);
 
     public Task PublishUI<TMessage>(TMessage message,
         CancellationToken cancellationToken = default)
-        where TMessage : notnull => 
+        where TMessage : notnull =>
             Publish(message, args => dispatcher.InvokeAsync(async () => await args()),
                 null, cancellationToken);
 
     public Task PublishUI<TMessage>(TMessage message,
         object key,
         CancellationToken cancellationToken = default)
-        where TMessage : notnull => 
+        where TMessage : notnull =>
             Publish(message, args => dispatcher.InvokeAsync(async () => await args()),
                 key, cancellationToken);
+
     public Task PublishUI<TMessage>(CancellationToken cancellationToken = default)
-        where TMessage : new() => 
+        where TMessage : new() =>
             Publish(new TMessage(), args => dispatcher.InvokeAsync(async () => await args()),
                 null, cancellationToken);
 

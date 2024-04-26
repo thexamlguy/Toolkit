@@ -1,6 +1,6 @@
 ﻿namespace Toolkit.Foundation;
 
-public class ConfigurationInitializer<TConfiguration>(IConfigurationReader<TConfiguration> reader, 
+public class ConfigurationInitializer<TConfiguration>(IConfigurationReader<TConfiguration> reader,
     IConfigurationWriter<TConfiguration> writer,
     IConfigurationFactory<TConfiguration> factory,
     IPublisher publisher) :

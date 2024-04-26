@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 
 namespace Toolkit.Foundation;
 
@@ -17,22 +16,22 @@ public class ComponentInitializer(IEnumerable<IComponent> components,
             IComponentBuilder builder = component.Create();
             builder.AddServices(services =>
             {
-                services.AddTransient(_ => 
+                services.AddTransient(_ =>
                     provider.GetRequiredService<IProxyService<IPublisher>>());
 
                 services.AddTransient(_ =>
                     provider.GetRequiredService<IProxyService<IComponentHostCollection>>());
 
-                services.AddScoped(_ => 
+                services.AddScoped(_ =>
                     provider.GetRequiredService<INavigationContextCollection>());
-                
-                services.AddScoped(_ => 
+
+                services.AddScoped(_ =>
                     provider.GetRequiredService<INavigationContextProvider>());
 
-                services.AddScoped(_ => 
+                services.AddScoped(_ =>
                     provider.GetRequiredService<IComponentScopeCollection>());
 
-                services.AddTransient(_ => 
+                services.AddTransient(_ =>
                     provider.GetRequiredService<IComponentScopeProvider>());
 
                 services.AddRange(typedServices.Services);

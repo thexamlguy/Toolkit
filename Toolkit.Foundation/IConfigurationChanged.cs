@@ -1,4 +1,4 @@
 ﻿namespace Toolkit.Foundation;
 
-public interface IConfigurationChanged<TConfiguration> : 
+public interface IConfigurationChanged<TConfiguration> :
     IInitializer;

@@ -15,7 +15,6 @@ public class ComponentHost(IServiceProvider services,
 
     public void Dispose()
     {
-
     }
 
     public async Task StartAsync(CancellationToken cancellationToken = default)

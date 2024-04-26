@@ -9,29 +9,29 @@ using SkiaSharp;
 
 namespace Toolkit.UI.Controls.Avalonia;
 
-public class BlurBehind : 
+public class BlurBehind :
     Control
 {
     public static readonly StyledProperty<ExperimentalAcrylicMaterial> MaterialProperty =
         AvaloniaProperty.Register<BlurBehind, ExperimentalAcrylicMaterial>("Material");
 
-    public static readonly ImmutableExperimentalAcrylicMaterial DefaultAcrylicMaterialDark = 
+    public static readonly ImmutableExperimentalAcrylicMaterial DefaultAcrylicMaterialDark =
         (ImmutableExperimentalAcrylicMaterial)new ExperimentalAcrylicMaterial()
-    {
-        MaterialOpacity = 0.25,
-        TintColor = Colors.Black,
-        TintOpacity = 0.7,
-        PlatformTransparencyCompensationLevel = 0
-    }.ToImmutable();
+        {
+            MaterialOpacity = 0.25,
+            TintColor = Colors.Black,
+            TintOpacity = 0.7,
+            PlatformTransparencyCompensationLevel = 0
+        }.ToImmutable();
 
-    public static readonly ImmutableExperimentalAcrylicMaterial DefaultAcrylicMaterialLight = 
+    public static readonly ImmutableExperimentalAcrylicMaterial DefaultAcrylicMaterialLight =
         (ImmutableExperimentalAcrylicMaterial)new ExperimentalAcrylicMaterial()
-    {
-        MaterialOpacity = 0.0,
-        TintColor = Colors.White,
-        TintOpacity = 0.3,
-        PlatformTransparencyCompensationLevel = 0
-    }.ToImmutable();
+        {
+            MaterialOpacity = 0.0,
+            TintColor = Colors.White,
+            TintOpacity = 0.3,
+            PlatformTransparencyCompensationLevel = 0
+        }.ToImmutable();
 
     static BlurBehind()
     {
@@ -49,7 +49,7 @@ public class BlurBehind :
         ImmutableExperimentalAcrylicMaterial material = Material is not null
             ? (ImmutableExperimentalAcrylicMaterial)Material.ToImmutable()
             : Application.Current?.ActualThemeVariant == ThemeVariant.Dark ? DefaultAcrylicMaterialDark : DefaultAcrylicMaterialLight;
-       
+
         context.Custom(new BlurBehindRenderOperation(material, new Rect(default, Bounds.Size)));
     }
 
@@ -63,18 +63,17 @@ public class BlurBehind :
 
         public void Dispose()
         {
-
         }
 
-        public bool Equals(ICustomDrawOperation? other) => 
-            other is BlurBehindRenderOperation behindRenderOperation && 
+        public bool Equals(ICustomDrawOperation? other) =>
+            other is BlurBehindRenderOperation behindRenderOperation &&
             behindRenderOperation.bounds == bounds && behindRenderOperation.material.Equals(material);
 
         public bool HitTest(Point point) => bounds.Contains(point);
 
         public void Render(ImmediateDrawingContext context)
         {
-            if (context.TryGetFeature<ISkiaSharpApiLeaseFeature>() is ISkiaSharpApiLeaseFeature  leaseFeature)
+            if (context.TryGetFeature<ISkiaSharpApiLeaseFeature>() is ISkiaSharpApiLeaseFeature leaseFeature)
             {
                 using ISkiaSharpApiLease? lease = leaseFeature.Lease();
                 if (lease.SkCanvas is SKCanvas canvas)
@@ -92,7 +91,7 @@ public class BlurBehind :
                                     SKImageInfo.PlatformColorType, SKAlphaType.Premul));
 
                             using (SKImageFilter filter = SKImageFilter.CreateBlur(8, 8, SKShaderTileMode.Clamp))
-                            using (SKPaint blurPaint = new() { Shader = backdropShader, ImageFilter = filter }) 
+                            using (SKPaint blurPaint = new() { Shader = backdropShader, ImageFilter = filter })
                                 blurred.Canvas.DrawRect(5, 5, (float)bounds.Width - 20, (float)bounds.Height - 20, blurPaint);
 
                             using SKImage blurSnap = blurred.Snapshot();
@@ -105,11 +104,9 @@ public class BlurBehind :
 
                             canvas.DrawRect(0, 0, (float)bounds.Width, (float)bounds.Height, blurSnapPaint);
                         }
-
                     }
                 }
             }
         }
     }
 }
-

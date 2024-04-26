@@ -1,9 +1,9 @@
-﻿using Avalonia.Media.Imaging;
-using Avalonia.Styling;
-using Avalonia;
-using SukiUI.Utilities.Background;
-using Avalonia.Platform;
+﻿using Avalonia;
 using Avalonia.Media;
+using Avalonia.Media.Imaging;
+using Avalonia.Platform;
+using Avalonia.Styling;
+using SukiUI.Utilities.Background;
 
 namespace Toolkit.UI.Controls.Avalonia;
 
@@ -28,7 +28,7 @@ public class FastNoiseBackgroundRenderer
 
     public FastNoiseBackgroundRenderer(FastNoiseRendererOptions? options = null)
     {
-        FastNoiseRendererOptions opt = options ?? 
+        FastNoiseRendererOptions opt = options ??
             new FastNoiseRendererOptions(FastNoiseLite.NoiseType.OpenSimplex2);
 
         NoiseGen.SetNoiseType(opt.Type);
@@ -130,7 +130,7 @@ public class FastNoiseBackgroundRenderer
         return ARGB(A(back), resultR, resultG, resultB);
     }
 
-    private static byte G(uint col) => 
+    private static byte G(uint col) =>
         (byte)(col >> 8);
 
     private static uint GetBackgroundColour(Color input)
@@ -159,7 +159,7 @@ public class FastNoiseBackgroundRenderer
 
     private static byte R(uint col) => (byte)(col >> 16);
 
-    private static uint ToUInt32(Color colour) => 
+    private static uint ToUInt32(Color colour) =>
         (uint)(colour.A << 24 | colour.R << 16 | colour.G << 8 | colour.B);
 
     private static uint WithAlpha(uint col, byte a) => col & 0x00FFFFFF | (uint)(a << 24);
