@@ -178,7 +178,7 @@ public static class IServiceCollectionExtensions
                     services.Add(new ServiceDescriptor(wrapperType, provider =>
                         provider.GetService<IServiceFactory>()?.Create(wrapperType,
                             provider.GetRequiredService(typeof(INotificationHandler<>).MakeGenericType(notificationType)),
-                            provider.GetServices(typeof(IPipelineBehavior<>)
+                            provider.GetServices(typeof(IPipelineBehaviour<>)
                                 .MakeGenericType(notificationType)))!, lifetime));
                 }
 
@@ -197,7 +197,7 @@ public static class IServiceCollectionExtensions
                     services.Add(new ServiceDescriptor(wrapperType, provider =>
                         provider.GetService<IServiceFactory>()?.Create(wrapperType,
                                 provider.GetRequiredService<THandler>(),
-                                provider.GetServices(typeof(IPipelineBehavior<,>)
+                                provider.GetServices(typeof(IPipelineBehaviour<,>)
                                     .MakeGenericType(requestType, responseType)))!, lifetime));
                 }
             }

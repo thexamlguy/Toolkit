@@ -6,8 +6,8 @@ namespace Toolkit.UI.Controls.Avalonia;
 public class ThemeResources :
     Styles
 {
-    public ThemeResources(IServiceProvider? serviceProvider = null)
+    public ThemeResources(IServiceProvider? provider = null)
     {
-        AvaloniaXamlLoader.Load(serviceProvider, this);
+        AvaloniaXamlLoader.Load(provider, this);
     }
 }

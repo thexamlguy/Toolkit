@@ -1,12 +1,8 @@
 ﻿namespace Toolkit.Foundation;
 
-public record Request<TValue> : 
-    INotification
-{
-
-}
+public record Request<TValue>;
 
 public class Request
 {
-    public static Request<TValue> Create<TValue>() => new();
+    public static Request<TValue> As<TValue>() => new();
 }

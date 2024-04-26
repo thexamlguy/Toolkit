@@ -5,8 +5,9 @@ namespace Toolkit.Foundation;
 public class Mediator(IServiceProvider provider) :
     IMediator
 {
-    public Task<TResponse?> SendAsync<TResponse>(IRequest<TResponse> request,
+    public Task<TResponse?> Handle<TRequest, TResponse>(TRequest request,
         CancellationToken cancellationToken = default)
+        where TRequest : notnull
     {
         Type handlerType = typeof(HandlerWrapper<,>).MakeGenericType(request.GetType(),
             typeof(TResponse));
@@ -23,7 +24,7 @@ public class Mediator(IServiceProvider provider) :
         return Task.FromResult<TResponse?>(default);
     }
 
-    public Task<object?> SendAsync(object message,
+    public Task<object?> Handle(object message,
         CancellationToken cancellationToken = default)
     {
         if (message.GetType().GetInterface(typeof(IRequest<>).Name) is Type requestType &&

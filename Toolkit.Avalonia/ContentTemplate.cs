@@ -14,7 +14,7 @@ public class ContentTemplate :
     {
         if (item is IObservableViewModel observableViewModel)
         {
-            if (observableViewModel.ServiceProvider is IServiceProvider provider)
+            if (observableViewModel.Provider is IServiceProvider provider)
             {
                 IContentTemplateDescriptorProvider? contentTemplateProvider = provider.GetService<IContentTemplateDescriptorProvider>();
                 INavigationContext? viewModelContentBinder = provider.GetService<INavigationContext>();

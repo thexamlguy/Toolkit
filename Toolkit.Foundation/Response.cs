@@ -1,4 +1,3 @@
 ﻿namespace Toolkit.Foundation;
 
-public record Response<TValue>(TValue Value) :
-    INotification;
+public record Response<TValue>(TValue Value);

@@ -2,12 +2,13 @@
 
 namespace Toolkit.Foundation;
 
-public partial class ValueViewModel<TValue>(IServiceProvider serviceProvider,
-    IServiceFactory serviceFactory,
+public partial class ValueViewModel<TValue>(IServiceProvider provider,
+    IServiceFactory factory,
+    IMediator mediator,
     IPublisher publisher,
     ISubscriber subscriber,
     IDisposer disposer) :
-    ObservableViewModel(serviceProvider, serviceFactory, publisher, subscriber, disposer)
+    ObservableViewModel(provider, factory, mediator, publisher, subscriber, disposer)
 {
     [ObservableProperty]
     private TValue? value;

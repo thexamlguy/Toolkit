@@ -8,14 +8,15 @@ public partial class ComponentConfigurationViewModel<TConfiguration, TValue, THe
     INotificationHandler<Changed<TConfiguration>>
     where TConfiguration : class
 {
-    public ComponentConfigurationViewModel(IServiceProvider serviceProvider, 
-        IServiceFactory serviceFactory, 
+    public ComponentConfigurationViewModel(IServiceProvider provider, 
+        IServiceFactory factory,
+        IMediator mediator,
         IPublisher publisher,
         ISubscriber subscriber, 
         IDisposer disposer,
         THeader header,
         TDescription description,
-        TAction action) : base(serviceProvider, serviceFactory, publisher, subscriber, disposer)
+        TAction action) : base(provider, factory, mediator, publisher, subscriber, disposer)
     {
 
     }
@@ -27,8 +28,9 @@ public partial class ComponentConfigurationViewModel<TConfiguration, TValue, THe
     }
 }
 
-public partial class ComponentConfigurationViewModel<TConfiguration, TValue, TAction>(IServiceProvider serviceProvider,
-    IServiceFactory serviceFactory,
+public partial class ComponentConfigurationViewModel<TConfiguration, TValue, TAction>(IServiceProvider provider,
+    IServiceFactory factory,
+    IMediator mediator,
     IPublisher publisher,
     ISubscriber subscriber,
     IDisposer disposer,
@@ -37,7 +39,7 @@ public partial class ComponentConfigurationViewModel<TConfiguration, TValue, TAc
     Func<TConfiguration, TValue> valueDelegate,
     object header,
     object description) :
-    ValueViewModel<TValue>(serviceProvider, serviceFactory, publisher, subscriber, disposer),
+    ValueViewModel<TValue>(provider, factory, mediator, publisher, subscriber, disposer),
     IComponentConfigurationViewModel,
     INotificationHandler<Changed<TConfiguration>>
     where TConfiguration : class
@@ -68,8 +70,9 @@ public partial class ComponentConfigurationViewModel<TConfiguration, TValue, TAc
     }
 }
 
-public partial class ComponentConfigurationViewModel<TConfiguration, TValue, TDescription, TAction>(IServiceProvider serviceProvider,
-    IServiceFactory serviceFactory,
+public partial class ComponentConfigurationViewModel<TConfiguration, TValue, TDescription, TAction>(IServiceProvider provider,
+    IServiceFactory factory,
+    IMediator mediator,
     IPublisher publisher,
     ISubscriber subscriber,
     IDisposer disposer,
@@ -78,7 +81,7 @@ public partial class ComponentConfigurationViewModel<TConfiguration, TValue, TDe
     TConfiguration configuration,
     Func<TConfiguration, TValue> valueDelegate,
     object header) :
-    ValueViewModel<TValue>(serviceProvider, serviceFactory, publisher, subscriber, disposer),
+    ValueViewModel<TValue>(provider, factory, mediator, publisher, subscriber, disposer),
     IComponentConfigurationViewModel,
     INotificationHandler<Changed<TConfiguration>>
     where TConfiguration : class

@@ -3,7 +3,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace Toolkit.Foundation;
 
-public sealed class ComponentHost(IServiceProvider services,
+public class ComponentHost(IServiceProvider services,
     IEnumerable<IInitializer> initializers,
     IEnumerable<IHostedService> hostedServices) :
     IComponentHost

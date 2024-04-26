@@ -2,12 +2,13 @@
 
 namespace Toolkit.Foundation;
 
-public partial class CommandValueViewModel<TValue>(IServiceProvider serviceProvider,
-    IServiceFactory serviceFactory,
+public partial class CommandValueViewModel<TValue>(IServiceProvider provider,
+    IServiceFactory factory,
+    IMediator mediator,
     IPublisher publisher,
     ISubscriber subscriber,
     IDisposer disposer) :
-    ValueViewModel<TValue>(serviceProvider, serviceFactory, publisher, subscriber, disposer)
+    ValueViewModel<TValue>(provider, factory, mediator, publisher, subscriber, disposer)
 {
     public IRelayCommand InvokeCommand =>
         new AsyncRelayCommand(InvokeAsync);

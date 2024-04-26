@@ -5,12 +5,10 @@ public record Navigate(string Route,
     string? Scope = null, 
     object? Sender = null,
     EventHandler? Navigated = null,
-    object[]? Parameters = null) :
-    INotification;
+    object[]? Parameters = null);
 
 public record Navigate<TNavigation>(object Context, 
     object Template, 
     object Content,
     object? Sender = null,
-    object[]? Parameters = null) :
-    INotification;
+    object[]? Parameters = null);

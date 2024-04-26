@@ -3,8 +3,8 @@
 namespace Toolkit.Foundation;
 
 public class NavigationScope(IPublisher publisher,
-    IServiceProvider serviceProvider,
-    IServiceFactory serviceFactory,
+    IServiceProvider provider,
+    IServiceFactory factory,
     INavigationProvider navigationProvider,
     INavigationContextProvider navigationContextProvider,
     IContentTemplateDescriptorProvider contentTemplateDescriptorProvider) : 
@@ -39,11 +39,11 @@ public class NavigationScope(IPublisher publisher,
                     Enumerable.Empty<object?>(),
                     .. mappedParameters ?? Enumerable.Empty<object?>()];
 
-                if (serviceProvider.GetRequiredKeyedService(descriptor.TemplateType, segment) is object view)
+                if (provider.GetRequiredKeyedService(descriptor.TemplateType, segment) is object view)
                 {
                     if ((parameters is { Length: > 0 }
-                        ? serviceFactory.Create(descriptor.ContentType, parameters)
-                        : serviceProvider.GetRequiredKeyedService(descriptor.ContentType, segment)) is object viewModel)
+                        ? factory.Create(descriptor.ContentType, parameters)
+                        : provider.GetRequiredKeyedService(descriptor.ContentType, segment)) is object viewModel)
                     {
                         if (context is not null)
                         {

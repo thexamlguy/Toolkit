@@ -30,14 +30,16 @@ public partial class ObservableCollectionViewModel<TViewModel> :
     [ObservableProperty]
     private bool isInitialized;
 
-    public ObservableCollectionViewModel(IServiceProvider serviceProvider,
-        IServiceFactory serviceFactory,
+    public ObservableCollectionViewModel(IServiceProvider provider,
+        IServiceFactory factory,
+        IMediator mediator,
         IPublisher publisher,
         ISubscriber subscriber,
         IDisposer disposer)
     {
-        ServiceProvider = serviceProvider;
-        ServiceFactory = serviceFactory;
+        Provider = provider;
+        Factory = factory;
+        Mediator = mediator;
         Publisher = publisher;
         Disposer = disposer;
 
@@ -46,15 +48,17 @@ public partial class ObservableCollectionViewModel<TViewModel> :
         collection.CollectionChanged += OnCollectionChanged;
     }
 
-    public ObservableCollectionViewModel(IServiceProvider serviceProvider,
-        IServiceFactory serviceFactory,
+    public ObservableCollectionViewModel(IServiceProvider provider,
+        IServiceFactory factory,
+        IMediator mediator,
         IPublisher publisher,
         ISubscriber subscriber,
         IDisposer disposer,
         IEnumerable<TViewModel> items)
     {
-        ServiceProvider = serviceProvider;
-        ServiceFactory = serviceFactory;
+        Provider = provider;
+        Factory = factory;
+        Mediator = mediator;
         Publisher = publisher;
         Disposer = disposer;
 
@@ -72,6 +76,8 @@ public partial class ObservableCollectionViewModel<TViewModel> :
 
     public IDisposer Disposer { get; private set; }
 
+    public IServiceFactory Factory { get; private set; }
+
     bool IList.IsFixedSize => false;
 
     bool ICollection<TViewModel>.IsReadOnly => false;
@@ -80,11 +86,11 @@ public partial class ObservableCollectionViewModel<TViewModel> :
 
     bool ICollection.IsSynchronized => false;
 
+    public IMediator Mediator { get; }
+
+    public IServiceProvider Provider { get; private set; }
+
     public IPublisher Publisher { get; private set; }
-
-    public IServiceFactory ServiceFactory { get; private set; }
-
-    public IServiceProvider ServiceProvider { get; private set; }
 
     object ICollection.SyncRoot => this;
 
@@ -119,7 +125,7 @@ public partial class ObservableCollectionViewModel<TViewModel> :
 
     public TViewModel Add()
     {
-        TViewModel? item = ServiceFactory.Create<TViewModel>();
+        TViewModel? item = Factory.Create<TViewModel>();
 
         Add(item);
         return item;
@@ -128,7 +134,7 @@ public partial class ObservableCollectionViewModel<TViewModel> :
     public TViewModel Add<T>(params object?[] parameters)
         where T : TViewModel
     {
-        T? item = ServiceFactory.Create<T>(parameters);
+        T? item = Factory.Create<T>(parameters);
         Add(item);
 
         return item;
@@ -138,7 +144,7 @@ public partial class ObservableCollectionViewModel<TViewModel> :
         where T :
         TViewModel
     {
-        T? item = ServiceFactory.Create<T>();
+        T? item = Factory.Create<T>();
         Add(item);
 
         return item;
@@ -407,9 +413,10 @@ public partial class ObservableCollectionViewModel<TViewModel> :
         CollectionChanged?.Invoke(this, args);
 }
 
-public class ObservableCollectionViewModel(IServiceProvider serviceProvider,
-    IServiceFactory serviceFactory, 
+public class ObservableCollectionViewModel(IServiceProvider provider,
+    IServiceFactory factory, 
+    IMediator mediator,
     IPublisher publisher,
     ISubscriber subscriber,
     IDisposer disposer) :
-    ObservableCollectionViewModel<IDisposable>(serviceProvider, serviceFactory, publisher, subscriber, disposer);
+    ObservableCollectionViewModel<IDisposable>(provider, factory, mediator, publisher, subscriber, disposer);

@@ -1,10 +1,8 @@
 ﻿namespace Toolkit.Foundation;
 
-public interface INotificationHandler<in TNotification> :
+public interface INotificationHandler<in TMessage> :
     IHandler
-    where TNotification :
-    INotification
 {
-    Task Handle(TNotification args,
+    Task Handle(TMessage args,
         CancellationToken cancellationToken = default);
 }

@@ -1,17 +1,15 @@
 ﻿namespace Toolkit.Foundation;
 
-public interface IPipelineBehavior<TMessage, TResponse>
-    where TMessage : IMessage
+public interface IPipelineBehaviour<TMessage, TResponse>
 {
     Task<TResponse> Handle(TMessage message,
         HandlerDelegate<TMessage, TResponse> next,
         CancellationToken cancellationToken = default);
 }
 
-public interface IPipelineBehavior<TNotification>
-    where TNotification : INotification
+public interface IPipelineBehaviour<TMessage>
 {
-    Task Handle(TNotification notification,
-        NotificationHandlerDelegate<TNotification> next,
+    Task Handle(TMessage message,
+        NotificationHandlerDelegate<TMessage> next,
         CancellationToken cancellationToken = default);
 }

@@ -11,9 +11,9 @@ public class ServiceScopeFactory<TService>(IServiceScopeFactory serviceScopeFact
     {
         if (serviceScopeFactory.CreateScope() is IServiceScope serviceScope)
         {
-            if (serviceScope.ServiceProvider.GetService<IServiceFactory>() is IServiceFactory serviceFactory)
+            if (serviceScope.ServiceProvider.GetService<IServiceFactory>() is IServiceFactory factory)
             {
-                if (serviceFactory.Create<TService>(parameters) is TService service)
+                if (factory.Create<TService>(parameters) is TService service)
                 {
                     cache.Add(service, serviceScope);
                     return service;

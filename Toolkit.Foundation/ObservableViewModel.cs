@@ -14,14 +14,16 @@ public  partial class ObservableViewModel :
     [ObservableProperty]
     private bool isInitialized;
 
-    public ObservableViewModel(IServiceProvider serviceProvider,
-        IServiceFactory serviceFactory,
+    public ObservableViewModel(IServiceProvider provider,
+        IServiceFactory factory,
+        IMediator mediator,
         IPublisher publisher,
         ISubscriber subscriber,
         IDisposer disposer)
     {
-        ServiceProvider = serviceProvider;
-        ServiceFactory = serviceFactory;
+        Provider = provider;
+        Factory = factory;
+        Mediator = mediator;
         Publisher = publisher;
         Disposer = disposer;
 
@@ -32,11 +34,13 @@ public  partial class ObservableViewModel :
 
     public IDisposer Disposer { get; }
 
+    public IServiceFactory Factory { get; }
+
+    public IMediator Mediator { get; }
+
+    public IServiceProvider Provider { get; }
+
     public IPublisher Publisher { get; }
-
-    public IServiceFactory ServiceFactory { get; }
-
-    public IServiceProvider ServiceProvider { get; }
 
     public virtual Task Activated() =>
         Task.CompletedTask;
