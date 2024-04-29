@@ -7,9 +7,11 @@ public class ComponentFactory(IServiceProvider provider,
     IComponentScopeCollection scopes) : 
     IComponentFactory
 {
-    public IComponentHost? Create<TComponent>(string name,
-        ComponentConfiguration configuration, Action<IServiceCollection>? servicesDelegate = null) 
+    public IComponentHost? Create<TComponent, TConfiguration>(string name,
+        TConfiguration configuration, 
+        Action<IServiceCollection>? servicesDelegate = null)
         where TComponent : IComponent
+        where TConfiguration : ComponentConfiguration, new()
     {
         if (provider.GetRequiredService<TComponent>() is TComponent component)
         {
@@ -43,7 +45,7 @@ public class ComponentFactory(IServiceProvider provider,
                 }
             });
 
-            builder.AddConfiguration(name, configuration);
+            builder.AddConfiguration<TConfiguration>(name, configuration);
             IComponentHost host = builder.Build();
 
             scopes.Add(new ComponentScopeDescriptor(name,

@@ -4,7 +4,8 @@ namespace Toolkit.Foundation;
 
 public interface IComponentFactory
 {
-    IComponentHost? Create<TComponent>(string name,
-        ComponentConfiguration configuration, Action<IServiceCollection>? servicesDelegate = null)
-        where TComponent : IComponent;
+    IComponentHost? Create<TComponent, TConfiguration>(string name,
+        TConfiguration configuration, Action<IServiceCollection>? servicesDelegate = null)
+        where TComponent : IComponent
+        where TConfiguration : ComponentConfiguration, new();
 }

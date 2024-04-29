@@ -1,5 +1,3 @@
 ﻿namespace Toolkit.Foundation;
 
-public record ComponentConfiguration
-{
-}
+public record ComponentConfiguration;
