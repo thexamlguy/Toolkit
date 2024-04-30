@@ -133,7 +133,8 @@ public static class IHostBuilderExtension
                 services.AddTransient<IConfigurationInitializer<TConfiguration>, ConfigurationInitializer<TConfiguration>>(provider =>
                     provider.GetRequiredService<IServiceFactory>().Create<ConfigurationInitializer<TConfiguration>>(section));
 
-                services.AddTransient<IWritableConfiguration<TConfiguration>, WritableConfiguration<TConfiguration>>();
+                services.TryAddKeyedTransient<IWritableConfiguration<TConfiguration>>(section, (provider, key) =>
+                    new WritableConfiguration<TConfiguration>(provider.GetRequiredKeyedService<IConfigurationWriter<TConfiguration>>(key)));
 
                 services.TryAddKeyedTransient<IConfigurationDescriptor<TConfiguration>>(section, (provider, key) =>
                     new ConfigurationDescriptor<TConfiguration>(section, provider.GetRequiredKeyedService<IConfigurationReader<TConfiguration>>(key)));

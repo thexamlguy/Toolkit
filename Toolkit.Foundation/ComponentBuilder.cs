@@ -76,14 +76,8 @@ public class ComponentBuilder :
 
         configurationRegistered = true;
 
-        hostBuilder.ConfigureServices(services =>
-        {
-            services.AddConfiguration<ComponentConfiguration>(section: section,
-                defaultConfiguration: configuration);
-
-            services.AddConfiguration(section: section,
-                defaultConfiguration: configuration);
-        });
+        hostBuilder.AddConfiguration(section: section,
+            defaultConfiguration: configuration);
 
         return this;
     }
