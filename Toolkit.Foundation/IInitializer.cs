@@ -4,3 +4,8 @@ public interface IInitializer
 {
     Task Initialize();
 }
+
+public interface IInitializer<T>
+{
+    Task<T> Initialize();
+}

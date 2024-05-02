@@ -120,7 +120,6 @@ public class ConfigurationSource<TConfiguration>(IConfigurationFile<TConfigurati
         lock (lockingObject)
         {
             IFileInfo fileInfo = configurationFile.FileInfo;
-
             if (File.Exists(fileInfo.PhysicalPath))
             {
                 static Stream OpenRead(IFileInfo fileInfo)
@@ -153,9 +152,12 @@ public class ConfigurationSource<TConfiguration>(IConfigurationFile<TConfigurati
 
                 if (currentNode is not null)
                 {
-                    value = JsonSerializer.Deserialize<TConfiguration>(currentNode[segments[lastIndex]],
-                        serializerOptions ?? defaultSerializerOptions());
-                    return true;
+                    if (currentNode[segments[lastIndex]] is JsonNode sectionNode)
+                    {
+                        value = JsonSerializer.Deserialize<TConfiguration>(sectionNode,
+                            serializerOptions ?? defaultSerializerOptions());
+                        return true;
+                    }
                 }
             }
 

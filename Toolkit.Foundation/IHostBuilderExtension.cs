@@ -100,7 +100,7 @@ public static class IHostBuilderExtension
                     return new ConfigurationFile<TConfiguration>(fileInfo);
                 });
 
-                services.TryAddKeyedSingleton<IConfigurationSource<TConfiguration>>(section, (provider, KeyAccelerator) =>
+                services.TryAddKeyedTransient<IConfigurationSource<TConfiguration>>(section, (provider, key) =>
                 {
                     JsonSerializerOptions? defaultSerializer = null;
                     if (serializerDelegate is not null)
@@ -119,10 +119,11 @@ public static class IHostBuilderExtension
                         provider.GetRequiredKeyedService<IConfigurationFactory<TConfiguration>>(key)));
 
                 services.TryAddKeyedTransient<IConfigurationWriter<TConfiguration>>(section, (provider, key) =>
-                    new ConfigurationWriter<TConfiguration>(provider.GetRequiredKeyedService<IConfigurationSource<TConfiguration>>(key)));
+                    new ConfigurationWriter<TConfiguration>(provider.GetRequiredKeyedService<IConfigurationSource<TConfiguration>>(key),
+                        provider.GetRequiredKeyedService<IConfigurationFactory<TConfiguration>>(key)));
 
                 services.TryAddKeyedTransient<IConfigurationFactory<TConfiguration>>(section, (provider, key) =>
-                    new ConfigurationFactory<TConfiguration>(() => defaultConfiguration ?? new TConfiguration()));
+                    new ConfigurationFactory<TConfiguration>(() => defaultConfiguration ?? provider.GetRequiredKeyedService<TConfiguration>(key)));
 
                 services.AddTransient<IInitializer, ConfigurationInitializer<TConfiguration>>(provider =>
                     new ConfigurationInitializer<TConfiguration>(provider.GetRequiredKeyedService<IConfigurationReader<TConfiguration>>(section),
@@ -135,6 +136,9 @@ public static class IHostBuilderExtension
 
                 services.TryAddKeyedTransient<IWritableConfiguration<TConfiguration>>(section, (provider, key) =>
                     new WritableConfiguration<TConfiguration>(provider.GetRequiredKeyedService<IConfigurationWriter<TConfiguration>>(key)));
+
+                services.TryAddTransient<IWritableConfiguration<TConfiguration>>(provider =>
+                    new WritableConfiguration<TConfiguration>(provider.GetRequiredKeyedService<IConfigurationWriter<TConfiguration>>(section)));
 
                 services.TryAddKeyedTransient<IConfigurationDescriptor<TConfiguration>>(section, (provider, key) =>
                     new ConfigurationDescriptor<TConfiguration>(section, provider.GetRequiredKeyedService<IConfigurationReader<TConfiguration>>(key)));
