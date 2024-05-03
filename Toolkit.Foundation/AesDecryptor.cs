@@ -7,22 +7,44 @@ public class AesDecryptor :
 {
     private const int IvSize = 16;
 
-    public byte[] Decrypt(byte[] cipher, byte[] key)
+    public bool TryDecrypt(byte[] cipher,
+        byte[] key, 
+        out byte[]? decryptedData)
     {
-        Span<byte> iv = cipher.AsSpan(0, IvSize);
-        ReadOnlySpan<byte> encryptedContent = cipher.AsSpan(IvSize);
+        decryptedData = null;
 
-        using Aes aes = Aes.Create();
-        aes.Key = key;
-        aes.IV = iv.ToArray();
+        if (cipher is null || key is null || cipher.Length < IvSize)
+        {
+            return false;
+        }
 
-        using MemoryStream memoryStream = new(encryptedContent.ToArray());
-        using ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
-        using CryptoStream cryptoStream = new(memoryStream, decryptor, CryptoStreamMode.Read);
+        try
+        {
+            Span<byte> iv = cipher.AsSpan(0, IvSize);
+            ReadOnlySpan<byte> encryptedContent = cipher.AsSpan(IvSize);
 
-        using MemoryStream resultStream = new();
-        cryptoStream.CopyTo(resultStream);
+            using Aes aes = Aes.Create();
+            aes.Key = key;
+            aes.IV = iv.ToArray();
 
-        return resultStream.ToArray();
+            using MemoryStream memoryStream = new(encryptedContent.ToArray());
+            using ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
+            using CryptoStream cryptoStream = new(memoryStream, decryptor, CryptoStreamMode.Read);
+
+            using MemoryStream resultStream = new();
+            cryptoStream.CopyTo(resultStream);
+
+            decryptedData = resultStream.ToArray();
+
+            return true;
+        }
+        catch (CryptographicException)
+        {
+            return false;
+        }
+        catch (Exception)
+        {
+            return false;
+        }
     }
 }

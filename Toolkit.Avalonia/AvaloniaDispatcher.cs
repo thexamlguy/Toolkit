@@ -6,8 +6,5 @@ namespace Toolkit.Avalonia;
 public class AvaloniaDispatcher :
     IDispatcher
 {
-    public async Task InvokeAsync(Action action)
-    {
-        await Dispatcher.UIThread.InvokeAsync(action);
-    }
+    public async Task Invoke(Action action) => await Dispatcher.UIThread.InvokeAsync(action);
 }

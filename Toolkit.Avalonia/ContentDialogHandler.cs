@@ -79,7 +79,7 @@ public class ContentDialogHandler(IDispatcher dispatcher) :
                         async void DeactivateHandler(object? sender, EventArgs args)
                         {
                             deactivatable.DeactivateHandler -= DeactivateHandler;
-                            await dispatcher.InvokeAsync(contentDialog.Hide);
+                            await dispatcher.Invoke(contentDialog.Hide);
                         }
 
                         deactivatable.DeactivateHandler += DeactivateHandler;

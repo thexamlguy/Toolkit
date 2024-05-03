@@ -7,28 +7,43 @@ public class AesEncryptor :
 {
     private const int IvSize = 16;
 
-    public byte[] Encrypt(byte[] data, 
-        byte[] key)
+    public bool TryEncrypt(byte[] data, 
+        byte[] key,
+        out byte[]? encryptedData)
     {
-        if (key.Length != 32)
+        encryptedData = null;
+
+        if (data is null || key is null || key.Length != 32)
         {
-            throw new ArgumentException("Key must be 256 bits (32 bytes).");
+            return false;
         }
 
-        using Aes aes = Aes.Create();
-        aes.Key = key;
-        aes.GenerateIV();
-
-        using MemoryStream memoryStream = new();
-        memoryStream.Write(aes.IV.AsSpan(0, IvSize));
-
-        using (ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV))
-        using (CryptoStream cryptoStream = new(memoryStream, encryptor, CryptoStreamMode.Write))
+        try
         {
-            cryptoStream.Write(data, 0, data.Length);
-            cryptoStream.FlushFinalBlock();
-        }
+            using Aes aes = Aes.Create();
+            aes.Key = key;
+            aes.GenerateIV();
 
-        return memoryStream.ToArray();
+            using MemoryStream memoryStream = new();
+            memoryStream.Write(aes.IV, 0, IvSize);
+
+            using (ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV))
+            using (CryptoStream cryptoStream = new(memoryStream, encryptor, CryptoStreamMode.Write))
+            {
+                cryptoStream.Write(data, 0, data.Length);
+                cryptoStream.FlushFinalBlock();
+            }
+
+            encryptedData = memoryStream.ToArray();
+            return true;
+        }
+        catch (CryptographicException)
+        {
+            return false;
+        }
+        catch (Exception)
+        {
+            return false;
+        }
     }
 }

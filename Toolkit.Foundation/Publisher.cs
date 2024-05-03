@@ -73,29 +73,29 @@ public class Publisher(ISubscriptionManager subscriptionManager,
     public Task PublishUI<TMessage>(object key,
         CancellationToken cancellationToken = default)
         where TMessage : new() =>
-            Publish(new TMessage(), args => dispatcher.InvokeAsync(async () => await args()),
+            Publish(new TMessage(), args => dispatcher.Invoke(async () => await args()),
                 key, cancellationToken);
 
     public Task PublishUI<TMessage>(TMessage message,
         CancellationToken cancellationToken = default)
         where TMessage : notnull =>
-            Publish(message, args => dispatcher.InvokeAsync(async () => await args()),
+            Publish(message, args => dispatcher.Invoke(async () => await args()),
                 null, cancellationToken);
 
     public Task PublishUI<TMessage>(TMessage message,
         object key,
         CancellationToken cancellationToken = default)
         where TMessage : notnull =>
-            Publish(message, args => dispatcher.InvokeAsync(async () => await args()),
+            Publish(message, args => dispatcher.Invoke(async () => await args()),
                 key, cancellationToken);
 
     public Task PublishUI<TMessage>(CancellationToken cancellationToken = default)
         where TMessage : new() =>
-            Publish(new TMessage(), args => dispatcher.InvokeAsync(async () => await args()),
+            Publish(new TMessage(), args => dispatcher.Invoke(async () => await args()),
                 null, cancellationToken);
 
     public Task PublishUI(object message,
         CancellationToken cancellationToken = default) => Publish(message, args =>
-            dispatcher.InvokeAsync(async () => await args()),
+            dispatcher.Invoke(async () => await args()),
                 null, cancellationToken);
 }

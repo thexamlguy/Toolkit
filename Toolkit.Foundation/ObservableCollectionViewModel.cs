@@ -412,6 +412,17 @@ public partial class ObservableCollectionViewModel<TViewModel> :
         CollectionChanged?.Invoke(this, args);
 }
 
+public partial class ObservableCollectionViewModel<TValue, TViewModel>(IServiceProvider provider,
+    IServiceFactory factory,
+    IMediator mediator,
+    IPublisher publisher,
+    ISubscriber subscriber, IDisposer disposer) : ObservableCollectionViewModel<TViewModel>(provider, factory, mediator, publisher, subscriber, disposer)
+    where TViewModel : notnull
+{
+    [ObservableProperty]
+    private TValue? value;
+}
+
 public class ObservableCollectionViewModel(IServiceProvider provider,
     IServiceFactory factory,
     IMediator mediator,

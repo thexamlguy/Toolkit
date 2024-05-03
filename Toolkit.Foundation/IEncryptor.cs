@@ -1,5 +1,8 @@
 ﻿namespace Toolkit.Foundation;
+
 public interface IEncryptor
 {
-    byte[] Encrypt(byte[] data, byte[] key);
+    bool TryEncrypt(byte[] data,
+        byte[] key,
+        out byte[]? encryptedData);
 }
