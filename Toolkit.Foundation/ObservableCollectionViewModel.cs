@@ -97,7 +97,7 @@ public partial class ObservableCollectionViewModel<TViewModel> :
 
     public TViewModel this[int index]
     {
-        get => collection[index];
+        get => Count > 0 ? collection[index] : default;
         set => SetItem(index, value);
     }
 

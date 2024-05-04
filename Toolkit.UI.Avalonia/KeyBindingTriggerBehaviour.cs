@@ -5,12 +5,12 @@ using System.Windows.Input;
 
 namespace Toolkit.UI.Avalonia;
 
-public class KeyBindingTriggerBehavior :
+public class KeyBindingTriggerBehaviour :
     Trigger<InputElement>,
     ICommand
 {
     public static readonly StyledProperty<KeyGesture> GestureProperty =
-        AvaloniaProperty.Register<KeyBindingTriggerBehavior, KeyGesture>(nameof(Gesture));
+        AvaloniaProperty.Register<KeyBindingTriggerBehaviour, KeyGesture>(nameof(Gesture));
 
     public KeyGesture Gesture
     {
@@ -24,7 +24,7 @@ public class KeyBindingTriggerBehavior :
     {
         if (Gesture is not null)
         {
-            KeyBinding keyBinding = new KeyBinding
+            KeyBinding keyBinding = new()
             {
                 Gesture = Gesture,
                 Command = this

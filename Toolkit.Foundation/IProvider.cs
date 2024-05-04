@@ -9,3 +9,8 @@ public interface IProvider<TService>
 {
     TService? Get();
 }
+
+public interface ISelectable
+{
+    bool Selected { get; set; }
+}

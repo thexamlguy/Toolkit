@@ -10,5 +10,6 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\Toolkit.Foundation\Toolkit.Foundation.csproj" />
+	  <ProjectReference Include="..\Toolkit.UI.Controls.Avalonia\Toolkit.UI.Controls.Avalonia.csproj" />
 	</ItemGroup>
 </Project>

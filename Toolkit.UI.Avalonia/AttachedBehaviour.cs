@@ -2,7 +2,7 @@
 
 namespace Toolkit.UI.Avalonia;
 
-public class AttachedBehavior : Trigger
+public class AttachedBehaviour : Trigger
 {
     protected override void OnAttachedToVisualTree()
     {
