@@ -1,6 +1,6 @@
 ﻿namespace Toolkit.Foundation;
 
-public record Selected<TValue>(TValue Value);
+public record Selected<TValue>(TValue? Value);
 
 public record Selected
 {

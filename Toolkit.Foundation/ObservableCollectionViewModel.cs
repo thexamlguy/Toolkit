@@ -97,7 +97,7 @@ public partial class ObservableCollectionViewModel<TViewModel> :
 
     public TViewModel this[int index]
     {
-        get => Count > 0 ? collection[index] : default;
+        get => collection[index];
         set => SetItem(index, value);
     }
 
@@ -299,20 +299,29 @@ public partial class ObservableCollectionViewModel<TViewModel> :
 
     public async Task Initialize()
     {
-        if (isInitialized)
+        if (IsInitialized)
         {
             return;
         }
 
-        isInitialized = true;
+        IsInitialized = true;
+        await Enumerate();
+    }
+
+    public async Task Enumerate()
+    {
+        Clear();
 
         object? key = this.GetAttribute<NotificationAttribute>()
             is NotificationAttribute attribute
             ? this.GetPropertyValue(() => attribute.Key) is { } value ? value : attribute.Key
             : null;
 
-        await Publisher.PublishUI(new Enumerate<TViewModel>(key));
+        await Publisher.PublishUI(CreateEnumeration(key));
     }
+
+    protected virtual IEnumerate CreateEnumeration(object? key) => 
+        new Enumerate<TViewModel>() with { Key = key };
 
     public void Insert(int index, TViewModel item) =>
         InsertItem(index, item);
