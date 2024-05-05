@@ -1,5 +1,6 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using FluentAvalonia.UI.Media.Animation;
 using FluentAvalonia.UI.Navigation;
 using System.Reflection;
 using Toolkit.Foundation;
@@ -183,7 +184,7 @@ public class FrameHandler(INavigationContext navigationContext) :
                 navigationContext.Set(control);
 
                 NavigatedTo(args.Sender, control);
-                frame.NavigateFromObject(control);
+                frame.NavigateFromObject(control, new FrameNavigationOptions { TransitionInfoOverride = new SuppressNavigationTransitionInfo() });
             }
         }
 

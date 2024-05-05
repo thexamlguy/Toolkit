@@ -2,14 +2,12 @@
 using Avalonia.Threading;
 using Avalonia.Xaml.Interactivity;
 using System.Collections;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using Toolkit.Foundation;
 using Toolkit.UI.Controls.Avalonia;
 
 namespace Toolkit.UI.Avalonia;
 
-public class SelectNavigationViewItemAction :
+public class InvokeNavigationViewItemAction :
     AvaloniaObject,
     IAction
 {
