@@ -74,3 +74,15 @@ public partial class ObservableViewModel :
         return Task.CompletedTask;
     }
 }
+
+public partial class ObservableViewModel<TValue>(IServiceProvider provider,
+    IServiceFactory factory,
+    IMediator mediator, 
+    IPublisher publisher, 
+    ISubscriber subscriber, 
+    IDisposer disposer) : ObservableViewModel(provider, factory, mediator, publisher, subscriber, disposer)
+    where TValue : notnull
+{
+    [ObservableProperty]
+    private TValue? value;
+}

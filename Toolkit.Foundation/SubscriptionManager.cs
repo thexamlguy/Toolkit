@@ -54,7 +54,17 @@ public class SubscriptionManager(SubscriptionCollection subscriptions) :
         {
             if (interfaceType.GetGenericArguments().FirstOrDefault() is Type argumentType)
             {
-                subscriptions.AddOrUpdate($"{(key is not null ? $"{key}:" : "")}{argumentType}", _ => new List<WeakReference> { new(subscriber) }, (_, collection) =>
+                if (key is not null)
+                {
+                    subscriptions.AddOrUpdate($"{key}:{argumentType}", _ => new List<WeakReference> { new(subscriber) }, (_, collection) =>
+                    {
+                        collection.Add(new WeakReference(subscriber));
+                        return collection;
+                    });
+
+                }
+
+                subscriptions.AddOrUpdate($"{argumentType}", _ => new List<WeakReference> { new(subscriber) }, (_, collection) =>
                 {
                     collection.Add(new WeakReference(subscriber));
                     return collection;

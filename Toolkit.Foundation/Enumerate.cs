@@ -1,8 +1,11 @@
 ﻿namespace Toolkit.Foundation;
 
-public record Enumerate<TValue> : IEnumerate
+public record Enumerate<TValue> : 
+    IEnumerate
 {
     public object? Key { get; init; }
+
+    public EnumerateMode Mode { get; init; }
 
     public static Enumerate<TValue, TOptions> With<TOptions>(TOptions options) where TOptions : class
     {
@@ -10,14 +13,11 @@ public record Enumerate<TValue> : IEnumerate
     }
 }
 
-public interface IEnumerate
-{
-    object? Key { get; init; }
-}
-
-
-public record Enumerate<TValue, TOptions>(TOptions? Options = null) : IEnumerate
+public record Enumerate<TValue, TOptions>(TOptions? Options = null) : 
+    IEnumerate
     where TOptions : class
 {
     public object? Key { get; init; }
+
+    public EnumerateMode Mode { get; init; }
 }

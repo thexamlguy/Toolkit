@@ -1,10 +1,9 @@
 ﻿using Avalonia.Markup.Xaml;
-using Avalonia.Styling;
+using FluentAvalonia.Styling;
 
 namespace Toolkit.UI.Controls.Avalonia;
 
-public class ThemeResources :
-    Styles
+public class ThemeResources : FluentAvaloniaTheme
 {
     public ThemeResources(IServiceProvider? provider = null)
     {

@@ -310,17 +310,19 @@ public partial class ObservableCollectionViewModel<TViewModel> :
 
     public async Task Enumerate()
     {
-        Clear();
+        if (this.GetAttribute<EnumerateAttribute>() is EnumerateAttribute attribute)
+        {
+            if (attribute.Mode == EnumerateMode.Reset)
+            {
+                Clear();
+            }
 
-        object? key = this.GetAttribute<NotificationAttribute>()
-            is NotificationAttribute attribute
-            ? this.GetPropertyValue(() => attribute.Key) is { } value ? value : attribute.Key
-            : null;
-
-        await Publisher.PublishUI(CreateEnumeration(key));
+            object? key = this.GetPropertyValue(() => attribute.Key) is { } value ? value : attribute.Key;
+            await Publisher.PublishUI(PrepareEnumeration(key));
+        }
     }
 
-    protected virtual IEnumerate CreateEnumeration(object? key) => 
+    protected virtual IEnumerate PrepareEnumeration(object? key) => 
         new Enumerate<TViewModel>() with { Key = key };
 
     public void Insert(int index, TViewModel item) =>
