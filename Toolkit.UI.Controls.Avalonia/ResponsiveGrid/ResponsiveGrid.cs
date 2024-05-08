@@ -248,7 +248,8 @@ namespace Toolkit.UI.Controls.Avalonia
             int GetMD() => Math.Max(GetSM(), GetMediumOffset(control));
             int GetLG() => Math.Max(GetMD(), GetLargeOffset(control));
 
-            int span = width < Thresholds.ExtraSmallToSmall ? GetXS() : width < Thresholds.SmallToMedium ? GetSM() : width < Thresholds.MediumToLarge ? GetMD() : GetLG();
+            int span = width < Thresholds.ExtraSmallToSmall ? GetXS() : width < Thresholds.SmallToMedium ?
+                GetSM() : width < Thresholds.MediumToLarge ? GetMD() : GetLG();
             return Math.Min(span, MaxDivision);
         }
 
@@ -259,7 +260,8 @@ namespace Toolkit.UI.Controls.Avalonia
             int GetMD() => Math.Max(GetSM(), GetMediumPull(control));
             int GetLG() => Math.Max(GetMD(), GetLargePull(control));
 
-            int span = width < Thresholds.ExtraSmallToSmall ? GetXS() : width < Thresholds.SmallToMedium ? GetSM() : width < Thresholds.MediumToLarge ? GetMD() : GetLG();
+            int span = width < Thresholds.ExtraSmallToSmall ? GetXS() : width < Thresholds.SmallToMedium ?
+                GetSM() : width < Thresholds.MediumToLarge ? GetMD() : GetLG();
             return Math.Min(span, MaxDivision);
         }
 
@@ -270,7 +272,8 @@ namespace Toolkit.UI.Controls.Avalonia
             int GetMD() => Math.Max(GetSM(), GetMediumPush(control));
             int GetLG() => Math.Max(GetMD(), GetLargePush(control));
 
-            int span = width < Thresholds.ExtraSmallToSmall ? GetXS() : width < Thresholds.SmallToMedium ? GetSM() : width < Thresholds.MediumToLarge ? GetMD() : GetLG();
+            int span = width < Thresholds.ExtraSmallToSmall ? GetXS() : width < Thresholds.SmallToMedium ? 
+                GetSM() : width < Thresholds.MediumToLarge ? GetMD() : GetLG();
             return Math.Min(span, MaxDivision);
         }
 
@@ -281,7 +284,8 @@ namespace Toolkit.UI.Controls.Avalonia
             int GetMD() => Math.Max(GetSM(), GetMedium(control));
             int GetLG() => Math.Max(GetMD(), GetLarge(control));
 
-            int span = width < Thresholds.ExtraSmallToSmall ? GetXS() : width < Thresholds.SmallToMedium ? GetSM() : width < Thresholds.MediumToLarge ? GetMD() : GetLG();
+            int span = width < Thresholds.ExtraSmallToSmall ? GetXS() : width < Thresholds.SmallToMedium ? 
+                GetSM() : width < Thresholds.MediumToLarge ? GetMD() : GetLG();
             return Math.Min(span, MaxDivision);
         }
 
