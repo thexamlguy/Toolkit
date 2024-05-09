@@ -1,6 +1,6 @@
 ﻿namespace Toolkit.Foundation;
 
-public interface INavigationContextProvider
+public interface INavigationRegionProvider
 {
     object? Get(object key);
 

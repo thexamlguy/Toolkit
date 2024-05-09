@@ -5,7 +5,7 @@ using Toolkit.Foundation;
 
 namespace Toolkit.Avalonia;
 
-public class SingleViewApplicationHandler(INavigationContext navigationContext) :
+public class SingleViewApplicationHandler :
     INavigateHandler<ISingleViewApplicationLifetime>
 {
     public Task Handle(Navigate<ISingleViewApplicationLifetime> args,
@@ -18,8 +18,6 @@ public class SingleViewApplicationHandler(INavigationContext navigationContext) 
             {
                 lifeTime.MainView = control;
                 control.DataContext = args.Content;
-
-                navigationContext.Set(control);
             }
         }
 

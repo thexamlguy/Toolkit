@@ -8,7 +8,7 @@ using Toolkit.UI.Controls.Avalonia;
 
 namespace Toolkit.Avalonia;
 
-public class FrameHandler(INavigationContext navigationContext) :
+public class FrameHandler :
     INavigateHandler<Frame>,
     INavigateBackHandler<Frame>
 {
@@ -45,32 +45,6 @@ public class FrameHandler(INavigationContext navigationContext) :
                                 {
                                     await deactivating.Deactivating();
                                 }
-
-                                Type contentType = content.GetType();
-                                if (contentType.GetInterfaces() is Type[] contracts)
-                                {
-                                    foreach (Type contract in contracts)
-                                    {
-                                        if (contract.Name == typeof(IDeactivating<>).Name &&
-                                            contract.GetGenericArguments() is { Length: 1 } arguments)
-                                        {
-                                            if (contentType.GetMethods().FirstOrDefault(x =>
-                                                x.Name == "Deactivating" && x.ReturnType == typeof(Task<>)
-                                                    .MakeGenericType(arguments[0]))
-                                                        is MethodInfo methodInfo)
-                                            {
-                                                if (methodInfo.GetCustomAttribute<NavigationContextAttribute>()
-                                                    is NavigationContextAttribute attribute)
-                                                {
-                                                    if (await methodInfo.InvokeAsync<object?>(content) is object result)
-                                                    {
-                                                        results.Add(attribute.Name, result);
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
                             }
                         }
                     }
@@ -99,33 +73,6 @@ public class FrameHandler(INavigationContext navigationContext) :
                                 if (content is IDeactivated deactivated)
                                 {
                                     await deactivated.Deactivated();
-                                }
-
-                                Type contentType = content.GetType();
-                                if (contentType.GetInterfaces() is Type[] contracts)
-                                {
-                                    foreach (Type contract in contracts)
-                                    {
-                                        if (contract.Name == typeof(IActivated<>).Name &&
-                                            contract.GetGenericArguments() is { Length: 1 } arguments)
-                                        {
-                                            if (contentType.GetMethods().FirstOrDefault(x =>
-                                                x.Name == "NavigatedToAsync" &&
-                                                    x.GetCustomAttribute<NavigationContextAttribute>()
-                                                    is NavigationContextAttribute attribute && results.ContainsKey(attribute.Name))
-                                                is MethodInfo methodInfo)
-                                            {
-                                                if (methodInfo.GetCustomAttribute<NavigationContextAttribute>()
-                                                    is NavigationContextAttribute attribute)
-                                                {
-                                                    if (results.TryGetValue(attribute.Name, out object? value))
-                                                    {
-                                                        await methodInfo.InvokeAsync(content, value);
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
                                 }
                             }
                         }
@@ -181,8 +128,6 @@ public class FrameHandler(INavigationContext navigationContext) :
                 }
 
                 control.DataContext = args.Content;
-                navigationContext.Set(control);
-
                 NavigatedTo(args.Sender, control);
                 frame.NavigateFromObject(control, new FrameNavigationOptions { TransitionInfoOverride = new SuppressNavigationTransitionInfo() });
             }

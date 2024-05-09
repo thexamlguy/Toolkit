@@ -33,8 +33,8 @@ public class DefaultHostBuilder :
                 services.AddScoped<IProxyService<IPublisher>>(provider =>
                     new ProxyService<IPublisher>(provider.GetRequiredService<IPublisher>()));
 
-                services.AddScoped<IProxyService<INavigationContextProvider>>(provider =>
-                    new ProxyService<INavigationContextProvider>(provider.GetRequiredService<INavigationContextProvider>()));
+                services.AddScoped<IProxyService<INavigationRegionProvider>>(provider =>
+                    new ProxyService<INavigationRegionProvider>(provider.GetRequiredService<INavigationRegionProvider>()));
 
                 services.AddScoped<IProxyService<IComponentHostCollection>>(provider =>
                     new ProxyService<IComponentHostCollection>(provider.GetRequiredService<IComponentHostCollection>()));
@@ -45,12 +45,12 @@ public class DefaultHostBuilder :
 
                 services.AddTransient<INavigationProvider, NavigationProvider>();
 
-                services.AddScoped<INavigationContextCollection, NavigationContextCollection>();
-                services.AddTransient<INavigationContextProvider, NavigationContextProvider>();
+                services.AddScoped<INavigationRegionCollection, NavigationRegionCollection>();
+                services.AddTransient<INavigationRegionProvider, NavigationRegionProvider>();
 
                 services.AddTransient<INavigationScope, NavigationScope>();
 
-                services.AddSingleton(new ComponentScope("Root"));
+                services.AddSingleton(new NamedComponent("Root"));
                 services.AddScoped<IComponentScopeCollection, ComponentScopeCollection>(provider => new ComponentScopeCollection
                 {
                     new ComponentScopeDescriptor("Root", provider.GetRequiredService<IServiceProvider>())

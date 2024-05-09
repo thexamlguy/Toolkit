@@ -25,10 +25,10 @@ public class ComponentFactory(IServiceProvider provider,
                     provider.GetRequiredService<IProxyService<IComponentHostCollection>>());
 
                 services.AddScoped(_ =>
-                    provider.GetRequiredService<INavigationContextCollection>());
+                    provider.GetRequiredService<INavigationRegionCollection>());
 
                 services.AddScoped(_ =>
-                    provider.GetRequiredService<INavigationContextProvider>());
+                    provider.GetRequiredService<INavigationRegionProvider>());
 
                 services.AddScoped(_ =>
                     provider.GetRequiredService<IComponentScopeCollection>());
@@ -37,7 +37,7 @@ public class ComponentFactory(IServiceProvider provider,
                     provider.GetRequiredService<IComponentScopeProvider>());
 
                 services.AddRange(proxy.Services);
-                services.AddSingleton(new ComponentScope(name));
+                services.AddSingleton(new NamedComponent(name));
 
                 if (servicesDelegate is not null)
                 {
@@ -45,7 +45,7 @@ public class ComponentFactory(IServiceProvider provider,
                 }
             });
 
-            builder.AddConfiguration<TConfiguration>(name, configuration);
+            builder.AddConfiguration(name, configuration);
             IComponentHost host = builder.Build();
 
             scopes.Add(new ComponentScopeDescriptor(name,

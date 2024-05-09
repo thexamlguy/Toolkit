@@ -6,7 +6,7 @@ public class NavigationScope(IPublisher publisher,
     IServiceProvider provider,
     IServiceFactory factory,
     INavigationProvider navigationProvider,
-    INavigationContextProvider navigationContextProvider,
+    INavigationRegionProvider navigationContextProvider,
     IContentTemplateDescriptorProvider contentTemplateDescriptorProvider) :
     INavigationScope
 {

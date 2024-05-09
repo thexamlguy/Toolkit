@@ -5,7 +5,7 @@ using Toolkit.Foundation;
 
 namespace Toolkit.Avalonia;
 
-public class ClassicDesktopStyleApplicationHandler(INavigationContext navigationContext) :
+public class ClassicDesktopStyleApplicationHandler :
     INavigateHandler<IClassicDesktopStyleApplicationLifetime>
 {
     public Task Handle(Navigate<IClassicDesktopStyleApplicationLifetime> args,
@@ -18,8 +18,6 @@ public class ClassicDesktopStyleApplicationHandler(INavigationContext navigation
             {
                 lifeTime.MainWindow = window;
                 window.DataContext = args.Content;
-
-                navigationContext.Set(window);
             }
         }
 

@@ -17,7 +17,7 @@ public class ContentTemplate :
             if (observableViewModel.Provider is IServiceProvider provider)
             {
                 IContentTemplateDescriptorProvider? contentTemplateProvider = provider.GetService<IContentTemplateDescriptorProvider>();
-                INavigationContext? viewModelContentBinder = provider.GetService<INavigationContext>();
+                INavigationRegion? viewModelContentBinder = provider.GetService<INavigationRegion>();
 
                 if (contentTemplateProvider?.Get(item.GetType().Name) is IContentTemplateDescriptor descriptor)
                 {
@@ -55,7 +55,7 @@ public class ContentTemplate :
                         control.Loaded += HandleLoaded;
                         control.Unloaded += HandleUnloaded;
 
-                        viewModelContentBinder?.Set(control);
+                        //viewModelContentBinder?.Register(control);
 
                         return control;
                     }

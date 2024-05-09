@@ -126,7 +126,7 @@ public static class IServiceCollectionExtensions
         services.AddTransient<IDispatcher, AvaloniaDispatcher>();
 
         services.AddTransient<IContentTemplate, ContentTemplate>();
-        services.AddTransient<INavigationContext, NavigationContext>();
+        services.AddTransient<INavigationRegion, NavigationRegion>();
 
         services.AddNavigateHandler<ClassicDesktopStyleApplicationHandler>();
         services.AddNavigateHandler<SingleViewApplicationHandler>();
@@ -134,7 +134,7 @@ public static class IServiceCollectionExtensions
         services.AddNavigateHandler<FrameHandler>();
         services.AddNavigateHandler<ContentDialogHandler>();
 
-        services.AddScoped<INavigationContextCollection, NavigationContextCollection>(provider => new NavigationContextCollection
+        services.AddScoped<INavigationRegionCollection, NavigationRegionCollection>(provider => new NavigationRegionCollection
         {
             { typeof(IClassicDesktopStyleApplicationLifetime), typeof(IClassicDesktopStyleApplicationLifetime) },
             { typeof(ISingleViewApplicationLifetime), typeof(ISingleViewApplicationLifetime) }
@@ -148,7 +148,7 @@ public static class IServiceCollectionExtensions
                 services.AddTransient<IContentTemplateDescriptorProvider, ContentTemplateDescriptorProvider>();
                 services.AddTransient<IContentTemplate, ContentTemplate>();
 
-                services.AddTransient<INavigationContext, NavigationContext>();
+                services.AddTransient<INavigationRegion, NavigationRegion>();
 
                 services.AddNavigateHandler<ContentControlHandler>();
                 services.AddNavigateHandler<FrameHandler>();

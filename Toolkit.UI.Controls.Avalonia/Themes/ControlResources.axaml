@@ -6,6 +6,7 @@
                 <MergeResourceInclude Source="../ContentDialog/ContentDialog.axaml" />
                 <MergeResourceInclude Source="../SettingsExpander/SettingsExpander.axaml" />
                 <MergeResourceInclude Source="../SettingsExpander/SettingsExpanderItem.axaml" />
+                <MergeResourceInclude Source="../PersonPicture/PersonPicture.axaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Styles.Resources>

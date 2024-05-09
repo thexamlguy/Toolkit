@@ -1,4 +1,4 @@
 ﻿namespace Toolkit.Foundation;
 
-public interface INavigationContextCollection :
+public interface INavigationRegionCollection :
     IDictionary<object, object?>;

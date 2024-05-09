@@ -39,8 +39,8 @@ public class ComponentBuilder :
                 services.AddTransient<INavigationScope, NavigationScope>();
 
                 services.AddTransient<INavigationProvider, NavigationProvider>();
-                services.AddScoped<INavigationContextCollection, NavigationContextCollection>();
-                services.AddTransient<INavigationContextProvider, NavigationContextProvider>();
+                services.AddScoped<INavigationRegionCollection, NavigationRegionCollection>();
+                services.AddTransient<INavigationRegionProvider, NavigationRegionProvider>();
 
                 services.AddHandler<NavigateHandler>();
                 services.AddHandler<NavigateBackHandler>();

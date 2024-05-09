@@ -23,10 +23,10 @@ public class ComponentInitializer(IEnumerable<IComponent> components,
                     provider.GetRequiredService<IProxyService<IComponentHostCollection>>());
 
                 services.AddScoped(_ =>
-                    provider.GetRequiredService<INavigationContextCollection>());
+                    provider.GetRequiredService<INavigationRegionCollection>());
 
                 services.AddScoped(_ =>
-                    provider.GetRequiredService<INavigationContextProvider>());
+                    provider.GetRequiredService<INavigationRegionProvider>());
 
                 services.AddScoped(_ =>
                     provider.GetRequiredService<IComponentScopeCollection>());
@@ -36,7 +36,7 @@ public class ComponentInitializer(IEnumerable<IComponent> components,
 
                 services.AddRange(typedServices.Services);
 
-                services.AddSingleton(new ComponentScope(component.GetType().Name));
+                services.AddSingleton(new NamedComponent(component.GetType().Name));
             });
 
             IComponentHost host = builder.Build();

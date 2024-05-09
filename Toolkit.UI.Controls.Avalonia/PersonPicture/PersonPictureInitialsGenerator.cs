@@ -2,39 +2,41 @@
 
 internal class PersonPictureInitialsGenerator
 {
-    public static PersonPictureCharacterType GetCharacterType(string str)
+    public static PersonPictureCharacterType GetCharacterType(string content)
     {
-
         PersonPictureCharacterType result = PersonPictureCharacterType.Other;
-        for (int i = 0; i < 3; i++)
+        if (content is { Length: > 0 })
         {
-            if ((i >= str.Length) || (str[i] == '\0') || (str[i] == 0xFEFF))
+            for (int i = 0; i < 3; i++)
             {
-                break;
-            }
+                if ((i >= content.Length) || (content[i] == '\0') || (content[i] == 0xFEFF))
+                {
+                    break;
+                }
 
-            char character = str[i];
-            PersonPictureCharacterType evaluationResult = GetCharacterType(character);
+                char character = content[i];
+                PersonPictureCharacterType evaluationResult = GetCharacterType(character);
 
-            switch (evaluationResult)
-            {
-                case PersonPictureCharacterType.Glyph:
-                    result = PersonPictureCharacterType.Glyph;
-                    break;
-                case PersonPictureCharacterType.Symbolic:
-                    if (result != PersonPictureCharacterType.Glyph)
-                    {
-                        result = PersonPictureCharacterType.Symbolic;
-                    }
-                    break;
-                case PersonPictureCharacterType.Standard:
-                    if ((result != PersonPictureCharacterType.Glyph) && (result != PersonPictureCharacterType.Symbolic))
-                    {
-                        result = PersonPictureCharacterType.Standard;
-                    }
-                    break;
-                default:
-                    break;
+                switch (evaluationResult)
+                {
+                    case PersonPictureCharacterType.Glyph:
+                        result = PersonPictureCharacterType.Glyph;
+                        break;
+                    case PersonPictureCharacterType.Symbolic:
+                        if (result != PersonPictureCharacterType.Glyph)
+                        {
+                            result = PersonPictureCharacterType.Symbolic;
+                        }
+                        break;
+                    case PersonPictureCharacterType.Standard:
+                        if ((result != PersonPictureCharacterType.Glyph) && (result != PersonPictureCharacterType.Symbolic))
+                        {
+                            result = PersonPictureCharacterType.Standard;
+                        }
+                        break;
+                    default:
+                        break;
+                }
             }
         }
         return result;

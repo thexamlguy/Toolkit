@@ -9,8 +9,7 @@ public class ConditionAction :
     IAction
 {
     public static readonly DirectProperty<ConditionAction, ActionCollection> ActionsProperty =
-        AvaloniaProperty.RegisterDirect<ConditionAction, ActionCollection>(nameof(Actions),
-            x => x.Actions);
+        AvaloniaProperty.RegisterDirect<ConditionAction, ActionCollection>(nameof(Actions), x => x.Actions);
 
     public static readonly StyledProperty<ICondition> ConditionProperty =
         AvaloniaProperty.Register<ConditionAction, ICondition>(nameof(Condition));

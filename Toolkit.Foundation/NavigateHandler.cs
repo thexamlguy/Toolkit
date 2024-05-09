@@ -2,7 +2,7 @@
 
 namespace Toolkit.Foundation;
 
-public class NavigateHandler(ComponentScope scope,
+public class NavigateHandler(NamedComponent scope,
     IComponentScopeProvider provider) :
     INotificationHandler<Navigate>
 {
