@@ -86,3 +86,18 @@ public partial class ObservableViewModel<TValue>(IServiceProvider provider,
     [ObservableProperty]
     private TValue? value;
 }
+
+public partial class ObservableViewModel<TKey, TValue>(IServiceProvider provider,
+    IServiceFactory factory,
+    IMediator mediator,
+    IPublisher publisher,
+    ISubscriber subscriber,
+    IDisposer disposer) : ObservableViewModel(provider, factory, mediator, publisher, subscriber, disposer)
+    where TValue : notnull
+{
+    [ObservableProperty]
+    private TKey? key;
+
+    [ObservableProperty]
+    private TValue? value;
+}
