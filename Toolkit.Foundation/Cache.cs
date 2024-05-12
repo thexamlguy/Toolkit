@@ -4,10 +4,11 @@ using System.Reactive.Disposables;
 
 namespace Toolkit.Foundation;
 
-public class Cache<TValue>(IDisposer disposer) :
+public class Cache<TValue>(IDisposer disposer,
+    IComparer<TValue> comparer) :
     ICache<TValue>
 {
-    private readonly List<TValue> cache = [];
+    private readonly SortedSet<TValue> cache = new(comparer);
 
     public void Add(TValue value)
     {
