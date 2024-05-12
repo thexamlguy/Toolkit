@@ -316,6 +316,7 @@ public partial class ObservableCollectionViewModel<TViewModel> :
         await Enumerate();
     }
 
+
     public async Task Enumerate()
     {
         if (this.GetAttribute<EnumerateAttribute>() is EnumerateAttribute attribute)
