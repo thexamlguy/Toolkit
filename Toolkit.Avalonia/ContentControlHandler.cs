@@ -43,6 +43,11 @@ public class ContentControlHandler :
                         {
                             await deactivated.OnDeactivated();
                         }
+
+                        if (content is IDisposable disposable)
+                        {
+                            disposable.Dispose();
+                        }
                     }
                 }
 

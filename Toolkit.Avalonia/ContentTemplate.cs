@@ -49,14 +49,16 @@ public class ContentTemplate :
                                 {
                                     await deactivated.OnDeactivated();
                                 }
+
+                                if (content is IDisposable disposable)
+                                {
+                                    disposable.Dispose();
+                                }
                             }
                         }
 
                         control.Loaded += HandleLoaded;
                         control.Unloaded += HandleUnloaded;
-
-                        //viewModelContentBinder?.Register(control);
-
                         return control;
                     }
                 }
