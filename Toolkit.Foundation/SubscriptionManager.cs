@@ -6,7 +6,8 @@ public class SubscriptionManager(SubscriptionCollection subscriptions,
     IDisposer disposer) : 
     ISubscriptionManager
 {
-    public IEnumerable<object?> GetHandlers(Type notificationType, object key)
+    public IEnumerable<object?> GetHandlers(Type notificationType, 
+        object key)
     {
         string subscriptionKey = $"{(key is not null ? $"{key}:" : "")}{notificationType}";
         if (subscriptions.TryGetValue(subscriptionKey, out List<WeakReference>? subscribers))
@@ -69,7 +70,8 @@ public class SubscriptionManager(SubscriptionCollection subscriptions,
         }
     }
 
-    private void RemoveSubscriber(object subscriber, Type argumentType)
+    private void RemoveSubscriber(object subscriber, 
+        Type argumentType)
     {
         string subscriptionKey = $"{argumentType}";
         if (subscriptions.TryGetValue(subscriptionKey, out List<WeakReference>? subscribers))
