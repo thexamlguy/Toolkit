@@ -38,13 +38,13 @@ public class PersonPicture : TemplatedControl
     private static readonly StyledProperty<PersonPictureTemplateSettings> TemplateSettingsProperty =
         AvaloniaProperty.Register<PersonPicture, PersonPictureTemplateSettings>(nameof(TemplateSettings));
 
-    private FontIcon badgeGlyphIcon;
-    private ImageBrush badgeImageBrush;
-    private TextBlock badgeNumberTextBlock;
-    private Ellipse badgingBackgroundEllipse;
-    private Ellipse badgingEllipse;
-    private string displayNameInitials;
-    private TextBlock initialsTextBlock;
+    private FontIcon? badgeGlyphIcon;
+    private ImageBrush? badgeImageBrush;
+    private TextBlock? badgeNumberTextBlock;
+    private Ellipse? badgingBackgroundEllipse;
+    private Ellipse? badgingEllipse;
+    private string? displayNameInitials;
+    private TextBlock? initialsTextBlock;
 
     public PersonPicture()
     {
