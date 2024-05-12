@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.Extensions.DependencyInjection;
 using System.Collections;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -140,11 +141,18 @@ public partial class ObservableCollectionViewModel<TViewModel> :
         return item;
     }
 
-    public TViewModel Add<T>()
+    public TViewModel Add<T>(bool scope = false)
         where T :
         TViewModel
     {
-        T? item = Factory.Create<T>();
+        IServiceFactory? factory = null;
+        if (scope)
+        {
+            IServiceScope serviceScope = Provider.CreateScope();
+            factory = serviceScope.ServiceProvider.GetRequiredService<IServiceFactory>();
+        }
+
+        T? item = factory is not null ? factory.Create<T>() : Factory.Create<T>();
         Add(item);
 
         return item;

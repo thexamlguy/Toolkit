@@ -29,13 +29,12 @@ public class ComponentBuilder :
 
                 services.AddScoped<SubscriptionCollection>();
                 services.AddScoped<ISubscriptionManager, SubscriptionManager>();
+                services.AddScoped<IDisposer, Disposer>();
 
                 services.AddTransient<ISubscriber, Subscriber>();
                 services.AddTransient<IPublisher, Publisher>();
 
                 services.AddTransient<IMediator, Mediator>();
-                services.AddScoped<IDisposer, Disposer>();
-
                 services.AddTransient<INavigationScope, NavigationScope>();
 
                 services.AddTransient<INavigationProvider, NavigationProvider>();

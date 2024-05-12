@@ -3,20 +3,28 @@
 namespace Toolkit.Foundation;
 
 public class NavigateHandler(NamedComponent scope,
-    IComponentScopeProvider provider) :
+    IComponentScopeProvider componentScopeProvider,
+    IServiceProvider provider) :
     INotificationHandler<Navigate>
 {
     public async Task Handle(Navigate args,
-        CancellationToken cancellationToken)
+      CancellationToken cancellationToken)
     {
-        if (provider.Get(args.Scope ?? scope.Name)
-            is ComponentScopeDescriptor descriptor)
+        INavigationScope? navigationScope;
+        if (args.Scope == "self")
         {
-            if (descriptor?.Services?.GetService<INavigationScope>() is INavigationScope navigationScope)
-            {
-                await navigationScope.NavigateAsync(args.Route, args.Sender,
-                    args.Context, args.Navigated, args.Parameters, cancellationToken);
-            }
+            navigationScope = provider.GetRequiredService<INavigationScope>();
+        }
+        else
+        {
+            ComponentScopeDescriptor? descriptor = componentScopeProvider.Get(args.Scope ?? scope.Name);
+            navigationScope = descriptor?.Services?.GetRequiredService<INavigationScope>();
+        }
+
+        if (navigationScope is not null)
+        {
+            await navigationScope.NavigateAsync(args.Route, args.Sender,
+                args.Context, args.Navigated, args.Parameters, cancellationToken);
         }
     }
 }

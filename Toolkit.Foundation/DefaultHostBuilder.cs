@@ -24,11 +24,12 @@ public class DefaultHostBuilder :
                     ComponentHostCollection>();
 
                 services.AddScoped<SubscriptionCollection>();
-                services.AddScoped<ISubscriptionManager, SubscriptionManager>();
+                
+                services.AddTransient<ISubscriptionManager, SubscriptionManager>();
                 services.AddTransient<ISubscriber, Subscriber>();
-                services.AddTransient<IPublisher, Publisher>();
 
-                services.AddScoped<IMediator, Mediator>();
+                services.AddTransient<IPublisher, Publisher>();
+                services.AddTransient<IMediator, Mediator>();
 
                 services.AddScoped<IProxyService<IPublisher>>(provider =>
                     new ProxyService<IPublisher>(provider.GetRequiredService<IPublisher>()));
@@ -48,7 +49,7 @@ public class DefaultHostBuilder :
                 services.AddScoped<INavigationRegionCollection, NavigationRegionCollection>();
                 services.AddTransient<INavigationRegionProvider, NavigationRegionProvider>();
 
-                services.AddTransient<INavigationScope, NavigationScope>();
+                services.AddScoped<INavigationScope, NavigationScope>();
 
                 services.AddSingleton(new NamedComponent("Root"));
                 services.AddScoped<IComponentScopeCollection, ComponentScopeCollection>(provider => new ComponentScopeCollection
