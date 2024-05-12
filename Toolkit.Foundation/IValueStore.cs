@@ -1,6 +1,6 @@
 ﻿namespace Toolkit.Foundation;
 
-public interface IContainer<T>
+public interface IValueStore<T>
 {
     T? Value { get; }
 

@@ -1,7 +1,7 @@
 ﻿namespace Toolkit.Foundation;
 
-public class Container<T> :
-    IContainer<T>
+public class ValueStore<T> :
+    IValueStore<T>
 {
     public T? Value { get; private set; }
 

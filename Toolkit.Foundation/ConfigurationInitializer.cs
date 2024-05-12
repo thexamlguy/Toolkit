@@ -20,6 +20,6 @@ public class ConfigurationInitializer<TConfiguration>(IConfigurationReader<TConf
             }
         }
 
-        await publisher.PublishUI(new Changed<TConfiguration>(configuration));
+        await publisher.PublishUI(new Activated<TConfiguration>(configuration));
     }
 }

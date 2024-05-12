@@ -92,12 +92,13 @@ public partial class ObservableViewModel<TKey, TValue>(IServiceProvider provider
     IMediator mediator,
     IPublisher publisher,
     ISubscriber subscriber,
-    IDisposer disposer) : ObservableViewModel(provider, factory, mediator, publisher, subscriber, disposer)
-    where TValue : notnull
+    IDisposer disposer,
+    TValue? value = null) : ObservableViewModel(provider, factory, mediator, publisher, subscriber, disposer)
+    where TValue : class
 {
     [ObservableProperty]
     private TKey? key;
 
     [ObservableProperty]
-    private TValue? value;
+    private TValue? value = value;
 }
