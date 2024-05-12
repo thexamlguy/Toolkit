@@ -1,12 +1,10 @@
 ﻿namespace Toolkit.Foundation;
 
-public record Create<TValue>(TValue Value);
-
 public record Create
 {
-    public static Create<TValue> As<TValue>(TValue value) =>
+    public static CreateEventArgs<TValue> As<TValue>(TValue value) =>
         new(value);
 
-    public static Create<TValue> As<TValue>() where TValue : new() =>
+    public static CreateEventArgs<TValue> As<TValue>() where TValue : new() =>
         new(new TValue());
 }

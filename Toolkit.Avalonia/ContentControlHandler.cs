@@ -7,7 +7,7 @@ namespace Toolkit.Avalonia;
 public class ContentControlHandler :
     INavigateHandler<ContentControl>
 {
-    public async Task Handle(Navigate<ContentControl> args,
+    public async Task Handle(NavigateEventArgs<ContentControl> args,
         CancellationToken cancellationToken)
     {
         if (args.Context is ContentControl contentControl)
@@ -27,7 +27,7 @@ public class ContentControlHandler :
 
                         if (content is IActivated activated)
                         {
-                            await activated.Activated();
+                            await activated.OnActivated();
                         }
                     }
 
@@ -41,7 +41,7 @@ public class ContentControlHandler :
                     {
                         if (content is IDeactivated deactivated)
                         {
-                            await deactivated.Deactivated();
+                            await deactivated.OnDeactivated();
                         }
                     }
                 }

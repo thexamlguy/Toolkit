@@ -5,7 +5,7 @@ namespace Toolkit.Foundation;
 public partial class ComponentConfigurationViewModel<TConfiguration, TValue, THeader, TDescription, TAction> :
     ValueViewModel<TValue>,
     IComponentConfigurationViewModel,
-    INotificationHandler<Changed<TConfiguration>>
+    INotificationHandler<ChangedEventArgs<TConfiguration>>
     where TConfiguration : class
 {
     public ComponentConfigurationViewModel(IServiceProvider provider,
@@ -20,7 +20,7 @@ public partial class ComponentConfigurationViewModel<TConfiguration, TValue, THe
     {
     }
 
-    public Task Handle(Changed<TConfiguration> args,
+    public Task Handle(ChangedEventArgs<TConfiguration> args,
         CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
@@ -40,7 +40,7 @@ public partial class ComponentConfigurationViewModel<TConfiguration, TValue, TAc
     object description) :
     ValueViewModel<TValue>(provider, factory, mediator, publisher, subscriber, disposer),
     IComponentConfigurationViewModel,
-    INotificationHandler<Changed<TConfiguration>>
+    INotificationHandler<ChangedEventArgs<TConfiguration>>
     where TConfiguration : class
 {
     [ObservableProperty]
@@ -52,13 +52,13 @@ public partial class ComponentConfigurationViewModel<TConfiguration, TValue, TAc
     [ObservableProperty]
     private object description = description;
 
-    public override Task Activated()
+    public override Task OnActivated()
     {
         Value = valueDelegate.Invoke(configuration);
-        return base.Activated();
+        return base.OnActivated();
     }
 
-    public Task Handle(Changed<TConfiguration> args,
+    public Task Handle(ChangedEventArgs<TConfiguration> args,
         CancellationToken cancellationToken = default)
     {
         if (args.Value is TConfiguration configuration)
@@ -83,7 +83,7 @@ public partial class ComponentConfigurationViewModel<TConfiguration, TValue, TDe
     object header) :
     ValueViewModel<TValue>(provider, factory, mediator, publisher, subscriber, disposer),
     IComponentConfigurationViewModel,
-    INotificationHandler<Changed<TConfiguration>>
+    INotificationHandler<ChangedEventArgs<TConfiguration>>
     where TConfiguration : class
 {
     [ObservableProperty]
@@ -95,13 +95,13 @@ public partial class ComponentConfigurationViewModel<TConfiguration, TValue, TDe
     [ObservableProperty]
     private TDescription description = description;
 
-    public override Task Activated()
+    public override Task OnActivated()
     {
         Value = valueDelegate.Invoke(configuration);
-        return base.Activated();
+        return base.OnActivated();
     }
 
-    public Task Handle(Changed<TConfiguration> args,
+    public Task Handle(ChangedEventArgs<TConfiguration> args,
         CancellationToken cancellationToken = default)
     {
         if (args.Value is TConfiguration configuration)

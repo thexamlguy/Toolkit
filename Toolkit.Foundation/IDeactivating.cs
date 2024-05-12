@@ -2,7 +2,7 @@
 
 public interface IDeactivating
 {
-    Task Deactivating();
+    Task OnDeactivating();
 }
 
 public interface IDeactivating<TResult>

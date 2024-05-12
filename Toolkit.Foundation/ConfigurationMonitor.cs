@@ -16,7 +16,7 @@ public class ConfigurationMonitor<TConfiguration>(IConfigurationFile<TConfigurat
         {
             if (reader.Read() is { } configuration)
             {
-                await publisher.PublishUI(new Changed<TConfiguration>(configuration));
+                await publisher.PublishUI(new ChangedEventArgs<TConfiguration>(configuration));
             }
         }
 

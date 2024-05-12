@@ -8,7 +8,7 @@ namespace Toolkit.Avalonia;
 public class SingleViewApplicationHandler :
     INavigateHandler<ISingleViewApplicationLifetime>
 {
-    public Task Handle(Navigate<ISingleViewApplicationLifetime> args,
+    public Task Handle(NavigateEventArgs<ISingleViewApplicationLifetime> args,
         CancellationToken cancellationToken = default)
     {
         if (Application.Current?.ApplicationLifetime is

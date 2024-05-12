@@ -1,11 +1,11 @@
 ﻿namespace Toolkit.Foundation;
 
 public class ConfigurationChangedHandler<TConfiguration, TValue>(ConfigurationValue<TConfiguration, TValue> configurationValue) :
-    INotificationHandler<Changed<TConfiguration>>
+    INotificationHandler<ChangedEventArgs<TConfiguration>>
     where TValue :
     class, new()
 {
-    public Task Handle(Changed<TConfiguration> args,
+    public Task Handle(ChangedEventArgs<TConfiguration> args,
         CancellationToken cancellationToken = default)
     {
         if (args.Value is TConfiguration configuration)

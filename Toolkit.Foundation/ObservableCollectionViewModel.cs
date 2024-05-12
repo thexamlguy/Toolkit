@@ -19,11 +19,11 @@ public partial class ObservableCollectionViewModel<TViewModel> :
     IList,
     IReadOnlyList<TViewModel>,
     INotifyCollectionChanged,
-    INotificationHandler<Remove<TViewModel>>,
-    INotificationHandler<Create<TViewModel>>,
-    INotificationHandler<Insert<TViewModel>>,
-    INotificationHandler<Move<TViewModel>>,
-    INotificationHandler<Replace<TViewModel>>
+    INotificationHandler<RemoveEventArgs<TViewModel>>,
+    INotificationHandler<CreateEventArgs<TViewModel>>,
+    INotificationHandler<InsertEventArgs<TViewModel>>,
+    INotificationHandler<MoveEventArgs<TViewModel>>,
+    INotificationHandler<ReplaceEventArgs<TViewModel>>
     where TViewModel :
     notnull
 {
@@ -121,7 +121,7 @@ public partial class ObservableCollectionViewModel<TViewModel> :
         }
     }
 
-    public virtual Task Activated() =>
+    public virtual Task OnActivated() =>
         Task.CompletedTask;
 
     public TViewModel Add()
@@ -222,10 +222,10 @@ public partial class ObservableCollectionViewModel<TViewModel> :
         return Task.CompletedTask;
     }
 
-    public virtual Task Deactivated() =>
+    public virtual Task OnDeactivated() =>
         Task.CompletedTask;
 
-    public virtual Task Deactivating() =>
+    public virtual Task OnDeactivating() =>
         Task.CompletedTask;
 
     public virtual void Dispose()
@@ -240,7 +240,7 @@ public partial class ObservableCollectionViewModel<TViewModel> :
     IEnumerator IEnumerable.GetEnumerator() =>
         ((IEnumerable)collection).GetEnumerator();
 
-    public Task Handle(Remove<TViewModel> args,
+    public Task Handle(RemoveEventArgs<TViewModel> args,
         CancellationToken cancellationToken)
     {
         foreach (TViewModel item in this.ToList())
@@ -254,7 +254,7 @@ public partial class ObservableCollectionViewModel<TViewModel> :
         return Task.CompletedTask;
     }
 
-    public Task Handle(Create<TViewModel> args,
+    public Task Handle(CreateEventArgs<TViewModel> args,
         CancellationToken cancellationToken)
     {
         if (args.Value is TViewModel item)
@@ -265,7 +265,7 @@ public partial class ObservableCollectionViewModel<TViewModel> :
         return Task.CompletedTask;
     }
 
-    public Task Handle(Insert<TViewModel> args,
+    public Task Handle(InsertEventArgs<TViewModel> args,
         CancellationToken cancellationToken)
     {
         if (args.Value is TViewModel item)
@@ -276,7 +276,7 @@ public partial class ObservableCollectionViewModel<TViewModel> :
         return Task.CompletedTask;
     }
 
-    public Task Handle(Move<TViewModel> args,
+    public Task Handle(MoveEventArgs<TViewModel> args,
         CancellationToken cancellationToken)
     {
         if (args.Value is TViewModel item)
@@ -287,7 +287,7 @@ public partial class ObservableCollectionViewModel<TViewModel> :
         return Task.CompletedTask;
     }
 
-    public Task Handle(Replace<TViewModel> args,
+    public Task Handle(ReplaceEventArgs<TViewModel> args,
         CancellationToken cancellationToken)
     {
         if (args.Value is TViewModel item)
@@ -332,7 +332,7 @@ public partial class ObservableCollectionViewModel<TViewModel> :
     }
 
     protected virtual IEnumerate PrepareEnumeration(object? key) => 
-        new Enumerate<TViewModel>() with { Key = key };
+        new EnumerateEventArgs<TViewModel>() with { Key = key };
 
     public void Insert(int index, TViewModel item) =>
         InsertItem(index, item);

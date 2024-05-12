@@ -3,9 +3,9 @@
 namespace Toolkit.Foundation;
 
 public class NavigateBackHandler(IComponentScopeProvider provider) :
-    INotificationHandler<NavigateBack>
+    INotificationHandler<NavigateBackEventArgs>
 {
-    public async Task Handle(NavigateBack args,
+    public async Task Handle(NavigateBackEventArgs args,
         CancellationToken cancellationToken)
     {
         if (provider.Get(args.Scope ?? "Root")

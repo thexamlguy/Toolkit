@@ -34,7 +34,7 @@ public class NavigateBackAction :
         {
             if (control.DataContext is IObservableViewModel observableViewModel)
             {
-                observableViewModel.Publisher.Publish(new NavigateBack(Context
+                observableViewModel.Publisher.Publish(new NavigateBackEventArgs(Context
                     ?? null, Scope ?? null)).ConfigureAwait(false);
             }
         }

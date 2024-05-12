@@ -62,7 +62,7 @@ public class NavigationScope(IPublisher publisher,
                             if (navigationProvider.Get(context is Type type ? type : context.GetType())
                                 is INavigation navigation)
                             {
-                                Type navigateType = typeof(Navigate<>).MakeGenericType(navigation.Type);
+                                Type navigateType = typeof(NavigateEventArgs<>).MakeGenericType(navigation.Type);
                                 if (Activator.CreateInstance(navigateType, [context, view, viewModel, sender, parameters]) is object navigate)
                                 {
                                     await publisher.Publish(navigate, cancellationToken);
@@ -92,7 +92,7 @@ public class NavigationScope(IPublisher publisher,
             if (navigationProvider.Get(context is Type type ? type : context.GetType())
                 is INavigation navigation)
             {
-                Type navigateType = typeof(NavigateBack<>).MakeGenericType(navigation.Type);
+                Type navigateType = typeof(NavigateBackEventArgs<>).MakeGenericType(navigation.Type);
                 if (Activator.CreateInstance(navigateType, [context]) is object navigate)
                 {
                     await publisher.Publish(navigate, cancellationToken);

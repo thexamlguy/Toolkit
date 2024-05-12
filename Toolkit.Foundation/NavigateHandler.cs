@@ -5,9 +5,9 @@ namespace Toolkit.Foundation;
 public class NavigateHandler(NamedComponent scope,
     IComponentScopeProvider componentScopeProvider,
     IServiceProvider provider) :
-    INotificationHandler<Navigate>
+    INotificationHandler<NavigateEventArgs>
 {
-    public async Task Handle(Navigate args,
+    public async Task Handle(NavigateEventArgs args,
       CancellationToken cancellationToken)
     {
         INavigationScope? navigationScope;

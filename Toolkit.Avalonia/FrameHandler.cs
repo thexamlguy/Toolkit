@@ -12,7 +12,7 @@ public class FrameHandler :
     INavigateHandler<Frame>,
     INavigateBackHandler<Frame>
 {
-    public Task Handle(Navigate<Frame> args,
+    public Task Handle(NavigateEventArgs<Frame> args,
         CancellationToken cancellationToken)
     {
         if (args.Context is Frame frame)
@@ -43,7 +43,7 @@ public class FrameHandler :
                             {
                                 if (content is IDeactivating deactivating)
                                 {
-                                    await deactivating.Deactivating();
+                                    await deactivating.OnDeactivating();
                                 }
                             }
                         }
@@ -72,7 +72,7 @@ public class FrameHandler :
                             {
                                 if (content is IDeactivated deactivated)
                                 {
-                                    await deactivated.Deactivated();
+                                    await deactivated.OnDeactivated();
                                 }
                             }
                         }
@@ -119,7 +119,7 @@ public class FrameHandler :
 
                             if (content is IActivated activated)
                             {
-                                await activated.Activated();
+                                await activated.OnActivated();
                             }
                         }
                     }
@@ -136,7 +136,7 @@ public class FrameHandler :
         return Task.CompletedTask;
     }
 
-    public Task Handle(NavigateBack<Frame> args,
+    public Task Handle(NavigateBackEventArgs<Frame> args,
         CancellationToken cancellationToken = default)
     {
         if (args.Context is Frame frame)

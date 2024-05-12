@@ -2,7 +2,7 @@
 
 public interface IActivated
 {
-    Task Activated();
+    Task OnActivated();
 }
 
 public interface IActivated<TResult>

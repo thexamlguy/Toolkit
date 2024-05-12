@@ -3,5 +3,5 @@
 public interface INavigateHandler;
 
 public interface INavigateHandler<TNavigation> :
-    INotificationHandler<Navigate<TNavigation>>,
+    INotificationHandler<NavigateEventArgs<TNavigation>>,
     INavigateHandler;

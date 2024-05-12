@@ -6,7 +6,7 @@ namespace Toolkit.Avalonia;
 public class ContentDialogHandler(IDispatcher dispatcher) :
     INavigateHandler<ContentDialog>
 {
-    public async Task Handle(Navigate<ContentDialog> args,
+    public async Task Handle(NavigateEventArgs<ContentDialog> args,
         CancellationToken cancellationToken)
     {
         if (args.Context is ContentDialog contentDialog)
@@ -94,7 +94,7 @@ public class ContentDialogHandler(IDispatcher dispatcher) :
 
                     if (content is IActivated activated)
                     {
-                        await activated.Activated();
+                        await activated.OnActivated();
                     }
                 }
             }

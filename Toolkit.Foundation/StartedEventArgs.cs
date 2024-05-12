@@ -1,3 +1,3 @@
 ﻿namespace Toolkit.Foundation;
 
-public record Started;
+public record StartedEventArgs;

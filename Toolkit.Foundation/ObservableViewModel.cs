@@ -42,7 +42,7 @@ public partial class ObservableViewModel :
 
     public IPublisher Publisher { get; }
 
-    public virtual Task Activated() =>
+    public virtual Task OnActivated() =>
         Task.CompletedTask;
 
     public Task Deactivate()
@@ -51,10 +51,10 @@ public partial class ObservableViewModel :
         return Task.CompletedTask;
     }
 
-    public virtual Task Deactivated() =>
+    public virtual Task OnDeactivated() =>
         Task.CompletedTask;
 
-    public virtual Task Deactivating() =>
+    public virtual Task OnDeactivating() =>
         Task.CompletedTask;
 
     public void Dispose()
