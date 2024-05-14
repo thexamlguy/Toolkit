@@ -26,9 +26,11 @@ public class DefaultHostBuilder :
                 services.AddSingleton<IDisposer, Disposer>();
 
                 services.AddScoped<SubscriptionCollection>();
-                services.AddTransient<ISubscriptionManager, SubscriptionManager>();
 
-                services.AddTransient<ISubscriber, Subscriber>();
+                services.AddTransient<IHandlerProvider, HandlerProvider>();
+                services.AddTransient<ISubscription, Subscription>();
+
+                services.AddTransient<ISubscription, Subscription>();
 
                 services.AddTransient<IPublisher, Publisher>();
                 services.AddTransient<IMediator, Mediator>();

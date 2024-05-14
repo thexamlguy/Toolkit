@@ -6,7 +6,7 @@ public partial class CommandValueViewModel<TValue>(IServiceProvider provider,
     IServiceFactory factory,
     IMediator mediator,
     IPublisher publisher,
-    ISubscriber subscriber,
+    ISubscription subscriber,
     IDisposer disposer) :
     ValueViewModel<TValue>(provider, factory, mediator, publisher, subscriber, disposer)
 {

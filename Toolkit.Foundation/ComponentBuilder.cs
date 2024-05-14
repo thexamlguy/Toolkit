@@ -27,11 +27,14 @@ public class ComponentBuilder :
                     new ServiceFactory((type, parameters) =>
                         ActivatorUtilities.CreateInstance(provider, type, parameters!)));
 
-                services.AddScoped<SubscriptionCollection>();
-                services.AddScoped<ISubscriptionManager, SubscriptionManager>();
                 services.AddSingleton<IDisposer, Disposer>();
 
-                services.AddTransient<ISubscriber, Subscriber>();
+                services.AddScoped<SubscriptionCollection>();
+
+                services.AddTransient<IHandlerProvider, HandlerProvider>();
+                services.AddTransient<ISubscription, Subscription>();
+
+                services.AddTransient<ISubscription, Subscription>();
                 services.AddTransient<IPublisher, Publisher>();
 
                 services.AddTransient<IMediator, Mediator>();

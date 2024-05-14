@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace Toolkit.Foundation;
 
-public class Publisher(ISubscriptionManager subscriptionManager,
+public class Publisher(IHandlerProvider handlerProvider,
     IServiceProvider provider,
     IDispatcher dispatcher) :
     IPublisher
@@ -29,8 +29,8 @@ public class Publisher(ISubscriptionManager subscriptionManager,
         List<object?> handlers = provider.GetServices(typeof(NotificationHandlerWrapper<>)
             .MakeGenericType(notificationType)).ToList();
 
-        foreach (object? handler in subscriptionManager
-            .GetHandlers(notificationType, key!))
+        foreach (object? handler in handlerProvider
+            .Get(notificationType, key!))
         {
             handlers.Add(handler);
         }

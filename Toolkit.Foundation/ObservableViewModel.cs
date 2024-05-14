@@ -19,7 +19,7 @@ public partial class ObservableViewModel :
         IServiceFactory factory,
         IMediator mediator,
         IPublisher publisher,
-        ISubscriber subscriber,
+        ISubscription subscriber,
         IDisposer disposer)
     {
         Provider = provider;
@@ -80,7 +80,7 @@ public partial class ObservableViewModel<TValue>(IServiceProvider provider,
     IServiceFactory factory,
     IMediator mediator, 
     IPublisher publisher, 
-    ISubscriber subscriber, 
+    ISubscription subscriber, 
     IDisposer disposer) : ObservableViewModel(provider, factory, mediator, publisher, subscriber, disposer)
     where TValue : notnull
 {
@@ -92,7 +92,7 @@ public partial class ObservableViewModel<TKey, TValue>(IServiceProvider provider
     IServiceFactory factory,
     IMediator mediator,
     IPublisher publisher,
-    ISubscriber subscriber,
+    ISubscription subscriber,
     IDisposer disposer,
     TValue? value = null) : ObservableViewModel(provider, factory, mediator, publisher, subscriber, disposer)
     where TValue : class

@@ -1,8 +1,8 @@
 ﻿namespace Toolkit.Foundation;
 
-public interface ISubscriber
+public interface ISubscription
 {
-    void Remove(object subscriber);
-
     void Add(object subscriber);
+
+    void Remove(object subscriber);
 }

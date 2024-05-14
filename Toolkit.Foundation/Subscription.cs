@@ -2,27 +2,26 @@
 
 namespace Toolkit.Foundation;
 
-public class SubscriptionManager(SubscriptionCollection subscriptions, 
-    IDisposer disposer) : 
-    ISubscriptionManager
+public class Subscription(SubscriptionCollection subscriptions,
+    IDisposer disposer) :
+    ISubscription
 {
-    public IEnumerable<object?> GetHandlers(Type notificationType, 
-        object key)
+    public void Add(object subscriber)
     {
-        string subscriptionKey = $"{(key is not null ? $"{key}:" : "")}{notificationType}";
-        if (subscriptions.TryGetValue(subscriptionKey, out List<WeakReference>? subscribers))
+        Type handlerType = subscriber.GetType();
+        object? key = GetKeyFromHandler(subscriber);
+        foreach (Type interfaceType in GetHandlerInterfaces(handlerType))
         {
-            foreach (WeakReference weakRef in subscribers.ToArray())
+            if (interfaceType.GetGenericArguments().FirstOrDefault() is Type argumentType)
             {
-                object? target = weakRef.Target;
-                if (target != null)
+                string subscriptionKey = $"{(key is not null ? $"{key}:" : "")}{argumentType}";
+                subscriptions.AddOrUpdate(subscriptionKey, _ => new List<WeakReference> { new(subscriber) }, (_, collection) =>
                 {
-                    yield return target;
-                }
-                else
-                {
-                    subscribers.Remove(weakRef);
-                }
+                    collection.Add(new WeakReference(subscriber));
+                    return collection;
+                });
+
+                disposer.Add(subscriber, Disposable.Create(() => RemoveSubscriber(subscriber, argumentType)));
             }
         }
     }
@@ -50,27 +49,8 @@ public class SubscriptionManager(SubscriptionCollection subscriptions,
         }
     }
 
-    public void Add(object subscriber)
-    {
-        Type handlerType = subscriber.GetType();
-        object? key = GetKeyFromHandler(subscriber);
-        foreach (Type interfaceType in GetHandlerInterfaces(handlerType))
-        {
-            if (interfaceType.GetGenericArguments().FirstOrDefault() is Type argumentType)
-            {
-                string subscriptionKey = $"{(key is not null ? $"{key}:" : "")}{argumentType}";
-                subscriptions.AddOrUpdate(subscriptionKey, _ => new List<WeakReference> { new(subscriber) }, (_, collection) =>
-                {
-                    collection.Add(new WeakReference(subscriber));
-                    return collection;
-                });
 
-                disposer.Add(subscriber, Disposable.Create(() => RemoveSubscriber(subscriber, argumentType)));
-            }
-        }
-    }
-
-    private void RemoveSubscriber(object subscriber, 
+    private void RemoveSubscriber(object subscriber,
         Type argumentType)
     {
         string subscriptionKey = $"{argumentType}";
@@ -91,7 +71,7 @@ public class SubscriptionManager(SubscriptionCollection subscriptions,
         }
     }
 
-    private object? GetKeyFromHandler(object handler) => 
+    private object? GetKeyFromHandler(object handler) =>
         handler.GetAttribute<NotificationAttribute>() is NotificationAttribute attribute
             ? handler.GetPropertyValue(() => attribute.Key) is { } value ? value : attribute.Key : null;
 

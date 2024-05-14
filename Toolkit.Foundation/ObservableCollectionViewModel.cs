@@ -41,7 +41,7 @@ public partial class ObservableCollectionViewModel<TViewModel> :
         IServiceFactory factory,
         IMediator mediator,
         IPublisher publisher,
-        ISubscriber subscriber,
+        ISubscription subscriber,
         IDisposer disposer)
     {
         Provider = provider;
@@ -59,7 +59,7 @@ public partial class ObservableCollectionViewModel<TViewModel> :
         IServiceFactory factory,
         IMediator mediator,
         IPublisher publisher,
-        ISubscriber subscriber,
+        ISubscription subscriber,
         IDisposer disposer,
         IEnumerable<TViewModel> items)
     {
@@ -459,7 +459,7 @@ public partial class ObservableCollectionViewModel<TValue, TViewModel>(IServiceP
     IServiceFactory factory,
     IMediator mediator,
     IPublisher publisher,
-    ISubscriber subscriber, IDisposer disposer) : ObservableCollectionViewModel<TViewModel>(provider, factory, mediator, publisher, subscriber, disposer)
+    ISubscription subscriber, IDisposer disposer) : ObservableCollectionViewModel<TViewModel>(provider, factory, mediator, publisher, subscriber, disposer)
     where TViewModel : notnull
 {
     [ObservableProperty]
@@ -470,6 +470,6 @@ public class ObservableCollectionViewModel(IServiceProvider provider,
     IServiceFactory factory,
     IMediator mediator,
     IPublisher publisher,
-    ISubscriber subscriber,
+    ISubscription subscriber,
     IDisposer disposer) :
     ObservableCollectionViewModel<IDisposable>(provider, factory, mediator, publisher, subscriber, disposer);
