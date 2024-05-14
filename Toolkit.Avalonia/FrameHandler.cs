@@ -12,8 +12,7 @@ public class FrameHandler :
     INavigateHandler<Frame>,
     INavigateBackHandler<Frame>
 {
-    public Task Handle(NavigateEventArgs<Frame> args,
-        CancellationToken cancellationToken)
+    public Task Handle(NavigateEventArgs<Frame> args)
     {
         if (args.Context is Frame frame)
         {
@@ -136,8 +135,7 @@ public class FrameHandler :
         return Task.CompletedTask;
     }
 
-    public Task Handle(NavigateBackEventArgs<Frame> args,
-        CancellationToken cancellationToken = default)
+    public Task Handle(NavigateBackEventArgs<Frame> args)
     {
         if (args.Context is Frame frame)
         {

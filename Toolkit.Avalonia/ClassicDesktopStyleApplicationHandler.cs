@@ -8,8 +8,7 @@ namespace Toolkit.Avalonia;
 public class ClassicDesktopStyleApplicationHandler :
     INavigateHandler<IClassicDesktopStyleApplicationLifetime>
 {
-    public Task Handle(NavigateEventArgs<IClassicDesktopStyleApplicationLifetime> args,
-        CancellationToken cancellationToken = default)
+    public Task Handle(NavigateEventArgs<IClassicDesktopStyleApplicationLifetime> args)
     {
         if (Application.Current?.ApplicationLifetime is
             IClassicDesktopStyleApplicationLifetime lifeTime)

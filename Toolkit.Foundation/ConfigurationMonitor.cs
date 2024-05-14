@@ -11,12 +11,12 @@ public class ConfigurationMonitor<TConfiguration>(IConfigurationFile<TConfigurat
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        async void ChangedHandler(object sender,
+        void ChangedHandler(object sender,
             FileSystemEventArgs args)
         {
             if (reader.Read() is { } configuration)
             {
-                await publisher.PublishUI(new ChangedEventArgs<TConfiguration>(configuration));
+                publisher.PublishUI(new ChangedEventArgs<TConfiguration>(configuration));
             }
         }
 

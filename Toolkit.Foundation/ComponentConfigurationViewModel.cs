@@ -20,8 +20,7 @@ public partial class ComponentConfigurationViewModel<TConfiguration, TValue, THe
     {
     }
 
-    public Task Handle(ChangedEventArgs<TConfiguration> args,
-        CancellationToken cancellationToken = default)
+    public Task Handle(ChangedEventArgs<TConfiguration> args)
     {
         throw new NotImplementedException();
     }
@@ -58,8 +57,7 @@ public partial class ComponentConfigurationViewModel<TConfiguration, TValue, TAc
         return base.OnActivated();
     }
 
-    public Task Handle(ChangedEventArgs<TConfiguration> args,
-        CancellationToken cancellationToken = default)
+    public Task Handle(ChangedEventArgs<TConfiguration> args)
     {
         if (args.Value is TConfiguration configuration)
         {
@@ -101,8 +99,7 @@ public partial class ComponentConfigurationViewModel<TConfiguration, TValue, TDe
         return base.OnActivated();
     }
 
-    public Task Handle(ChangedEventArgs<TConfiguration> args,
-        CancellationToken cancellationToken = default)
+    public Task Handle(ChangedEventArgs<TConfiguration> args)
     {
         if (args.Value is TConfiguration configuration)
         {

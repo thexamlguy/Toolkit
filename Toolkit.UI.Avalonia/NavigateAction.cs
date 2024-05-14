@@ -74,8 +74,8 @@ public class NavigateAction :
                     ParameterBindings.Select(binding => new KeyValuePair<string, object>(binding.Key, binding.Value)).ToArray() :
                     Enumerable.Empty<KeyValuePair<string, object>>()];
 
-                observableViewModel.Publisher.Publish(new NavigateEventArgs(Route, Context == this ? control : Context, Scope ?? null, 
-                    control.DataContext, Navigated, parameters)).ConfigureAwait(false);
+                observableViewModel.Publisher.Publish(new NavigateEventArgs(Route, Context == this ? control : Context, Scope ?? null,
+                    control.DataContext, Navigated, parameters));
             }
         }
 

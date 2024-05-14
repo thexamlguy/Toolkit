@@ -7,8 +7,7 @@ namespace Toolkit.Avalonia;
 public class ContentControlHandler :
     INavigateHandler<ContentControl>
 {
-    public async Task Handle(NavigateEventArgs<ContentControl> args,
-        CancellationToken cancellationToken)
+    public async Task Handle(NavigateEventArgs<ContentControl> args)
     {
         if (args.Context is ContentControl contentControl)
         {

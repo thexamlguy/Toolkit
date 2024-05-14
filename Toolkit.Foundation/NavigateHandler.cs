@@ -7,8 +7,7 @@ public class NavigateHandler(NamedComponent scope,
     IServiceProvider provider) :
     INotificationHandler<NavigateEventArgs>
 {
-    public async Task Handle(NavigateEventArgs args,
-      CancellationToken cancellationToken)
+    public Task Handle(NavigateEventArgs args)
     {
         INavigationScope? navigationScope;
         if (args.Scope == "self")
@@ -21,10 +20,9 @@ public class NavigateHandler(NamedComponent scope,
             navigationScope = descriptor?.Services?.GetRequiredService<INavigationScope>();
         }
 
-        if (navigationScope is not null)
-        {
-            await navigationScope.NavigateAsync(args.Route, args.Sender,
-                args.Context, args.Navigated, args.Parameters, cancellationToken);
-        }
+        navigationScope?.Navigate(args.Route, args.Sender,
+                args.Context, args.Navigated, args.Parameters);
+
+        return Task.CompletedTask;
     }
 }

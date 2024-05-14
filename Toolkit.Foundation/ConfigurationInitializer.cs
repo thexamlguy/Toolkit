@@ -9,7 +9,7 @@ public class ConfigurationInitializer<TConfiguration>(IConfigurationReader<TConf
     where TConfiguration :
     class
 {
-    public async Task Initialize()
+    public Task Initialize()
     {
         if (!reader.TryRead(out TConfiguration? configuration))
         {
@@ -20,6 +20,7 @@ public class ConfigurationInitializer<TConfiguration>(IConfigurationReader<TConf
             }
         }
 
-        await publisher.PublishUI(new ActivatedEventArgs<TConfiguration>(configuration));
+        publisher.PublishUI(new ActivatedEventArgs<TConfiguration>(configuration));
+        return Task.CompletedTask;
     }
 }

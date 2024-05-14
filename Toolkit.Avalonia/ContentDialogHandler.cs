@@ -6,8 +6,7 @@ namespace Toolkit.Avalonia;
 public class ContentDialogHandler(IDispatcher dispatcher) :
     INavigateHandler<ContentDialog>
 {
-    public async Task Handle(NavigateEventArgs<ContentDialog> args,
-        CancellationToken cancellationToken)
+    public async Task Handle(NavigateEventArgs<ContentDialog> args)
     {
         if (args.Context is ContentDialog contentDialog)
         {
@@ -86,7 +85,7 @@ public class ContentDialogHandler(IDispatcher dispatcher) :
                     }
 
                     // A hack to wait for the dialog to finish loading up to make it appear more responsive
-                    await Task.Delay(250, cancellationToken);
+                    await Task.Delay(250);
                     if (content is IInitializer initializer)
                     {
                         await initializer.Initialize();

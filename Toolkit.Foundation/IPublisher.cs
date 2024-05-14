@@ -2,45 +2,37 @@
 
 public interface IPublisher
 {
-    public Task Publish<TMessage>(object key,
-        CancellationToken cancellationToken = default)
+    void Publish<TMessage>(object key)
         where TMessage : new();
 
-    public Task Publish<TMessage>(TMessage message,
-        CancellationToken cancellationToken = default)
+    void Publish<TMessage>(TMessage message)
         where TMessage : notnull;
 
-    public Task Publish<TMessage>(TMessage message,
-        object key,
-        CancellationToken cancellationToken = default)
+    void Publish<TMessage>(TMessage message,
+        object key)
         where TMessage : notnull;
 
-    Task PublishUI<TMessage>(TMessage message,
-        object key,
-        CancellationToken cancellationToken = default)
+    void PublishUI<TMessage>(TMessage message,
+        object key)
         where TMessage : notnull;
 
-    Task PublishUI<TMessage>(object key,
-        CancellationToken cancellationToken = default)
+    void PublishUI<TMessage>(object key)
         where TMessage : new();
 
-    Task PublishUI<TMessage>(TMessage message,
-        CancellationToken cancellationToken = default)
+    void PublishUI<TMessage>(TMessage message)
         where TMessage : notnull;
 
-    Task PublishUI(object message,
-        CancellationToken cancellationToken = default);
+    void PublishUI(object message);
 
-    Task Publish(object message,
+    void Publish(object message,
         Func<Func<Task>, Task> marshal,
-        object? key = null,
-        CancellationToken cancellationToken = default);
+        object? key = null);
 
-    Task PublishUI<TMessage>(CancellationToken cancellationToken = default)
+    void PublishUI<TMessage>()
         where TMessage : new();
 
-    Task Publish<TMessage>(CancellationToken cancellationToken = default)
+    void Publish<TMessage>()
         where TMessage : new();
 
-    public Task Publish(object message, CancellationToken cancellationToken = default);
+    void Publish(object message);
 }

@@ -10,8 +10,8 @@ public class NavigationScope(IPublisher publisher,
     IContentTemplateDescriptorProvider contentTemplateDescriptorProvider) :
     INavigationScope
 {
-    public async Task NavigateAsync(string route, object? sender = null, object? context = null,
-        EventHandler? navigated = null, object[]? parameters = null, CancellationToken cancellationToken = default)
+    public void Navigate(string route, object? sender = null, object? context = null,
+        EventHandler? navigated = null, object[]? parameters = null)
     {
         string[] segments = route.Split('/');
         int segmentCount = segments.Length;
@@ -65,7 +65,7 @@ public class NavigationScope(IPublisher publisher,
                                 Type navigateType = typeof(NavigateEventArgs<>).MakeGenericType(navigation.Type);
                                 if (Activator.CreateInstance(navigateType, [context, view, viewModel, sender, parameters]) is object navigate)
                                 {
-                                    await publisher.Publish(navigate, cancellationToken);
+                                    publisher.Publish(navigate);
                                     if (currentSegmentIndex == segmentCount)
                                     {
                                         navigated?.Invoke(this, EventArgs.Empty);
@@ -79,8 +79,7 @@ public class NavigationScope(IPublisher publisher,
         }
     }
 
-    public async Task NavigateBackAsync(object? context,
-        CancellationToken cancellationToken = default)
+    public void Back(object? context)
     {
         if (context is not null)
         {
@@ -95,7 +94,7 @@ public class NavigationScope(IPublisher publisher,
                 Type navigateType = typeof(NavigateBackEventArgs<>).MakeGenericType(navigation.Type);
                 if (Activator.CreateInstance(navigateType, [context]) is object navigate)
                 {
-                    await publisher.Publish(navigate, cancellationToken);
+                    publisher.Publish(navigate);
                 }
             }
         }

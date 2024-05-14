@@ -6,19 +6,18 @@ public class NotificationHandlerWrapper<TMessage>(INotificationHandler<TMessage>
     private readonly IEnumerable<IPipelineBehaviour<TMessage>> pipelineBehaviours =
         pipelineBehaviours.Reverse();
 
-    public async Task Handle(TMessage message,
-        CancellationToken cancellationToken)
+    public async Task Handle(TMessage message)
     {
         NotificationHandlerDelegate<TMessage> currentHandler = handler.Handle;
         foreach (IPipelineBehaviour<TMessage> behaviour in pipelineBehaviours)
         {
             NotificationHandlerDelegate<TMessage> previousHandler = currentHandler;
-            currentHandler = async (args, token) =>
+            currentHandler = async (args) =>
             {
-                await behaviour.Handle(args, previousHandler, token);
+                await behaviour.Handle(args, previousHandler);
             };
         }
 
-        await currentHandler(message, cancellationToken);
+        await currentHandler(message);
     }
 }

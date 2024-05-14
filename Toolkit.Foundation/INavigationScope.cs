@@ -2,8 +2,8 @@
 
 public interface INavigationScope
 {
-    Task NavigateAsync(string route, object? sender = null, object? context = null,
-        EventHandler? navigated = null, object[]? parameters = null, CancellationToken cancellationToken = default);
+    void Navigate(string route, object? sender = null, object? context = null,
+        EventHandler? navigated = null, object[]? parameters = null);
 
-    Task NavigateBackAsync(object? context, CancellationToken cancellationToken = default);
+    void Back(object? context);
 }

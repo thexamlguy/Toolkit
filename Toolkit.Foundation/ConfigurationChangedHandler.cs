@@ -5,8 +5,7 @@ public class ConfigurationChangedHandler<TConfiguration, TValue>(ConfigurationVa
     where TValue :
     class, new()
 {
-    public Task Handle(ChangedEventArgs<TConfiguration> args,
-        CancellationToken cancellationToken = default)
+    public Task Handle(ChangedEventArgs<TConfiguration> args)
     {
         if (args.Value is TConfiguration configuration)
         {

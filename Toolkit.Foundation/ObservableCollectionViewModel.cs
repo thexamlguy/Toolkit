@@ -235,7 +235,7 @@ public partial class ObservableCollectionViewModel<TViewModel> :
         Disposer.Dispose(this);
     }
 
-    public async Task Enumerate()
+    public void Enumerate()
     {
         if (this.GetAttribute<EnumerateAttribute>() is EnumerateAttribute attribute)
         {
@@ -245,7 +245,7 @@ public partial class ObservableCollectionViewModel<TViewModel> :
             }
 
             object? key = this.GetPropertyValue(() => attribute.Key) is { } value ? value : attribute.Key;
-            await Publisher.PublishUI(PrepareEnumeration(key));
+            Publisher.PublishUI(PrepareEnumeration(key));
         }
     }
 
@@ -255,8 +255,7 @@ public partial class ObservableCollectionViewModel<TViewModel> :
     IEnumerator IEnumerable.GetEnumerator() =>
         ((IEnumerable)collection).GetEnumerator();
 
-    public Task Handle(RemoveEventArgs<TViewModel> args,
-        CancellationToken cancellationToken)
+    public Task Handle(RemoveEventArgs<TViewModel> args)
     {
         foreach (TViewModel item in this.ToList())
         {
@@ -269,8 +268,7 @@ public partial class ObservableCollectionViewModel<TViewModel> :
         return Task.CompletedTask;
     }
 
-    public Task Handle(CreateEventArgs<TViewModel> args,
-        CancellationToken cancellationToken)
+    public Task Handle(CreateEventArgs<TViewModel> args)
     {
         if (args.Value is TViewModel item)
         {
@@ -280,8 +278,7 @@ public partial class ObservableCollectionViewModel<TViewModel> :
         return Task.CompletedTask;
     }
 
-    public Task Handle(InsertEventArgs<TViewModel> args,
-        CancellationToken cancellationToken)
+    public Task Handle(InsertEventArgs<TViewModel> args)
     {
         if (args.Value is TViewModel item)
         {
@@ -291,8 +288,7 @@ public partial class ObservableCollectionViewModel<TViewModel> :
         return Task.CompletedTask;
     }
 
-    public Task Handle(MoveEventArgs<TViewModel> args,
-        CancellationToken cancellationToken)
+    public Task Handle(MoveEventArgs<TViewModel> args)
     {
         if (args.Value is TViewModel item)
         {
@@ -302,8 +298,7 @@ public partial class ObservableCollectionViewModel<TViewModel> :
         return Task.CompletedTask;
     }
 
-    public Task Handle(ReplaceEventArgs<TViewModel> args,
-        CancellationToken cancellationToken)
+    public Task Handle(ReplaceEventArgs<TViewModel> args)
     {
         if (args.Value is TViewModel item)
         {
@@ -328,7 +323,7 @@ public partial class ObservableCollectionViewModel<TViewModel> :
         }
 
         Initialized = true;
-        await Enumerate();
+        Enumerate();
     }
 
     public void Insert(int index, TViewModel item) =>
