@@ -34,10 +34,11 @@ public partial class ObservableCollectionViewModel<TViewModel> :
     [ObservableProperty]
     private bool initialized;
 
-    private bool selfDisposing;
+    [ObservableProperty]
+    private int selectedIndex = 0;
 
     public ObservableCollectionViewModel(IServiceProvider provider,
-            IServiceFactory factory,
+        IServiceFactory factory,
         IMediator mediator,
         IPublisher publisher,
         ISubscriber subscriber,
@@ -181,6 +182,7 @@ public partial class ObservableCollectionViewModel<TViewModel> :
         }
         catch (InvalidCastException)
         {
+
         }
 
         Add(item!);
@@ -205,7 +207,6 @@ public partial class ObservableCollectionViewModel<TViewModel> :
         }
 
         ClearItems();
-
         clearing = false;
     }
 
@@ -229,8 +230,6 @@ public partial class ObservableCollectionViewModel<TViewModel> :
 
     public virtual void Dispose()
     {
-        selfDisposing = true;
-
         GC.SuppressFinalize(this);
         Disposer.Dispose(this);
     }
@@ -315,15 +314,17 @@ public partial class ObservableCollectionViewModel<TViewModel> :
         IsCompatibleObject(value) ?
         IndexOf((TViewModel)value!) : -1;
 
-    public async Task Initialize()
+    public Task Initialize()
     {
         if (Initialized)
         {
-            return;
+            return Task.CompletedTask;
         }
 
         Initialized = true;
         Enumerate();
+
+        return Task.CompletedTask;
     }
 
     public void Insert(int index, TViewModel item) =>
@@ -360,6 +361,7 @@ public partial class ObservableCollectionViewModel<TViewModel> :
 
     public virtual Task OnDeactivating() =>
         Task.CompletedTask;
+
     public bool Remove(TViewModel item)
     {
         int index = collection.IndexOf(item);
@@ -410,13 +412,13 @@ public partial class ObservableCollectionViewModel<TViewModel> :
         Disposer.Add(this, item);
         Disposer.Add(item, Disposable.Create(() =>
         {
-            if (item is IList collection)
-            {
-                collection.Clear();
-            }
-
             if (item is IRemovable && !clearing)
             {
+                if (item is IList collection)
+                {
+                    collection.Clear();
+                }
+
                 Remove(item);
             }
         }));
@@ -425,7 +427,8 @@ public partial class ObservableCollectionViewModel<TViewModel> :
     }
 
     protected virtual IEnumerate PrepareEnumeration(object? key) =>
-                            new EnumerateEventArgs<TViewModel>() with { Key = key };
+        new EnumerateEventArgs<TViewModel>() with { Key = key };
+
     protected virtual void RemoveItem(int index) =>
         collection.RemoveAt(index);
 
@@ -437,6 +440,19 @@ public partial class ObservableCollectionViewModel<TViewModel> :
 
     private void OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs args) =>
         CollectionChanged?.Invoke(this, args);
+
+    partial void OnSelectedIndexChanged(int oldValue, int newValue)
+    {
+        if (oldValue >= 0 && oldValue <= this.Count -1 && this[oldValue] is ISelectable removed)
+        {
+            removed.Selected = false;
+        }
+
+        if (newValue >= 0 && newValue <= this.Count - 1 && this[newValue] is ISelectable added)
+        {
+            added.Selected = true;
+        }
+    }
 }
 
 public partial class ObservableCollectionViewModel<TValue, TViewModel>(IServiceProvider provider,
