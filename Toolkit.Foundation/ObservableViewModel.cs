@@ -9,7 +9,8 @@ public partial class ObservableViewModel :
     IActivated,
     IDeactivating,
     IDeactivated,
-    IDeactivatable
+    IDeactivatable,
+    IDisposable
 {
     [ObservableProperty]
     private bool isInitialized;

@@ -29,11 +29,18 @@ public partial class ObservableCollectionViewModel<TViewModel> :
 {
     private readonly ObservableCollection<TViewModel> collection = [];
 
+    private bool clearing;
+
     [ObservableProperty]
     private bool isInitialized;
 
+    [ObservableProperty]
+    private int selectedIndex = 0;
+
+    private bool selfDisposing;
+
     public ObservableCollectionViewModel(IServiceProvider provider,
-        IServiceFactory factory,
+            IServiceFactory factory,
         IMediator mediator,
         IPublisher publisher,
         ISubscriber subscriber,
@@ -121,9 +128,6 @@ public partial class ObservableCollectionViewModel<TViewModel> :
         }
     }
 
-    public virtual Task OnActivated() =>
-        Task.CompletedTask;
-
     public TViewModel Add()
     {
         TViewModel? item = Factory.Create<TViewModel>();
@@ -196,12 +200,16 @@ public partial class ObservableCollectionViewModel<TViewModel> :
 
     public void Clear()
     {
-        foreach (TViewModel item in collection)
+        clearing = true;
+
+        foreach (TViewModel item in this.ToList())
         {
             Disposer.Dispose(item);
         }
 
         ClearItems();
+
+        clearing = false;
     }
 
     public bool Contains(TViewModel item) =>
@@ -222,16 +230,26 @@ public partial class ObservableCollectionViewModel<TViewModel> :
         return Task.CompletedTask;
     }
 
-    public virtual Task OnDeactivated() =>
-        Task.CompletedTask;
-
-    public virtual Task OnDeactivating() =>
-        Task.CompletedTask;
-
     public virtual void Dispose()
     {
+        selfDisposing = true;
+
         GC.SuppressFinalize(this);
         Disposer.Dispose(this);
+    }
+
+    public async Task Enumerate()
+    {
+        if (this.GetAttribute<EnumerateAttribute>() is EnumerateAttribute attribute)
+        {
+            if (attribute.Mode == EnumerateMode.Reset)
+            {
+                Clear();
+            }
+
+            object? key = this.GetPropertyValue(() => attribute.Key) is { } value ? value : attribute.Key;
+            await Publisher.PublishUI(PrepareEnumeration(key));
+        }
     }
 
     public IEnumerator<TViewModel> GetEnumerator() =>
@@ -316,24 +334,6 @@ public partial class ObservableCollectionViewModel<TViewModel> :
         await Enumerate();
     }
 
-
-    public async Task Enumerate()
-    {
-        if (this.GetAttribute<EnumerateAttribute>() is EnumerateAttribute attribute)
-        {
-            if (attribute.Mode == EnumerateMode.Reset)
-            {
-                Clear();
-            }
-
-            object? key = this.GetPropertyValue(() => attribute.Key) is { } value ? value : attribute.Key;
-            await Publisher.PublishUI(PrepareEnumeration(key));
-        }
-    }
-
-    protected virtual IEnumerate PrepareEnumeration(object? key) => 
-        new EnumerateEventArgs<TViewModel>() with { Key = key };
-
     public void Insert(int index, TViewModel item) =>
         InsertItem(index, item);
 
@@ -360,6 +360,14 @@ public partial class ObservableCollectionViewModel<TViewModel> :
         return true;
     }
 
+    public virtual Task OnActivated() =>
+        Task.CompletedTask;
+
+    public virtual Task OnDeactivated() =>
+        Task.CompletedTask;
+
+    public virtual Task OnDeactivating() =>
+        Task.CompletedTask;
     public bool Remove(TViewModel item)
     {
         int index = collection.IndexOf(item);
@@ -402,23 +410,30 @@ public partial class ObservableCollectionViewModel<TViewModel> :
     }
 
     protected virtual void ClearItems() =>
-        collection.Clear();
+    collection.Clear();
 
     protected virtual void InsertItem(int index,
         TViewModel item)
     {
         Disposer.Add(this, item);
-        Disposer.Add(item, item, Disposable.Create(() =>
+        Disposer.Add(item, Disposable.Create(() =>
         {
             if (item is IList collection)
             {
                 collection.Clear();
+            }
+
+            if (item is IRemovable && !clearing)
+            {
+                Remove(item);
             }
         }));
 
         collection.Insert(index, item);
     }
 
+    protected virtual IEnumerate PrepareEnumeration(object? key) =>
+                            new EnumerateEventArgs<TViewModel>() with { Key = key };
     protected virtual void RemoveItem(int index) =>
         collection.RemoveAt(index);
 

@@ -29,7 +29,7 @@ public class ComponentBuilder :
 
                 services.AddScoped<SubscriptionCollection>();
                 services.AddScoped<ISubscriptionManager, SubscriptionManager>();
-                services.AddScoped<IDisposer, Disposer>();
+                services.AddSingleton<IDisposer, Disposer>();
 
                 services.AddTransient<ISubscriber, Subscriber>();
                 services.AddTransient<IPublisher, Publisher>();

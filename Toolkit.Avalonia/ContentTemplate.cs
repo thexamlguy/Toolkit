@@ -50,10 +50,10 @@ public class ContentTemplate :
                                     await deactivated.OnDeactivated();
                                 }
 
-                                if (content is IDisposable disposable)
-                                {
-                                    disposable.Dispose();
-                                }
+                                //if (content is IDisposable disposable)
+                                //{
+                                //    disposable.Dispose();
+                                //}
                             }
                         }
 
