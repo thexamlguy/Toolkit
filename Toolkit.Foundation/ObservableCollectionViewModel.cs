@@ -32,10 +32,7 @@ public partial class ObservableCollectionViewModel<TViewModel> :
     private bool clearing;
 
     [ObservableProperty]
-    private bool isInitialized;
-
-    [ObservableProperty]
-    private int selectedIndex = 0;
+    private bool initialized;
 
     private bool selfDisposing;
 
@@ -325,12 +322,12 @@ public partial class ObservableCollectionViewModel<TViewModel> :
 
     public async Task Initialize()
     {
-        if (IsInitialized)
+        if (Initialized)
         {
             return;
         }
 
-        IsInitialized = true;
+        Initialized = true;
         await Enumerate();
     }
 
@@ -410,7 +407,7 @@ public partial class ObservableCollectionViewModel<TViewModel> :
     }
 
     protected virtual void ClearItems() =>
-    collection.Clear();
+        collection.Clear();
 
     protected virtual void InsertItem(int index,
         TViewModel item)
