@@ -1,27 +1,62 @@
-﻿using System.Reflection;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
 
 namespace Toolkit.Foundation;
 
-public class Mediator(IServiceProvider provider) :
+public class Mediator(IHandlerProvider handlerProvider,
+    IServiceProvider provider) :
     IMediator
 {
-    public Task<TResponse?> Handle<TRequest, TResponse>(TRequest request,
+    public async Task<TResponse?> Handle<TMessage, TResponse>(TMessage message,
         CancellationToken cancellationToken = default)
-        where TRequest : notnull
+        where TMessage : notnull
     {
-        Type handlerType = typeof(HandlerWrapper<,>).MakeGenericType(request.GetType(),
-            typeof(TResponse));
+        Type messageType = message.GetType();
+        Type handlerWrapperType = typeof(HandlerWrapper<,>).MakeGenericType(messageType, typeof(TResponse));
 
-        if (provider.GetService(handlerType)
-            is object handler)
+        Dictionary<Type, List<object?>> handlers = [];
+
+        foreach (object? service in provider.GetServices(handlerWrapperType))
         {
-            if (handlerType.GetMethod("Handle") is MethodInfo handleMethod)
+            if (service?.GetType() is Type serviceType)
             {
-                return (Task<TResponse?>)handleMethod.Invoke(handler, new object[] { request, cancellationToken })!;
+                if (!handlers.TryGetValue(serviceType, out List<object?>? handlerList))
+                {
+                    handlerList = [];
+                    handlers.Add(serviceType, handlerList);
+                }
+
+                handlerList.Add(service);
             }
         }
 
-        return Task.FromResult<TResponse?>(default);
+        foreach (object? handler in handlerProvider.Get(messageType))
+        {
+            if (handler is not null)
+            {
+                Type handlerType = handler.GetType();
+                if (!handlers.TryGetValue(handlerType, out List<object?>? handlerList))
+                {
+                    handlerList = [];
+                    handlers.Add(handlerType, handlerList);
+                }
+                handlerList.Add(handler);
+            }
+        }
+
+        foreach (KeyValuePair<Type, List<object?>> handlerEntry in handlers)
+        {
+            foreach (object? handler in handlerEntry.Value)
+            {
+                if (handler?.GetType().GetMethod("Handle") is MethodInfo handleMethod)
+                {
+                    return await (Task<TResponse?>)handleMethod.Invoke(handler, 
+                        new object[] { message, cancellationToken })!;
+                }
+            }
+        }
+
+        return default;
     }
 
     public Task<object?> Handle(object message,

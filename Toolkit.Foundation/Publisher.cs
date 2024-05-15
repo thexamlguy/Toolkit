@@ -25,12 +25,11 @@ public class Publisher(IHandlerProvider handlerProvider,
         object? key = null)
     {
         Type notificationType = message.GetType();
+        Type handlerType = typeof(NotificationHandlerWrapper<>)
+            .MakeGenericType(notificationType);
 
-        List<object?> handlers = provider.GetServices(typeof(NotificationHandlerWrapper<>)
-            .MakeGenericType(notificationType)).ToList();
-
-        foreach (object? handler in handlerProvider
-            .Get(notificationType, key!))
+        List<object?> handlers = provider.GetServices(handlerType).ToList();
+        foreach (object? handler in handlerProvider.Get(notificationType, key))
         {
             handlers.Add(handler);
         }
@@ -39,8 +38,7 @@ public class Publisher(IHandlerProvider handlerProvider,
         {
             if (handler is not null)
             {
-                Type? handlerType = handler.GetType();
-                MethodInfo? handleMethod = handlerType.GetMethod("Handle",
+                MethodInfo? handleMethod = handler.GetType().GetMethod("Handle",
                     [notificationType]);
 
                 if (handleMethod is not null)

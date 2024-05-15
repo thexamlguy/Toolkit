@@ -76,6 +76,11 @@ public class Subscription(SubscriptionCollection subscriptions,
             ? handler.GetPropertyValue(() => attribute.Key) is { } value ? value : attribute.Key : null;
 
     private IEnumerable<Type> GetHandlerInterfaces(Type handlerType) =>
-        handlerType.GetInterfaces().Where(interfaceType => interfaceType.IsGenericType &&
-            interfaceType.GetGenericTypeDefinition() == typeof(INotificationHandler<>));
+        handlerType.GetInterfaces().Where(interfaceType =>
+        {
+            Type? definition = interfaceType.IsGenericType ? interfaceType.GetGenericTypeDefinition() : null;
+            return definition == typeof(INotificationHandler<>) ||
+                   definition == typeof(IHandler<>) ||
+                   definition == typeof(IHandler<,>);
+        });
 }
