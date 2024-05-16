@@ -10,8 +10,11 @@ public class NavigationScope(IPublisher publisher,
     IContentTemplateDescriptorProvider contentTemplateDescriptorProvider) :
     INavigationScope
 {
-    public void Navigate(string route, object? sender = null, object? context = null,
-        EventHandler? navigated = null, object[]? parameters = null)
+    public void Navigate(string route, 
+        object? sender = null, 
+        object? context = null,
+        EventHandler? navigated = null,
+        object[]? parameters = null)
     {
         string[] segments = route.Split('/');
         int segmentCount = segments.Length;
@@ -41,26 +44,25 @@ public class NavigationScope(IPublisher publisher,
 
                 if (provider.GetRequiredKeyedService(descriptor.TemplateType, segment) is object view)
                 {
-                    if ((parameters is { Length: > 0 }
+                    if (context is not null)
+                    {
+                        if (navigationContextProvider.TryGet(context, out object? scopedContext))
+                        {
+                            context = scopedContext;
+                        }
+                    }
+                    else
+                    {
+                        context = view;
+                    }
+
+                    if (context is not null)
+                    {
+                        if ((parameters is { Length: > 0 }
                         ? factory.Create(descriptor.ContentType, parameters)
                         : provider.GetRequiredKeyedService(descriptor.ContentType, segment)) is object viewModel)
-                    {
-                        if (context is not null)
                         {
-                            if (navigationContextProvider.TryGet(context, out object? scopedContext))
-                            {
-                                context = scopedContext;
-                            }
-                        }
-                        else
-                        {
-                            context = view;
-                        }
-
-                        if (context is not null)
-                        {
-                            if (navigationProvider.Get(context is Type type ? type : context.GetType())
-                                is INavigation navigation)
+                            if (navigationProvider.Get(context is Type type ? type : context.GetType()) is INavigation navigation)
                             {
                                 Type navigateType = typeof(NavigateEventArgs<>).MakeGenericType(navigation.Type);
                                 if (Activator.CreateInstance(navigateType, [context, view, viewModel, sender, parameters]) is object navigate)

@@ -40,6 +40,7 @@ public class Mediator(IHandlerProvider handlerProvider,
                     handlerList = [];
                     handlers.Add(handlerType, handlerList);
                 }
+
                 handlerList.Add(handler);
             }
         }
@@ -48,7 +49,7 @@ public class Mediator(IHandlerProvider handlerProvider,
         {
             foreach (object? handler in handlerEntry.Value)
             {
-                if (handler?.GetType().GetMethod("Handle") is MethodInfo handleMethod)
+                if (handler?.GetType().GetMethod("Handle", [messageType, typeof(CancellationToken)]) is MethodInfo handleMethod)
                 {
                     return await (Task<TResponse?>)handleMethod.Invoke(handler, 
                         new object[] { message, cancellationToken })!;

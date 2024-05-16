@@ -3,16 +3,15 @@
 namespace Toolkit.Foundation;
 
 public class NavigateHandler(NamedComponent scope,
-    IComponentScopeProvider componentScopeProvider,
-    IServiceProvider provider) :
+    IComponentScopeProvider componentScopeProvider) :
     INotificationHandler<NavigateEventArgs>
 {
     public Task Handle(NavigateEventArgs args)
     {
         INavigationScope? navigationScope;
-        if (args.Scope == "self")
+        if (args.Scope == "self" && args.Sender is IServiceProviderRequired requireServiceProvider)
         {
-            navigationScope = provider.GetRequiredService<INavigationScope>();
+             navigationScope = requireServiceProvider.Provider.GetRequiredService<INavigationScope>();
         }
         else
         {

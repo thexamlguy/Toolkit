@@ -32,9 +32,8 @@ public class ComponentBuilder :
                 services.AddScoped<SubscriptionCollection>();
 
                 services.AddTransient<IHandlerProvider, HandlerProvider>();
-                services.AddTransient<ISubscription, Subscription>();
+                services.AddScoped<ISubscription, Subscription>();
 
-                services.AddTransient<ISubscription, Subscription>();
                 services.AddTransient<IPublisher, Publisher>();
 
                 services.AddTransient<IMediator, Mediator>();

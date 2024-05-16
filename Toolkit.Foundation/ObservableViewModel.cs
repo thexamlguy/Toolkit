@@ -10,7 +10,12 @@ public partial class ObservableViewModel :
     IDeactivating,
     IDeactivated,
     IDeactivatable,
-    IDisposable
+    IDisposable,
+    IServiceProviderRequired,
+    IServiceFactoryRequired,
+    IMediatorRequired,
+    IPublisherRequired,
+    IDisposerRequired
 {
     [ObservableProperty]
     private bool isInitialized;
