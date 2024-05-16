@@ -1,13 +1,13 @@
 ﻿namespace Toolkit.Foundation;
 
 public record NavigateEventArgs(string Route,
-    object? Context = null,
+    object? Region = null,
     string? Scope = null,
     object? Sender = null,
     EventHandler? Navigated = null,
     object[]? Parameters = null);
 
-public record NavigateEventArgs<TNavigation>(object Context,
+public record NavigateEventArgs<TNavigation>(object Region,
     object Template,
     object Content,
     object? Sender = null,

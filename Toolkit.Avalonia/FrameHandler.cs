@@ -14,7 +14,7 @@ public class FrameHandler :
 {
     public Task Handle(NavigateEventArgs<Frame> args)
     {
-        if (args.Context is Frame frame)
+        if (args.Region is Frame frame)
         {
             frame.NavigationPageFactory ??= new NavigationPageFactory();
             if (args.Template is Control control)

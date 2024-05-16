@@ -20,7 +20,7 @@ public class NavigateHandler(NamedComponent scope,
         }
 
         navigationScope?.Navigate(args.Route, args.Sender,
-                args.Context, args.Navigated, args.Parameters);
+                args.Region, args.Navigated, args.Parameters);
 
         return Task.CompletedTask;
     }

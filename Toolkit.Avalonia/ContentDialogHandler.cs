@@ -8,7 +8,7 @@ public class ContentDialogHandler(IDispatcher dispatcher) :
 {
     public async Task Handle(NavigateEventArgs<ContentDialog> args)
     {
-        if (args.Context is ContentDialog contentDialog)
+        if (args.Region is ContentDialog contentDialog)
         {
             contentDialog.DataContext = args.Content;
 

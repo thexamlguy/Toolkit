@@ -9,7 +9,7 @@ public class ContentControlHandler :
 {
     public async Task Handle(NavigateEventArgs<ContentControl> args)
     {
-        if (args.Context is ContentControl contentControl)
+        if (args.Region is ContentControl contentControl)
         {
             if (args.Template is Control control)
             {

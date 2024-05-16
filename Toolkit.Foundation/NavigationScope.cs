@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using System.Data.SqlTypes;
 
 namespace Toolkit.Foundation;
 
@@ -6,16 +7,21 @@ public class NavigationScope(IPublisher publisher,
     IServiceProvider provider,
     IServiceFactory factory,
     INavigationProvider navigationProvider,
-    INavigationRegionProvider navigationContextProvider,
+    INavigationRegionProvider navigationRegionProvider,
     IContentTemplateDescriptorProvider contentTemplateDescriptorProvider) :
     INavigationScope
 {
     public void Navigate(string route, 
         object? sender = null, 
-        object? context = null,
+        object? region = null,
         EventHandler? navigated = null,
         object[]? parameters = null)
     {
+        if (region is null)
+        {
+            return;
+        }
+
         string[] segments = route.Split('/');
         int segmentCount = segments.Length;
         int currentSegmentIndex = 0;
@@ -44,28 +50,33 @@ public class NavigationScope(IPublisher publisher,
 
                 if (provider.GetRequiredKeyedService(descriptor.TemplateType, segment) is object view)
                 {
-                    if (context is not null)
+                    if (region is not null)
                     {
-                        if (navigationContextProvider.TryGet(context, out object? scopedContext))
+                        switch (region)
                         {
-                            context = scopedContext;
+                            case "self":
+                                region = view;
+                                break;
+                            default:
+                                if (navigationRegionProvider.TryGet(region, out object? value))
+                                {
+                                    region = value;
+                                }
+
+                                break;
                         }
                     }
-                    else
-                    {
-                        context = view;
-                    }
 
-                    if (context is not null)
+                    if (region is not null)
                     {
                         if ((parameters is { Length: > 0 }
                         ? factory.Create(descriptor.ContentType, parameters)
                         : provider.GetRequiredKeyedService(descriptor.ContentType, segment)) is object viewModel)
                         {
-                            if (navigationProvider.Get(context is Type type ? type : context.GetType()) is INavigation navigation)
+                            if (navigationProvider.Get(region is Type type ? type : region.GetType()) is INavigation navigation)
                             {
                                 Type navigateType = typeof(NavigateEventArgs<>).MakeGenericType(navigation.Type);
-                                if (Activator.CreateInstance(navigateType, [context, view, viewModel, sender, parameters]) is object navigate)
+                                if (Activator.CreateInstance(navigateType, [region, view, viewModel, sender, parameters]) is object navigate)
                                 {
                                     publisher.Publish(navigate);
                                     if (currentSegmentIndex == segmentCount)
@@ -85,7 +96,7 @@ public class NavigationScope(IPublisher publisher,
     {
         if (context is not null)
         {
-            navigationContextProvider.TryGet(context, out context);
+            navigationRegionProvider.TryGet(context, out context);
         }
 
         if (context is not null)

@@ -1,4 +1,5 @@
 ﻿using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Metadata;
 using Avalonia.Xaml.Interactivity;
@@ -10,15 +11,15 @@ public class NavigateAction :
     AvaloniaObject,
     IAction
 {
-    public static readonly StyledProperty<object> ContextProperty =
-        AvaloniaProperty.Register<NavigateAction, object>(nameof(Context));
-
     public static readonly DirectProperty<NavigateAction, ParameterBindingCollection> ParameterBindingsProperty =
         AvaloniaProperty.RegisterDirect<NavigateAction, ParameterBindingCollection>(nameof(ParameterBindings),
             x => x.ParameterBindings);
 
     public static readonly StyledProperty<object[]?> ParametersProperty =
         AvaloniaProperty.Register<NavigateAction, object[]?>(nameof(Parameters));
+
+    public static readonly StyledProperty<object> RegionProperty =
+        AvaloniaProperty.Register<NavigateAction, object>(nameof(Region));
 
     public static readonly StyledProperty<string> RouteProperty =
         AvaloniaProperty.Register<NavigateAction, string>(nameof(Route));
@@ -30,10 +31,10 @@ public class NavigateAction :
 
     public event EventHandler? Navigated;
 
-    public object Context
+    public object Region
     {
-        get => GetValue(ContextProperty);
-        set => SetValue(ContextProperty, value);
+        get => GetValue(RegionProperty);
+        set => SetValue(RegionProperty, value);
     }
 
     [Content]
@@ -61,12 +62,12 @@ public class NavigateAction :
     public object Execute(object? sender,
         object? parameter)
     {
-        if (sender is TemplatedControl control)
+        if (sender is Control content)
         {
             Dictionary<string, object> arguments =
                 new(StringComparer.InvariantCultureIgnoreCase);
 
-            if (control.DataContext is IObservableViewModel observableViewModel)
+            if (content.DataContext is IObservableViewModel observableViewModel)
             {
                 object[] parameters = [.. Parameters ?? Enumerable.Empty<object?>(),
                     ..
@@ -74,8 +75,8 @@ public class NavigateAction :
                     ParameterBindings.Select(binding => new KeyValuePair<string, object>(binding.Key, binding.Value)).ToArray() :
                     Enumerable.Empty<KeyValuePair<string, object>>()];
 
-                observableViewModel.Publisher.Publish(new NavigateEventArgs(Route, Context == this ? control : Context, Scope ?? null,
-                    control.DataContext, Navigated, parameters));
+                observableViewModel.Publisher.Publish(new NavigateEventArgs(Route, Region == this ? content : Region, Scope ?? null,
+                    content.DataContext, Navigated, parameters));
             }
         }
 
