@@ -2,7 +2,7 @@
 
 namespace Toolkit.Foundation;
 
-public partial class ObservableViewModel :
+public partial class Observable :
     ObservableObject,
     IObservableViewModel,
     IInitializer,
@@ -20,7 +20,7 @@ public partial class ObservableViewModel :
     [ObservableProperty]
     private bool isInitialized;
 
-    public ObservableViewModel(IServiceProvider provider,
+    public Observable(IServiceProvider provider,
         IServiceFactory factory,
         IMediator mediator,
         IPublisher publisher,
@@ -81,25 +81,25 @@ public partial class ObservableViewModel :
     }
 }
 
-public partial class ObservableViewModel<TValue>(IServiceProvider provider,
+public partial class Observable<TValue>(IServiceProvider provider,
     IServiceFactory factory,
     IMediator mediator, 
     IPublisher publisher, 
     ISubscription subscriber, 
-    IDisposer disposer) : ObservableViewModel(provider, factory, mediator, publisher, subscriber, disposer)
+    IDisposer disposer) : Observable(provider, factory, mediator, publisher, subscriber, disposer)
     where TValue : notnull
 {
     [ObservableProperty]
     private TValue? value;
 }
 
-public partial class ObservableViewModel<TKey, TValue>(IServiceProvider provider,
+public partial class Observable<TKey, TValue>(IServiceProvider provider,
     IServiceFactory factory,
     IMediator mediator,
     IPublisher publisher,
     ISubscription subscriber,
     IDisposer disposer,
-    TValue? value = null) : ObservableViewModel(provider, factory, mediator, publisher, subscriber, disposer)
+    TValue? value = null) : Observable(provider, factory, mediator, publisher, subscriber, disposer)
     where TValue : class
 {
     [ObservableProperty]

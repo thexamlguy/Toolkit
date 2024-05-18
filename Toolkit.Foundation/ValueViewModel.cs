@@ -8,7 +8,7 @@ public partial class ValueViewModel<TValue>(IServiceProvider provider,
     IPublisher publisher,
     ISubscription subscriber,
     IDisposer disposer) :
-    ObservableViewModel(provider, factory, mediator, publisher, subscriber, disposer)
+    Observable(provider, factory, mediator, publisher, subscriber, disposer)
 {
     [ObservableProperty]
     private TValue? value;

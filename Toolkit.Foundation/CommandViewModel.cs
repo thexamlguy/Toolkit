@@ -8,7 +8,7 @@ public partial class CommandViewModel(IServiceProvider provider,
     IPublisher publisher,
     ISubscription subscriber,
     IDisposer disposer) :
-    ObservableViewModel(provider, factory, mediator, publisher, subscriber, disposer)
+    Observable(provider, factory, mediator, publisher, subscriber, disposer)
 {
     public IRelayCommand InvokeCommand =>
         new AsyncRelayCommand(InvokeAsync);
