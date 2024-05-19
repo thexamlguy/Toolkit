@@ -250,9 +250,9 @@ public partial class ObservableCollection<TItem> :
         Disposer.Dispose(this);
     }
 
-    public void Aggerate()
+    public void BeginAggregation()
     {
-        if (this.GetAttribute<EnumerateAttribute>() is EnumerateAttribute attribute)
+        if (this.GetAttribute<AggerateAttribute>() is AggerateAttribute attribute)
         {
             if (attribute.Mode == AggerateMode.Reset)
             {
@@ -260,7 +260,7 @@ public partial class ObservableCollection<TItem> :
             }
 
             object? key = this.GetPropertyValue(() => attribute.Key) is { } value ? value : attribute.Key;
-            Publisher.PublishUI(OnAggerate(key));
+            Publisher.PublishUI(OnPrepareAggregation(key));
         }
     }
 
@@ -338,7 +338,7 @@ public partial class ObservableCollection<TItem> :
         }
 
         Initialized = true;
-        Aggerate();
+        BeginAggregation();
 
         return Task.CompletedTask;
     }
@@ -442,7 +442,7 @@ public partial class ObservableCollection<TItem> :
         collection.Insert(index, item);
     }
 
-    protected virtual IAggerate OnAggerate(object? key) =>
+    protected virtual IAggerate OnPrepareAggregation(object? key) =>
         new AggerateEventArgs<TItem>() with { Key = key };
 
     protected virtual void RemoveItem(int index) =>
