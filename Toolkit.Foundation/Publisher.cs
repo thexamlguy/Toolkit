@@ -4,13 +4,14 @@ using System.Reflection;
 namespace Toolkit.Foundation;
 
 public class Publisher(IHandlerProvider handlerProvider,
-    IServiceProvider provider,
+    IServiceFactory serviceFactory,
+    IServiceProvider serviceProvider,
     IDispatcher dispatcher) :
     IPublisher
 {
     public void Publish<TMessage>(object key)
         where TMessage : new() =>
-            Publish(new TMessage(), async args => await args(), key);
+            Publish(serviceFactory.Create<TMessage>() ?? new TMessage(), async args => await args(), key);
 
     public void Publish<TMessage>(TMessage message)
         where TMessage : notnull =>
@@ -28,7 +29,7 @@ public class Publisher(IHandlerProvider handlerProvider,
         Type handlerType = typeof(NotificationHandlerWrapper<>)
             .MakeGenericType(notificationType);
 
-        List<object?> handlers = provider.GetServices(handlerType).ToList();
+        List<object?> handlers = serviceProvider.GetServices(handlerType).ToList();
         foreach (object? handler in handlerProvider.Get(notificationType, key))
         {
             handlers.Add(handler);

@@ -7,7 +7,7 @@ public class NotificationAttribute(object key) : Attribute
 }
 
 public class EnumerateAttribute(object key,
-    EnumerateMode mode = EnumerateMode.Reset) : NotificationAttribute(key)
+    AggerateMode mode = AggerateMode.Reset) : NotificationAttribute(key)
 {
-    public EnumerateMode Mode => mode;
+    public AggerateMode Mode => mode;
 }

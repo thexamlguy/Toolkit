@@ -11,10 +11,18 @@ public interface IPublisher
     void Publish<TMessage>(TMessage message,
         object key)
         where TMessage : notnull;
+   
+    void Publish(object message,
+        Func<Func<Task>, Task> marshal,
+        object? key = null);
+
+    void Publish<TMessage>()
+        where TMessage : new();
+
+    void Publish(object message);
 
     void PublishUI<TMessage>(TMessage message,
-        object key)
-        where TMessage : notnull;
+        object key) where TMessage : notnull;
 
     void PublishUI<TMessage>(object key)
         where TMessage : new();
@@ -24,15 +32,6 @@ public interface IPublisher
 
     void PublishUI(object message);
 
-    void Publish(object message,
-        Func<Func<Task>, Task> marshal,
-        object? key = null);
-
     void PublishUI<TMessage>()
         where TMessage : new();
-
-    void Publish<TMessage>()
-        where TMessage : new();
-
-    void Publish(object message);
 }

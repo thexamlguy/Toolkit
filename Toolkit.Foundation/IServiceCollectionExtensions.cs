@@ -129,7 +129,8 @@ public static class IServiceCollectionExtensions
     }
 
     public static IServiceCollection AddTemplate<TViewModel, TView>(this IServiceCollection services,
-                        object? key = null,
+        object? key = null,
+        ServiceLifetime serviceLifetime = ServiceLifetime.Transient,
         params object[]? parameters)
     {
         Type viewModelType = typeof(TViewModel);
@@ -137,15 +138,29 @@ public static class IServiceCollectionExtensions
 
         key ??= viewModelType.Name.Replace("ViewModel", "");
 
-        services.AddTransient(viewModelType, provider =>
-            provider.GetRequiredService<IServiceFactory>().Create<TViewModel>(parameters)!);
+        if (parameters is { Length: 0 })
+        {
+            services.Add(new ServiceDescriptor(viewModelType, viewModelType, serviceLifetime));
+        }
+        else
+        {
+            services.Add(new ServiceDescriptor(viewModelType, provider =>
+                provider.GetRequiredService<IServiceFactory>().Create<TViewModel>(parameters)!, serviceLifetime));
+        }
 
-        services.AddTransient(viewType);
+        services.Add(new ServiceDescriptor(viewType, viewType, serviceLifetime));
 
-        services.AddKeyedTransient(viewModelType, key, (provider, key) =>
-            provider.GetRequiredService<IServiceFactory>().Create<TViewModel>(parameters)!);
+        if (parameters is { Length: 0 })
+        {
+            services.Add(new ServiceDescriptor(viewModelType, key, viewModelType, serviceLifetime));
+        }
+        else
+        {
+            services.Add(new ServiceDescriptor(viewModelType, key, (provider, key) =>
+                provider.GetRequiredService<IServiceFactory>().Create<TViewModel>(parameters)!, serviceLifetime));
+        }
 
-        services.AddKeyedTransient(viewType, key);
+        services.Add(new ServiceDescriptor(viewType, key, viewType, serviceLifetime));
 
         services.AddTransient<IContentTemplateDescriptor>(provider =>
             new ContentTemplateDescriptor(key, viewModelType, viewType, parameters));

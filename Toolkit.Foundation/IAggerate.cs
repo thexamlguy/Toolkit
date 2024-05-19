@@ -1,6 +1,6 @@
 ﻿namespace Toolkit.Foundation;
 
-public interface IEnumerate
+public interface IAggerate
 {
     object? Key { get; init; }
 }

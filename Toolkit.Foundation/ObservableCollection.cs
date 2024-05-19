@@ -111,6 +111,12 @@ public partial class ObservableCollection<TItem> :
         set => SetItem(index, value);
     }
 
+    public void ResetAndAddRange(Action<ObservableCollection<TItem>> args)
+    {
+        Clear();
+        args.Invoke(this);
+    }
+
     object? IList.this[int index]
     {
         get => collection[index];
@@ -130,24 +136,19 @@ public partial class ObservableCollection<TItem> :
         }
     }
 
-    public TItem Add()
-    {
-        TItem? item = Factory.Create<TItem>();
-
-        Add(item);
-        return item;
-    }
+    public TItem Add() => 
+        Add<TItem>(null, false);
 
     public TItem Add<T>(params object?[] parameters)
-        where T : TItem
-    {
-        T? item = Factory.Create<T>(parameters);
-        Add(item);
+        where T : TItem => Add<T>(null, false, parameters);
 
-        return item;
-    }
+    public TItem Add<T>(IDisposable? owner, 
+        params object?[] parameters)
+        where T : TItem => Add<T>(owner, false, parameters);
 
-    public TItem Add<T>(bool scope = false)
+    public TItem Add<T>(IDisposable? owner = null,
+        bool scope = false,
+        params object?[] parameters)
         where T :
         TItem
     {
@@ -158,8 +159,19 @@ public partial class ObservableCollection<TItem> :
             factory = serviceScope.ServiceProvider.GetRequiredService<IServiceFactory>();
         }
 
-        T? item = factory is not null ? factory.Create<T>() : Factory.Create<T>();
+        T? item = factory is not null ? factory.Create<T>(parameters) : Factory.Create<T>(parameters);
         Add(item);
+
+        if (owner is not null)
+        {
+            Disposer.Add(owner, Disposable.Create(() =>
+            {
+                if (item is IRemovable)
+                {
+                    Remove(item);
+                }
+            }));
+        }
 
         return item;
     }
@@ -238,17 +250,17 @@ public partial class ObservableCollection<TItem> :
         Disposer.Dispose(this);
     }
 
-    public void Enumerate()
+    public void Aggerate()
     {
         if (this.GetAttribute<EnumerateAttribute>() is EnumerateAttribute attribute)
         {
-            if (attribute.Mode == EnumerateMode.Reset)
+            if (attribute.Mode == AggerateMode.Reset)
             {
                 Clear();
             }
 
             object? key = this.GetPropertyValue(() => attribute.Key) is { } value ? value : attribute.Key;
-            Publisher.PublishUI(PrepareEnumeration(key));
+            Publisher.PublishUI(OnAggerate(key));
         }
     }
 
@@ -326,7 +338,7 @@ public partial class ObservableCollection<TItem> :
         }
 
         Initialized = true;
-        Enumerate();
+        Aggerate();
 
         return Task.CompletedTask;
     }
@@ -430,8 +442,8 @@ public partial class ObservableCollection<TItem> :
         collection.Insert(index, item);
     }
 
-    protected virtual IEnumerate PrepareEnumeration(object? key) =>
-        new EnumerateEventArgs<TItem>() with { Key = key };
+    protected virtual IAggerate OnAggerate(object? key) =>
+        new AggerateEventArgs<TItem>() with { Key = key };
 
     protected virtual void RemoveItem(int index) =>
         collection.RemoveAt(index);
