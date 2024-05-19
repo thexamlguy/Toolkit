@@ -6,10 +6,10 @@
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
 	<ItemGroup>
-	  <None Remove="Fonts\FluentSystemIcons-Regular.ttf" />
+	  <None Remove="Fonts\FluentSystemIcons-Resizable.ttf" />
 	</ItemGroup>
 	<ItemGroup>
-	  <AvaloniaResource Include="Fonts\FluentSystemIcons-Regular.ttf" />
+	  <AvaloniaResource Include="Fonts\FluentSystemIcons-Resizable.ttf" />
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Avalonia" Version="11.2.999-cibuild0048140-alpha" />

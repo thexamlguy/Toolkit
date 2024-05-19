@@ -86,12 +86,13 @@ public partial class Observable<TValue>(IServiceProvider provider,
     IMediator mediator, 
     IPublisher publisher, 
     ISubscription subscriber, 
-    IDisposer disposer) : Observable(provider, factory, mediator, publisher, subscriber, disposer)
-    where TValue : notnull
+    IDisposer disposer,
+    TValue? value = default) : Observable(provider, factory, mediator, publisher, subscriber, disposer)
 {
     [ObservableProperty]
-    private TValue? value;
+    private TValue? value = value;
 }
+
 
 public partial class Observable<TKey, TValue>(IServiceProvider provider,
     IServiceFactory factory,
@@ -99,8 +100,7 @@ public partial class Observable<TKey, TValue>(IServiceProvider provider,
     IPublisher publisher,
     ISubscription subscriber,
     IDisposer disposer,
-    TValue? value = null) : Observable(provider, factory, mediator, publisher, subscriber, disposer)
-    where TValue : class
+    TValue? value = default) : Observable(provider, factory, mediator, publisher, subscriber, disposer)
 {
     [ObservableProperty]
     private TKey? key;
