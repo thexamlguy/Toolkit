@@ -24,12 +24,14 @@ public partial class ObservableCollection<TItem> :
     IPublisherRequired,
     IDisposerRequired,
     INotificationHandler<RemoveEventArgs<TItem>>,
+    INotificationHandler<RemoveAtEventArgs<TItem>>,
+    INotificationHandler<RemoveAndInsertAtEventArgs<TItem>>,
     INotificationHandler<CreateEventArgs<TItem>>,
     INotificationHandler<InsertEventArgs<TItem>>,
     INotificationHandler<MoveEventArgs<TItem>>,
     INotificationHandler<ReplaceEventArgs<TItem>>
     where TItem :
-    notnull
+    IDisposable
 {
     private readonly System.Collections.ObjectModel.ObservableCollection<TItem> collection = [];
 
@@ -111,12 +113,6 @@ public partial class ObservableCollection<TItem> :
         set => SetItem(index, value);
     }
 
-    public void ResetAndAddRange(Action<ObservableCollection<TItem>> args)
-    {
-        Clear();
-        args.Invoke(this);
-    }
-
     object? IList.this[int index]
     {
         get => collection[index];
@@ -136,18 +132,13 @@ public partial class ObservableCollection<TItem> :
         }
     }
 
-    public TItem Add() => 
+    public TItem Add() =>
         Add<TItem>(null, false);
 
     public TItem Add<T>(params object?[] parameters)
-        where T : TItem => Add<T>(null, false, parameters);
+        where T : TItem => Add<T>(false, parameters);
 
-    public TItem Add<T>(IDisposable? owner, 
-        params object?[] parameters)
-        where T : TItem => Add<T>(owner, false, parameters);
-
-    public TItem Add<T>(IDisposable? owner = null,
-        bool scope = false,
+    public TItem Add<T>(bool scope = false,
         params object?[] parameters)
         where T :
         TItem
@@ -161,17 +152,6 @@ public partial class ObservableCollection<TItem> :
 
         T? item = factory is not null ? factory.Create<T>(parameters) : Factory.Create<T>(parameters);
         Add(item);
-
-        if (owner is not null)
-        {
-            Disposer.Add(owner, Disposable.Create(() =>
-            {
-                if (item is IRemovable)
-                {
-                    Remove(item);
-                }
-            }));
-        }
 
         return item;
     }
@@ -213,6 +193,20 @@ public partial class ObservableCollection<TItem> :
         }
     }
 
+    public void BeginAggregation()
+    {
+        if (this.GetAttribute<AggerateAttribute>() is AggerateAttribute attribute)
+        {
+            if (attribute.Mode == AggerateMode.Reset)
+            {
+                Clear();
+            }
+
+            object? key = this.GetPropertyValue(() => attribute.Key) is { } value ? value : attribute.Key;
+            Publisher.PublishUI(OnPrepareAggregation(key));
+        }
+    }
+
     public void Clear()
     {
         clearing = true;
@@ -220,6 +214,7 @@ public partial class ObservableCollection<TItem> :
         foreach (TItem item in this.ToList())
         {
             Disposer.Dispose(item);
+            Disposer.Remove(this, item);
         }
 
         ClearItems();
@@ -248,20 +243,6 @@ public partial class ObservableCollection<TItem> :
     {
         GC.SuppressFinalize(this);
         Disposer.Dispose(this);
-    }
-
-    public void BeginAggregation()
-    {
-        if (this.GetAttribute<AggerateAttribute>() is AggerateAttribute attribute)
-        {
-            if (attribute.Mode == AggerateMode.Reset)
-            {
-                Clear();
-            }
-
-            object? key = this.GetPropertyValue(() => attribute.Key) is { } value ? value : attribute.Key;
-            Publisher.PublishUI(OnPrepareAggregation(key));
-        }
     }
 
     public IEnumerator<TItem> GetEnumerator() =>
@@ -318,6 +299,27 @@ public partial class ObservableCollection<TItem> :
         if (args.Value is TItem item)
         {
             Replace(args.Index, item);
+        }
+
+        return Task.CompletedTask;
+    }
+
+    public Task Handle(RemoveAtEventArgs<TItem> args)
+    {
+        if (args.Index >= 0 && args.Index <= Count - 1)
+        {
+            RemoveAt(args.Index);
+        }
+
+        return Task.CompletedTask;
+    }
+
+    public Task Handle(RemoveAndInsertAtEventArgs<TItem> args)
+    {
+        if (args.OldIndex >= 0 && args.OldIndex <= Count - 1 && args.Value is TItem item)
+        {
+            RemoveAt(args.OldIndex);
+            Insert(args.NewIndex, item);
         }
 
         return Task.CompletedTask;
@@ -385,8 +387,10 @@ public partial class ObservableCollection<TItem> :
         {
             return false;
         }
-
+        
         Disposer.Dispose(item);
+        Disposer.Remove(this, item);
+
         RemoveItem(index);
 
         return true;
@@ -419,6 +423,12 @@ public partial class ObservableCollection<TItem> :
         return true;
     }
 
+    public void ResetAndAddRange(Action<ObservableCollection<TItem>> args)
+    {
+        Clear();
+        args.Invoke(this);
+    }
+
     protected virtual void ClearItems() =>
         collection.Clear();
 
@@ -439,7 +449,7 @@ public partial class ObservableCollection<TItem> :
             }
         }));
 
-        collection.Insert(index, item);
+        collection.Insert(index > Count ? Count : index, item);
     }
 
     protected virtual IAggerate OnPrepareAggregation(object? key) =>
@@ -476,7 +486,7 @@ public partial class ObservableCollection<TValue, TViewModel>(IServiceProvider p
     IMediator mediator,
     IPublisher publisher,
     ISubscription subscriber, IDisposer disposer) : ObservableCollection<TViewModel>(provider, factory, mediator, publisher, subscriber, disposer)
-    where TViewModel : notnull
+    where TViewModel : IDisposable
 {
     [ObservableProperty]
     private TValue? value;

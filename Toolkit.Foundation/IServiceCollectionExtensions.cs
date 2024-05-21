@@ -1,9 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.FileProviders;
-using Microsoft.Extensions.FileProviders.Physical;
-using Microsoft.Extensions.Hosting;
-using System.Text.Json;
 
 namespace Toolkit.Foundation;
 

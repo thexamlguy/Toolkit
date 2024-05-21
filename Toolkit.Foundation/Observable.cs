@@ -63,7 +63,7 @@ public partial class Observable :
     public virtual Task OnDeactivating() =>
         Task.CompletedTask;
 
-    public void Dispose()
+    public virtual void Dispose()
     {
         GC.SuppressFinalize(this);
         Disposer.Dispose(this);

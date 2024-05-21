@@ -1,5 +1,5 @@
 ﻿using System.Collections;
-using System.Collections.Concurrent;
+using System.Collections.Immutable;
 using System.Reactive.Disposables;
 
 namespace Toolkit.Foundation;
@@ -9,6 +9,12 @@ public class Cache<TValue>(IDisposer disposer,
     ICache<TValue>
 {
     private readonly SortedSet<TValue> cache = new(comparer);
+
+    public int IndexOf(TValue value)
+    {
+        ImmutableSortedSet<TValue> hashSet = cache.ToImmutableSortedSet(comparer);
+        return hashSet.IndexOf(value);
+    }
 
     public void Add(TValue value)
     {
@@ -21,6 +27,17 @@ public class Cache<TValue>(IDisposer disposer,
         cache.Add(value);
     }
 
+    public bool TryGetValue(TValue key, out TValue? value)
+    {
+        if (cache.TryGetValue(key, out value))
+        {
+            return true;
+        }
+
+        value = default;
+        return false;
+    }
+
     public void Clear() => cache.Clear();
 
     public IEnumerator<TValue> GetEnumerator() => cache.GetEnumerator();
@@ -30,14 +47,15 @@ public class Cache<TValue>(IDisposer disposer,
     public bool Remove(TValue value) => cache.Remove(value);
 }
 
-public class Cache<TKey, TValue> :
+public class Cache<TKey, TValue>(IDisposer disposer,
+    IComparer<TKey> comparer) :
     ICache<TKey, TValue>
     where TKey :
     notnull
     where TValue :
     notnull
 {
-    private readonly ConcurrentDictionary<TKey, TValue> cache = new();
+    private readonly SortedList<TKey, TValue> cache = new(comparer);
 
     public void Add(TKey key,
         TValue value)
@@ -48,6 +66,8 @@ public class Cache<TKey, TValue> :
     public void Clear() => cache.Clear();
 
     public bool ContainsKey(TKey key) => cache.ContainsKey(key);
+
+    public int IndexOf(TKey key) => cache.IndexOfKey(key);
 
     public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator() => cache.GetEnumerator();
 

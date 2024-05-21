@@ -21,7 +21,7 @@ public class Subscription(SubscriptionCollection subscriptions,
                     return collection;
                 });
 
-                disposer.Add(subscriber, Disposable.Create(() => RemoveSubscriber(subscriber, argumentType)));
+                disposer.Add(subscriber, Disposable.Create(() => RemoveSubscriber(subscriber, subscriptionKey)));
             }
         }
     }
@@ -51,10 +51,9 @@ public class Subscription(SubscriptionCollection subscriptions,
 
 
     private void RemoveSubscriber(object subscriber,
-        Type argumentType)
+        string key)
     {
-        string subscriptionKey = $"{argumentType}";
-        if (subscriptions.TryGetValue(subscriptionKey, out List<WeakReference>? subscribers))
+        if (subscriptions.TryGetValue(key, out List<WeakReference>? subscribers))
         {
             for (int i = subscribers.Count - 1; i >= 0; i--)
             {
@@ -66,7 +65,7 @@ public class Subscription(SubscriptionCollection subscriptions,
 
             if (subscribers.Count == 0)
             {
-                subscriptions.TryRemove(subscriptionKey, out _);
+                subscriptions.TryRemove(key, out _);
             }
         }
     }

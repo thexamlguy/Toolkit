@@ -8,12 +8,25 @@ public class NavigateHandler(NamedComponent scope,
 {
     public Task Handle(NavigateEventArgs args)
     {
-        INavigationScope? navigationScope;
-        if (args.Scope == "self" && args.Sender is IServiceProviderRequired requireServiceProvider)
+        INavigationScope? navigationScope = null;
+        if (args.Scope is "self" || args.Scope is "new")
         {
-             navigationScope = requireServiceProvider.Provider.GetRequiredService<INavigationScope>();
+            if (args.Sender is IServiceProviderRequired requireServiceProvider)
+            {
+                if (args.Scope is "self")
+                {
+                    navigationScope = requireServiceProvider.Provider.GetRequiredService<INavigationScope>();
+                }
+
+                if (args.Scope is "new")
+                {
+                    IServiceScope serviceScope = requireServiceProvider.Provider.CreateScope();
+                    navigationScope = serviceScope.ServiceProvider.GetRequiredService<INavigationScope>();
+                }
+            }
         }
-        else
+        
+        if (navigationScope is null) 
         {
             ComponentScopeDescriptor? descriptor = componentScopeProvider.Get(args.Scope ?? scope.Name);
             navigationScope = descriptor?.Services?.GetRequiredService<INavigationScope>();

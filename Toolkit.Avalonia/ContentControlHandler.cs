@@ -54,7 +54,10 @@ public class ContentControlHandler :
                 control.Unloaded += HandleUnloaded;
 
                 control.DataContext = args.Content;
+
+                contentControl.Content = null;
                 contentControl.Content = control;
+
                 await taskCompletionSource.Task;
             }
         }
