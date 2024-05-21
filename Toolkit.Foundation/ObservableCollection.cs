@@ -25,10 +25,10 @@ public partial class ObservableCollection<TItem> :
     IDisposerRequired,
     INotificationHandler<RemoveEventArgs<TItem>>,
     INotificationHandler<RemoveAtEventArgs<TItem>>,
-    INotificationHandler<RemoveAndInsertAtEventArgs<TItem>>,
     INotificationHandler<CreateEventArgs<TItem>>,
     INotificationHandler<InsertEventArgs<TItem>>,
     INotificationHandler<MoveEventArgs<TItem>>,
+    INotificationHandler<MoveToEventArgs<TItem>>,
     INotificationHandler<ReplaceEventArgs<TItem>>
     where TItem :
     IDisposable
@@ -284,6 +284,12 @@ public partial class ObservableCollection<TItem> :
         return Task.CompletedTask;
     }
 
+    public Task Handle(MoveToEventArgs<TItem> args)
+    {
+        Move(args.OldIndex, args.NewIndex);
+        return Task.CompletedTask;
+    }
+
     public Task Handle(MoveEventArgs<TItem> args)
     {
         if (args.Value is TItem item)
@@ -293,7 +299,6 @@ public partial class ObservableCollection<TItem> :
 
         return Task.CompletedTask;
     }
-
     public Task Handle(ReplaceEventArgs<TItem> args)
     {
         if (args.Value is TItem item)
@@ -309,17 +314,6 @@ public partial class ObservableCollection<TItem> :
         if (args.Index >= 0 && args.Index <= Count - 1)
         {
             RemoveAt(args.Index);
-        }
-
-        return Task.CompletedTask;
-    }
-
-    public Task Handle(RemoveAndInsertAtEventArgs<TItem> args)
-    {
-        if (args.OldIndex >= 0 && args.OldIndex <= Count - 1 && args.Value is TItem item)
-        {
-            RemoveAt(args.OldIndex);
-            Insert(args.NewIndex, item);
         }
 
         return Task.CompletedTask;
@@ -357,6 +351,20 @@ public partial class ObservableCollection<TItem> :
         }
     }
 
+    public bool Move(int oldIndex, int newIndex)
+    {
+        if (oldIndex < 0)
+        {
+            return false;
+        }
+
+        TItem item = this[oldIndex];
+
+        RemoveItem(oldIndex);
+        Insert(newIndex, item);
+
+        return true;
+    }
     public bool Move(int index, TItem item)
     {
         int oldIndex = collection.IndexOf(item);
