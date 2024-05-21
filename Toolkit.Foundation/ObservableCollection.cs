@@ -29,7 +29,8 @@ public partial class ObservableCollection<TItem> :
     INotificationHandler<InsertEventArgs<TItem>>,
     INotificationHandler<MoveEventArgs<TItem>>,
     INotificationHandler<MoveToEventArgs<TItem>>,
-    INotificationHandler<ReplaceEventArgs<TItem>>
+    INotificationHandler<ReplaceEventArgs<TItem>>,
+    INotificationHandler<SelectionEventArgs<TItem>>
     where TItem :
     IDisposable
 {
@@ -42,6 +43,9 @@ public partial class ObservableCollection<TItem> :
 
     [ObservableProperty]
     private int selectedIndex = 0;
+
+    [ObservableProperty]
+    private TItem? selectedItem;
 
     public ObservableCollection(IServiceProvider provider,
         IServiceFactory factory,
@@ -279,6 +283,15 @@ public partial class ObservableCollection<TItem> :
         if (args.Value is TItem item)
         {
             Insert(args.Index, item);
+
+            if (item is ISelectable selectable)
+            {
+                if (selectable.Selected)
+                {
+                    SelectedItem = item;
+                    SelectedIndex = this.IndexOf(item);
+                }
+            }
         }
 
         return Task.CompletedTask;
@@ -486,6 +499,11 @@ public partial class ObservableCollection<TItem> :
         {
             added.Selected = true;
         }
+    }
+
+    public Task Handle(SelectionEventArgs<TItem> args)
+    {
+        return Task.CompletedTask;
     }
 }
 
