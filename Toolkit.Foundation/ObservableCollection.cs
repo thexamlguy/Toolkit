@@ -289,7 +289,7 @@ public partial class ObservableCollection<TItem> :
                 if (selectable.Selected)
                 {
                     SelectedItem = item;
-                    SelectedIndex = this.IndexOf(item);
+                    SelectedIndex = IndexOf(item);
                 }
             }
         }
@@ -312,6 +312,7 @@ public partial class ObservableCollection<TItem> :
 
         return Task.CompletedTask;
     }
+
     public Task Handle(ReplaceEventArgs<TItem> args)
     {
         if (args.Value is TItem item)
@@ -329,6 +330,11 @@ public partial class ObservableCollection<TItem> :
             RemoveAt(args.Index);
         }
 
+        return Task.CompletedTask;
+    }
+
+    public Task Handle(SelectionEventArgs<TItem> args)
+    {
         return Task.CompletedTask;
     }
 
@@ -378,6 +384,7 @@ public partial class ObservableCollection<TItem> :
 
         return true;
     }
+
     public bool Move(int index, TItem item)
     {
         int oldIndex = collection.IndexOf(item);
@@ -408,7 +415,7 @@ public partial class ObservableCollection<TItem> :
         {
             return false;
         }
-        
+
         Disposer.Dispose(item);
         Disposer.Remove(this, item);
 
@@ -490,7 +497,7 @@ public partial class ObservableCollection<TItem> :
 
     partial void OnSelectedIndexChanged(int oldValue, int newValue)
     {
-        if (oldValue >= 0 && oldValue <= this.Count -1 && this[oldValue] is ISelectable removed)
+        if (oldValue >= 0 && oldValue <= this.Count - 1 && this[oldValue] is ISelectable removed)
         {
             removed.Selected = false;
         }
@@ -501,9 +508,12 @@ public partial class ObservableCollection<TItem> :
         }
     }
 
-    public Task Handle(SelectionEventArgs<TItem> args)
+    partial void OnSelectedItemChanged(TItem? oldValue, TItem? newValue)
     {
-        return Task.CompletedTask;
+        if (oldValue is ISelectable selectable)
+        {
+            selectable.Selected = false;
+        }
     }
 }
 
