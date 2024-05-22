@@ -5,16 +5,13 @@ using System.Reactive.Disposables;
 namespace Toolkit.Foundation;
 
 public class Cache<TValue>(IDisposer disposer,
-    IComparer<TValue> comparer) :
+    IComparer<TValue>? comparer = default) :
     ICache<TValue>
 {
-    private readonly SortedSet<TValue> cache = new(comparer);
+    private readonly List<TValue> cache = [];
 
-    public int IndexOf(TValue value)
-    {
-        ImmutableSortedSet<TValue> hashSet = cache.ToImmutableSortedSet(comparer);
-        return hashSet.IndexOf(value);
-    }
+    public int IndexOf(TValue value) => 
+        cache.IndexOf(value);
 
     public void Add(TValue value)
     {
@@ -25,12 +22,14 @@ public class Cache<TValue>(IDisposer disposer,
 
         disposer.Add(value, Disposable.Create(() => Remove(value)));
         cache.Add(value);
+        cache.Sort(comparer);
     }
 
     public bool TryGetValue(TValue key, out TValue? value)
     {
-        if (cache.TryGetValue(key, out value))
+        if (cache.FirstOrDefault(x => x is not null && x.Equals(key)) is TValue returningValue)
         {
+            value = returningValue;
             return true;
         }
 
@@ -47,8 +46,7 @@ public class Cache<TValue>(IDisposer disposer,
     public bool Remove(TValue value) => cache.Remove(value);
 }
 
-public class Cache<TKey, TValue>(IDisposer disposer,
-    IComparer<TKey> comparer) :
+public class Cache<TKey, TValue>(IComparer<TKey> comparer) :
     ICache<TKey, TValue>
     where TKey :
     notnull
