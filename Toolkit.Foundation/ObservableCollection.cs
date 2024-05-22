@@ -136,25 +136,11 @@ public partial class ObservableCollection<TItem> :
         }
     }
 
-    public TItem Add() =>
-        Add<TItem>(null, false);
-
     public TItem Add<T>(params object?[] parameters)
-        where T : TItem => Add<T>(false, parameters);
-
-    public TItem Add<T>(bool scope = false,
-        params object?[] parameters)
         where T :
         TItem
     {
-        IServiceFactory? factory = null;
-        if (scope)
-        {
-            IServiceScope serviceScope = Provider.CreateScope();
-            factory = serviceScope.ServiceProvider.GetRequiredService<IServiceFactory>();
-        }
-
-        T? item = factory is not null ? factory.Create<T>(parameters) : Factory.Create<T>(parameters);
+        T? item = Factory.Create<T>(parameters);
         Add(item);
 
         return item;
