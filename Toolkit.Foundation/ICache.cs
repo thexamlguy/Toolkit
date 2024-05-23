@@ -7,11 +7,11 @@ public interface ICache<TValue> :
 
     void Clear();
 
+    bool TryGetValue(TValue key, out TValue? item);
+
     int IndexOf(TValue value);
 
     bool Remove(TValue value);
-
-    bool TryGetValue(TValue key, out TValue? value);
 }
 
 public interface ICache<TKey, TValue> :
@@ -24,8 +24,6 @@ public interface ICache<TKey, TValue> :
     void Add(TKey key, TValue value);
 
     void Clear();
-
-    bool ContainsKey(TKey key);
 
     int IndexOf(TKey key);
 
