@@ -8,7 +8,6 @@ public class PersonPictureTemplateSettings : AvaloniaObject
     private static readonly StyledProperty<ImageBrush?> ActualImageBrushProperty =
         AvaloniaProperty.Register<PersonPictureTemplateSettings, ImageBrush?>(nameof(ActualImageBrush));
 
-
     private static readonly StyledProperty<string> ActualInitialsProperty =
         AvaloniaProperty.Register<PersonPictureTemplateSettings, string>(nameof(ActualInitials));
 

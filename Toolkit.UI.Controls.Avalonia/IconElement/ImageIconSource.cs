@@ -2,5 +2,4 @@
 
 public class ImageIconSource : FluentAvalonia.UI.Controls.ImageIconSource
 {
-
 }

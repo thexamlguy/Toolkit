@@ -2,12 +2,12 @@
 
 namespace Toolkit.Foundation;
 
-public class AesEncryptor : 
+public class AesEncryptor :
     IEncryptor
 {
     private const int IvSize = 16;
 
-    public bool TryEncrypt(byte[] data, 
+    public bool TryEncrypt(byte[] data,
         byte[] key,
         out byte[]? encryptedData)
     {

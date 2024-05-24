@@ -2,5 +2,4 @@
 
 public class FAIconElement : FluentAvalonia.UI.Controls.FAIconElement
 {
-
 }

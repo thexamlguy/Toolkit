@@ -18,6 +18,7 @@ public class ContentIconSource : FluentAvalonia.UI.Controls.IconSource
         get => GetValue(ContentProperty);
         set => SetValue(ContentProperty, value);
     }
+
     public IDataTemplate? IconTemplate
     {
         get => GetValue(ContentTemplateProperty);

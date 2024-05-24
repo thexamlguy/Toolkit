@@ -2,5 +2,4 @@
 
 public class BitmapIcon : FluentAvalonia.UI.Controls.BitmapIcon
 {
-
 }

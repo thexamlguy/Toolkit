@@ -2,10 +2,10 @@
 
 public interface INavigationScope
 {
-    void Navigate(string route, 
+    void Navigate(string route,
         object? sender = null,
         object? region = null,
-        EventHandler? navigated = null, 
+        EventHandler? navigated = null,
         object[]? parameters = null);
 
     void Back(object? region);

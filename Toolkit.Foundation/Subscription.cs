@@ -49,7 +49,6 @@ public class Subscription(SubscriptionCollection subscriptions,
         }
     }
 
-
     private void RemoveSubscriber(object subscriber,
         string key)
     {

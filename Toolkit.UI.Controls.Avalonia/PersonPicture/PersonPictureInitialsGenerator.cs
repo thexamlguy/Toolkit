@@ -22,18 +22,21 @@ internal class PersonPictureInitialsGenerator
                     case PersonPictureCharacterType.Glyph:
                         result = PersonPictureCharacterType.Glyph;
                         break;
+
                     case PersonPictureCharacterType.Symbolic:
                         if (result != PersonPictureCharacterType.Glyph)
                         {
                             result = PersonPictureCharacterType.Symbolic;
                         }
                         break;
+
                     case PersonPictureCharacterType.Standard:
                         if ((result != PersonPictureCharacterType.Glyph) && (result != PersonPictureCharacterType.Symbolic))
                         {
                             result = PersonPictureCharacterType.Standard;
                         }
                         break;
+
                     default:
                         break;
                 }
@@ -44,7 +47,6 @@ internal class PersonPictureInitialsGenerator
 
     public static PersonPictureCharacterType GetCharacterType(char character)
     {
-
         // IPA Extensions
         if ((character >= 0x0250) && (character <= 0x02AF))
         {
@@ -147,7 +149,7 @@ internal class PersonPictureInitialsGenerator
         {
             return PersonPictureCharacterType.Symbolic;
         }
-        // CJK Unified Ideographs Extension 
+        // CJK Unified Ideographs Extension
         if ((character >= 0x3400) && (character <= 0x4DBF))
         {
             return PersonPictureCharacterType.Symbolic;
@@ -317,6 +319,7 @@ internal class PersonPictureInitialsGenerator
             return string.Empty;
         }
     }
+
     private static string GetFirstFullCharacter(string str)
     {
         int start = 0;
@@ -385,6 +388,7 @@ internal class PersonPictureInitialsGenerator
 
         return value.Substring(startIndex, length);
     }
+
     private static string[] Split(string source, char delim, int maxIterations = 25)
     {
         return source.Split(new[] { delim }, maxIterations);

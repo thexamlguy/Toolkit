@@ -4,11 +4,11 @@ namespace Toolkit.Foundation;
 
 public class ComponentFactory(IServiceProvider provider,
     IProxyServiceCollection<IComponentBuilder> proxy,
-    IComponentScopeCollection scopes) : 
+    IComponentScopeCollection scopes) :
     IComponentFactory
 {
     public IComponentHost? Create<TComponent, TConfiguration>(string name,
-        TConfiguration configuration, 
+        TConfiguration configuration,
         Action<IServiceCollection>? servicesDelegate = null)
         where TComponent : IComponent
         where TConfiguration : ComponentConfiguration, new()

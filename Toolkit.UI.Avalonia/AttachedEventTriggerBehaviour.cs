@@ -21,10 +21,9 @@ public class AttachedEventTriggerBehaviour : Trigger
         {
             if (AssociatedObject is Interactive interactive)
             {
-                interactive.AddHandler(RoutedEvent, (object sender, RoutedEventArgs args) => {
-
+                interactive.AddHandler(RoutedEvent, (object sender, RoutedEventArgs args) =>
+                {
                     Interaction.ExecuteActions(AssociatedObject, Actions, null);
-
                 });
             }
         }

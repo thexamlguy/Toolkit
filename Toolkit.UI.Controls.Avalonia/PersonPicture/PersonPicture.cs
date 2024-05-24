@@ -4,8 +4,6 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Shapes;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
-using Kromek.UI.Avalonia.Controls;
-using System;
 
 namespace Toolkit.UI.Controls.Avalonia;
 
@@ -157,7 +155,6 @@ public class PersonPicture : TemplatedControl
 
         if (change.Property == ProfilePictureProperty)
         {
-
         }
     }
 
@@ -297,6 +294,7 @@ public class PersonPicture : TemplatedControl
             PseudoClasses.Set(":NoBadge", true);
         }
     }
+
     private void UpdateBadgeNumber()
     {
         if (badgingEllipse == null || badgeNumberTextBlock == null)
@@ -322,6 +320,7 @@ public class PersonPicture : TemplatedControl
             badgeNumberTextBlock.Text = "99+";
         }
     }
+
     private void UpdateDisplayName()
     {
         displayNameInitials = PersonPictureInitialsGenerator.InitialsFromDisplayName(DisplayName);

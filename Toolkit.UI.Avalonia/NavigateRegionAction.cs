@@ -21,19 +21,20 @@ public class NavigateRegionAction :
 
     [Content]
     public ActionCollection Actions => actions ??= [];
+
     public string Name
     {
         get => GetValue(NameProperty);
         set => SetValue(NameProperty, value);
     }
 
-    public object? Execute(object? sender, 
+    public object? Execute(object? sender,
         object? parameter)
     {
         if (sender is Control control)
         {
             if (control.DataContext is IObservableViewModel observableViewModel)
-            {   
+            {
                 if (observableViewModel.Provider.GetRequiredService<INavigationRegion>() is INavigationRegion navigationRegion)
                 {
                     navigationRegion.Register(Name, sender);

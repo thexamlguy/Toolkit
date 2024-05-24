@@ -2,7 +2,7 @@
 
 namespace Toolkit.Foundation;
 
-public class KeyGenerator : 
+public class KeyGenerator :
     IKeyGenerator
 {
     public byte[] Generate(int size)

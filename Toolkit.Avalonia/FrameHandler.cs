@@ -2,7 +2,6 @@
 using Avalonia.Controls.Primitives;
 using FluentAvalonia.UI.Media.Animation;
 using FluentAvalonia.UI.Navigation;
-using System.Reflection;
 using Toolkit.Foundation;
 using Toolkit.UI.Controls.Avalonia;
 

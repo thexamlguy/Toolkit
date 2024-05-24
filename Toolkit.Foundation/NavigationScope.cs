@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using System.Data.SqlTypes;
 
 namespace Toolkit.Foundation;
 
@@ -11,8 +10,8 @@ public class NavigationScope(IPublisher publisher,
     IContentTemplateDescriptorProvider contentTemplateDescriptorProvider) :
     INavigationScope
 {
-    public void Navigate(string route, 
-        object? sender = null, 
+    public void Navigate(string route,
+        object? sender = null,
         object? region = null,
         EventHandler? navigated = null,
         object[]? parameters = null)
@@ -57,6 +56,7 @@ public class NavigationScope(IPublisher publisher,
                             case "self":
                                 region = view;
                                 break;
+
                             default:
                                 if (navigationRegionProvider.TryGet(region, out object? value))
                                 {

@@ -2,5 +2,4 @@
 
 public class FAPathIcon : FluentAvalonia.UI.Controls.FAPathIcon
 {
-
 }

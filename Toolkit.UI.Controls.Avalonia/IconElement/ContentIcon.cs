@@ -22,6 +22,7 @@ public class ContentIcon : FluentAvalonia.UI.Controls.FAIconElement
         get => GetValue(ContentProperty);
         set => SetValue(ContentProperty, value);
     }
+
     public IDataTemplate? IconTemplate
     {
         get => GetValue(ContentTemplateProperty);
@@ -36,7 +37,6 @@ public class ContentIcon : FluentAvalonia.UI.Controls.FAIconElement
         }
 
         return base.MeasureOverride(availableSize);
-
     }
 
     protected override void OnAttachedToLogicalTree(LogicalTreeAttachmentEventArgs args)
@@ -58,6 +58,7 @@ public class ContentIcon : FluentAvalonia.UI.Controls.FAIconElement
 
         base.OnDetachedFromLogicalTree(args);
     }
+
     private void CreateContent()
     {
         content = new ContentControl();

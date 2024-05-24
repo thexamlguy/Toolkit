@@ -7,7 +7,7 @@ namespace Toolkit.Avalonia;
 public class NavigationRegion(INavigationRegionCollection collection) :
     INavigationRegion
 {
-    public void Register(string name, 
+    public void Register(string name,
         object target)
     {
         if (target is Control control)

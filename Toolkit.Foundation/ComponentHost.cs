@@ -10,14 +10,13 @@ public class ComponentHost(IServiceProvider services,
 {
     public IServiceProvider Services => services;
 
-
     public void Dispose()
     {
     }
 
     public TConfiguration? GetConfiguration<TConfiguration>() where TConfiguration : ComponentConfiguration
     {
-       return Services.GetService<TConfiguration>();
+        return Services.GetService<TConfiguration>();
     }
 
     public async Task StartAsync(CancellationToken cancellationToken = default)

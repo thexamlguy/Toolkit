@@ -365,8 +365,28 @@ public partial class ObservableCollection<TItem> :
 
         TItem item = this[oldIndex];
 
+        bool selected = false;
+        if (item is ISelectable selectable)
+        {
+            selected = selectable.Selected;
+
+            SelectedItem = default;
+            SelectedIndex = -1;
+        }
+
         RemoveItem(oldIndex);
         Insert(newIndex, item);
+
+        if (selected)
+        {
+            SelectedIndex = newIndex;
+            SelectedItem = item;
+
+            if (item is ISelectable selectable2)
+            {
+                selectable2.Selected = true;
+            }
+        }
 
         return true;
     }
@@ -491,14 +511,6 @@ public partial class ObservableCollection<TItem> :
         if (newValue >= 0 && newValue <= this.Count - 1 && this[newValue] is ISelectable added)
         {
             added.Selected = true;
-        }
-    }
-
-    partial void OnSelectedItemChanged(TItem? oldValue, TItem? newValue)
-    {
-        if (oldValue is ISelectable selectable)
-        {
-            selectable.Selected = false;
         }
     }
 }

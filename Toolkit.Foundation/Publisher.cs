@@ -18,7 +18,7 @@ public class Publisher(IHandlerProvider handlerProvider,
             Publish(message, async args => await args(), null);
 
     public void Publish<TMessage>(TMessage message, object key)
-        where TMessage : notnull => 
+        where TMessage : notnull =>
             Publish(message, async args => await args(), key);
 
     public void Publish(object message,
@@ -59,7 +59,7 @@ public class Publisher(IHandlerProvider handlerProvider,
             Publish(new TMessage(), async args => await args(), null);
 
     public void PublishUI<TMessage>(object key)
-        where TMessage : new() => 
+        where TMessage : new() =>
             Publish(new TMessage(), args => dispatcher.Invoke(async () => await args()), key);
 
     public void PublishUI<TMessage>(TMessage message)

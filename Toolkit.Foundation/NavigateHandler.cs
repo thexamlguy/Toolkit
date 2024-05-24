@@ -25,8 +25,8 @@ public class NavigateHandler(NamedComponent scope,
                 }
             }
         }
-        
-        if (navigationScope is null) 
+
+        if (navigationScope is null)
         {
             ComponentScopeDescriptor? descriptor = componentScopeProvider.Get(args.Scope ?? scope.Name);
             navigationScope = descriptor?.Services?.GetRequiredService<INavigationScope>();

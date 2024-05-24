@@ -51,7 +51,7 @@ public class Mediator(IHandlerProvider handlerProvider,
             {
                 if (handler?.GetType().GetMethod("Handle", [messageType, typeof(CancellationToken)]) is MethodInfo handleMethod)
                 {
-                    return await (Task<TResponse?>)handleMethod.Invoke(handler, 
+                    return await (Task<TResponse?>)handleMethod.Invoke(handler,
                         new object[] { message, cancellationToken })!;
                 }
             }

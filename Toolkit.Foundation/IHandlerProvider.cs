@@ -1,8 +1,7 @@
-﻿
-namespace Toolkit.Foundation;
+﻿namespace Toolkit.Foundation;
 
 public interface IHandlerProvider
 {
-    IEnumerable<object?> Get(Type type, 
+    IEnumerable<object?> Get(Type type,
         object? key = null);
 }

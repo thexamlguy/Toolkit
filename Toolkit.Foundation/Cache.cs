@@ -66,6 +66,7 @@ public class Cache<TKey, TValue>(IComparer<TKey> comparer) :
     notnull
 {
     private readonly List<KeyValuePair<TKey, TValue?>> items = [];
+
     public TValue? this[TKey key]
     {
         get
@@ -108,6 +109,7 @@ public class Cache<TKey, TValue>(IComparer<TKey> comparer) :
 
         items.Insert(index, new KeyValuePair<TKey, TValue?>(key, value));
     }
+
     public void Clear() => items.Clear();
 
     public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator() =>

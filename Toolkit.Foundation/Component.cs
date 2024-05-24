@@ -13,7 +13,7 @@ public class Component :
     }
 
     public static TComponent? Create<TComponent>(IServiceProvider provider,
-        Action<IComponentBuilder> builderDelegate) 
+        Action<IComponentBuilder> builderDelegate)
         where TComponent : class, IComponent
     {
         if (provider.GetRequiredService<IServiceFactory>() is IServiceFactory factory)
@@ -23,7 +23,7 @@ public class Component :
 
             return factory.Create<TComponent>(builder);
         }
-        return default ;
+        return default;
     }
 
     public virtual IComponentBuilder Create() => builder;

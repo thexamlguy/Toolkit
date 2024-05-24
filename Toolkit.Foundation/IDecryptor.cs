@@ -1,4 +1,5 @@
 ﻿namespace Toolkit.Foundation;
+
 public interface IDecryptor
 {
     bool TryDecrypt(byte[] cipher,

@@ -8,7 +8,7 @@ public class AesDecryptor :
     private const int IvSize = 16;
 
     public bool TryDecrypt(byte[] cipher,
-        byte[] key, 
+        byte[] key,
         out byte[]? decryptedData)
     {
         decryptedData = null;

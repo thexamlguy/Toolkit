@@ -1,6 +1,6 @@
 ﻿namespace Toolkit.Foundation;
 
-public class HandlerProvider(SubscriptionCollection subscriptions) : 
+public class HandlerProvider(SubscriptionCollection subscriptions) :
     IHandlerProvider
 {
     public IEnumerable<object?> Get(Type type,

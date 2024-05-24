@@ -2,5 +2,4 @@
 
 public class FontIcon : FluentAvalonia.UI.Controls.FontIcon
 {
-
 }

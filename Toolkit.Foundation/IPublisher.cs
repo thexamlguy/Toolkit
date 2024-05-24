@@ -11,7 +11,7 @@ public interface IPublisher
     void Publish<TMessage>(TMessage message,
         object key)
         where TMessage : notnull;
-   
+
     void Publish(object message,
         Func<Func<Task>, Task> marshal,
         object? key = null);

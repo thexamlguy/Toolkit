@@ -2,8 +2,7 @@
 
 namespace Toolkit.UI.Avalonia;
 
-public class ItemInvokedEventArgs : 
+public class ItemInvokedEventArgs :
     RoutedEventArgs
 {
-
 }

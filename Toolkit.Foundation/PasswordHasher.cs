@@ -2,7 +2,7 @@
 
 namespace Toolkit.Foundation;
 
-public class PasswordHasher : 
+public class PasswordHasher :
     IPasswordHasher
 {
     private const int SaltSize = 16;
