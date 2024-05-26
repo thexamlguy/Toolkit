@@ -44,6 +44,17 @@ public class Cache<TValue>(IComparer<TValue>? comparer = default) :
         return false;
     }
 
+    public bool Contains(TValue key)
+    {
+        int index = items.BinarySearch(key, comparer);
+        if (index >= 0)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
     public bool TryGetValue(TValue key, out TValue? item)
     {
         int index = items.BinarySearch(key, comparer);
@@ -144,6 +155,17 @@ public class Cache<TKey, TValue>(IComparer<TKey> comparer) :
         }
 
         value = default;
+        return false;
+    }
+
+    public bool Contains(TKey key)
+    {
+        int index = items.FindIndex(kvp => comparer.Compare(kvp.Key, key) == 0);
+        if (index >= 0)
+        {
+            items.RemoveAt(index);
+            return true;
+        }
         return false;
     }
 
