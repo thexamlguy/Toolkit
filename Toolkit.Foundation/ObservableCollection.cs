@@ -319,7 +319,7 @@ public partial class ObservableCollection<TItem> :
         return Task.CompletedTask;
     }
 
-    public Task Handle(SelectionEventArgs<TItem> args) => 
+    public Task Handle(SelectionEventArgs<TItem> args) =>
         Task.CompletedTask;
 
     public int IndexOf(TItem item) =>
@@ -342,6 +342,16 @@ public partial class ObservableCollection<TItem> :
         return Task.CompletedTask;
     }
 
+    public TItem Insert<T>(int index = 0,
+                                                                                                                params object?[] parameters)
+        where T :
+        TItem
+    {
+        T? item = Factory.Create<T>(parameters);
+        InsertItem(0, item);
+
+        return item;
+    }
     public void Insert(int index, TItem item) =>
         InsertItem(index, item);
 
