@@ -14,7 +14,7 @@ public class NavigationScope(IPublisher publisher,
         object? sender = null,
         object? region = null,
         EventHandler? navigated = null,
-        object[]? parameters = null)
+        IDictionary<string, object>? parameters = null)
     {
         if (region is null)
         {
@@ -32,20 +32,14 @@ public class NavigationScope(IPublisher publisher,
             if (contentTemplateDescriptorProvider.Get(segment)
                 is IContentTemplateDescriptor descriptor)
             {
-                Dictionary<string, object>? arguments = parameters?.OfType<KeyValuePair<string, object>>()
-                    .ToDictionary(x => x.Key, x => x.Value, StringComparer.InvariantCultureIgnoreCase) ?? [];
-
-                IEnumerable<object?>? mappedParameters = descriptor.ContentType
+                Dictionary<string, object>? arguments = parameters?.ToDictionary(x => x.Key, x => x.Value, StringComparer.InvariantCultureIgnoreCase) ?? [];
+                object[]? resolvedArguments = parameters is not null ? [.. descriptor.ContentType
                      .GetConstructors()
                      .FirstOrDefault()?
                      .GetParameters()
-                     .Select(parameter => parameter?.Name is not null && arguments
-                         .TryGetValue(parameter.Name, out object? argument) ? argument : default)
-                     .Where(argument => argument is not null);
-
-                parameters = [.. parameters?.Where(x => x.GetType() != typeof(KeyValuePair<string, object>)) ??
-                    Enumerable.Empty<object?>(),
-                    .. mappedParameters ?? Enumerable.Empty<object?>()];
+                     .Select(x => x?.Name is not null && arguments
+                         .TryGetValue(x.Name, out object? argument) ? argument : default)
+                     .Where(argument => argument is not null)] : [];
 
                 if (provider.GetRequiredKeyedService(descriptor.TemplateType, segment) is object view)
                 {
@@ -69,9 +63,9 @@ public class NavigationScope(IPublisher publisher,
 
                     if (region is not null)
                     {
-                        if ((parameters is { Length: > 0 }
-                        ? factory.Create(descriptor.ContentType, parameters)
-                        : provider.GetRequiredKeyedService(descriptor.ContentType, segment)) is object viewModel)
+                        if ((resolvedArguments is { Length: > 0 }
+                            ? factory.Create(descriptor.ContentType, resolvedArguments)
+                            : provider.GetRequiredKeyedService(descriptor.ContentType, segment)) is object viewModel)
                         {
                             if (navigationProvider.Get(region is Type type ? type : region.GetType()) is INavigation navigation)
                             {
@@ -92,20 +86,20 @@ public class NavigationScope(IPublisher publisher,
         }
     }
 
-    public void Back(object? context)
+    public void Back(object? region)
     {
-        if (context is not null)
+        if (region is not null)
         {
-            navigationRegionProvider.TryGet(context, out context);
+            navigationRegionProvider.TryGet(region, out region);
         }
 
-        if (context is not null)
+        if (region is not null)
         {
-            if (navigationProvider.Get(context is Type type ? type : context.GetType())
+            if (navigationProvider.Get(region is Type type ? type : region.GetType())
                 is INavigation navigation)
             {
                 Type navigateType = typeof(NavigateBackEventArgs<>).MakeGenericType(navigation.Type);
-                if (Activator.CreateInstance(navigateType, [context]) is object navigate)
+                if (Activator.CreateInstance(navigateType, [region]) is object navigate)
                 {
                     publisher.Publish(navigate);
                 }

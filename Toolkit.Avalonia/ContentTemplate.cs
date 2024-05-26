@@ -42,18 +42,13 @@ public class ContentTemplate :
 
                         async void HandleUnloaded(object? sender, RoutedEventArgs args)
                         {
-                            control.Unloaded -= HandleLoaded;
+                            control.Unloaded -= HandleUnloaded;
                             if (control.DataContext is object content)
                             {
                                 if (content is IDeactivated deactivated)
                                 {
                                     await deactivated.OnDeactivated();
                                 }
-
-                                //if (content is IDisposable disposable)
-                                //{
-                                //    disposable.Dispose();
-                                //}
                             }
                         }
 

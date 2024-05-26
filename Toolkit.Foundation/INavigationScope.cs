@@ -6,7 +6,7 @@ public interface INavigationScope
         object? sender = null,
         object? region = null,
         EventHandler? navigated = null,
-        object[]? parameters = null);
+        IDictionary<string, object>? parameters = null);
 
     void Back(object? region);
 }

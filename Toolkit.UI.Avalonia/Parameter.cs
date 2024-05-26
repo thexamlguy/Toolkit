@@ -2,14 +2,14 @@
 
 namespace Toolkit.UI.Avalonia;
 
-public class ParameterBinding :
+public class Parameter :
     AvaloniaObject
 {
     public static readonly StyledProperty<string> KeyProperty =
-        AvaloniaProperty.Register<ParameterBinding, string>(nameof(Key));
+        AvaloniaProperty.Register<Parameter, string>(nameof(Key));
 
     public static readonly StyledProperty<object> ValueProperty =
-        AvaloniaProperty.Register<ParameterBinding, object>(nameof(Value));
+        AvaloniaProperty.Register<Parameter, object>(nameof(Value));
 
     public string Key
     {
