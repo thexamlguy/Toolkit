@@ -319,10 +319,8 @@ public partial class ObservableCollection<TItem> :
         return Task.CompletedTask;
     }
 
-    public Task Handle(SelectionEventArgs<TItem> args)
-    {
-        return Task.CompletedTask;
-    }
+    public Task Handle(SelectionEventArgs<TItem> args) => 
+        Task.CompletedTask;
 
     public int IndexOf(TItem item) =>
         collection.IndexOf(item);
@@ -511,6 +509,17 @@ public partial class ObservableCollection<TItem> :
         if (newValue >= 0 && newValue <= this.Count - 1 && this[newValue] is ISelectable added)
         {
             added.Selected = true;
+        }
+    }
+
+    partial void OnSelectedItemChanged(TItem? oldValue, TItem? newValue)
+    {
+        if (SelectedItem is not null && !SelectedItem.Equals(oldValue))
+        {
+            if (oldValue is ISelectable selectable)
+            {
+                selectable.Selected = false;
+            }
         }
     }
 }

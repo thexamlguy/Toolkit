@@ -18,18 +18,15 @@ public class FrameHandler :
             frame.NavigationPageFactory ??= new NavigationPageFactory();
             if (args.Template is Control control)
             {
-                void NavigatingFrom(object? sender,
-                    Control control)
+                void NavigatingFrom(Control sender)
                 {
                     async void HandleNavigatingFrom(object? _,
                         NavigatingCancelEventArgs args)
                     {
-                        Dictionary<string, object> results = [];
+                        sender.RemoveHandler(Frame.NavigatingFromEvent, HandleNavigatingFrom);
+                        NavigatedFrom(sender);
 
-                        control.RemoveHandler(Frame.NavigatingFromEvent, HandleNavigatingFrom);
-                        NavigatedFrom(sender, control, () => results);
-
-                        if (control.DataContext is object content)
+                        if (sender.DataContext is object content)
                         {
                             if (content is IConfirmation confirmation &&
                                 !await confirmation.Confirm())
@@ -47,68 +44,41 @@ public class FrameHandler :
                         }
                     }
 
-                    control.AddHandler(Frame.NavigatingFromEvent, HandleNavigatingFrom);
+                    sender.AddHandler(Frame.NavigatingFromEvent, HandleNavigatingFrom);
                 }
 
-                void NavigatedFrom(object? sender,
-                    Control control,
-                    Func<Dictionary<string, object>> resultCallBack)
+                void NavigatedFrom(Control sender)
                 {
                     async void HandleNavigatedFrom(object? _,
                         NavigationEventArgs args)
                     {
-                        control.RemoveHandler(Frame.NavigatedFromEvent, HandleNavigatedFrom);
-                        if (args.NavigationMode == NavigationMode.New)
+                        sender.RemoveHandler(Frame.NavigatedFromEvent, HandleNavigatedFrom);
+                        if (sender.DataContext is object content)
                         {
-                            NavigatedTo(sender, control);
-                        }
-
-                        Dictionary<string, object> results = resultCallBack.Invoke();
-                        async Task DoNavigatedFromAsync(object? content)
-                        {
-                            if (content is not null)
+                            if (content is IDeactivated deactivated)
                             {
-                                if (content is IDeactivated deactivated)
-                                {
-                                    await deactivated.OnDeactivated();
-                                }
+                                await deactivated.OnDeactivated();
                             }
-                        }
 
-                        if (args.Source is TemplatedControl sourceTemplate)
-                        {
-                            if (sourceTemplate.DataContext is object content)
+                            if (content is IDisposable disposable)
                             {
-                                await DoNavigatedFromAsync(content);
+                                disposable.Dispose();
                             }
-                        }
-
-                        if (sender is TemplatedControl senderTemplate)
-                        {
-                            if (senderTemplate.DataContext is object content)
-                            {
-                                await DoNavigatedFromAsync(content);
-                            }
-                        }
-                        else
-                        {
-                            await DoNavigatedFromAsync(sender);
                         }
                     }
 
-                    control.AddHandler(Frame.NavigatedFromEvent, HandleNavigatedFrom);
+                    sender.AddHandler(Frame.NavigatedFromEvent, HandleNavigatedFrom);
                 }
 
-                void NavigatedTo(object? sender,
-                    Control control)
+                void NavigatedTo(Control sender)
                 {
                     async void HandleNavigatedTo(object? _,
                         NavigationEventArgs __)
                     {
-                        control.RemoveHandler(Frame.NavigatedToEvent, HandleNavigatedTo);
-                        NavigatingFrom(sender, control);
+                        sender.RemoveHandler(Frame.NavigatedToEvent, HandleNavigatedTo);
+                        NavigatingFrom(sender);
 
-                        if (control.DataContext is object content)
+                        if (sender.DataContext is object content)
                         {
                             if (content is IInitializer initializer)
                             {
@@ -122,11 +92,11 @@ public class FrameHandler :
                         }
                     }
 
-                    control.AddHandler(Frame.NavigatedToEvent, HandleNavigatedTo);
+                    sender.AddHandler(Frame.NavigatedToEvent, HandleNavigatedTo);
                 }
 
                 control.DataContext = args.Content;
-                NavigatedTo(args.Sender, control);
+                NavigatedTo(control);
                 frame.NavigateFromObject(control, new FrameNavigationOptions { TransitionInfoOverride = new SuppressNavigationTransitionInfo() });
             }
         }
