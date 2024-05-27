@@ -4,9 +4,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.FileProviders.Physical;
 using Microsoft.Extensions.Hosting;
-using System.Collections.ObjectModel;
 using System.Text.Json;
-using static System.Collections.Specialized.BitVector32;
 
 namespace Toolkit.Foundation;
 
@@ -22,13 +20,22 @@ public static class IHostBuilderExtension
             services.AddConfiguration<TConfiguration>(typeof(TConfiguration).Name, "Settings.json", null);
 
     public static IHostBuilder AddConfiguration<TConfiguration>(this IHostBuilder builder,
+        string section,
+        TConfiguration configuration)
+        where TConfiguration : class, new()
+    {
+        return builder.AddConfiguration(section, "Settings.json", configuration);
+    }
+
+    public static IHostBuilder AddConfiguration<TConfiguration>(this IHostBuilder builder,
+        string section,
         Action<TConfiguration> configurationDelegate)
         where TConfiguration : class, new()
     {
         TConfiguration configuration = new();
         configurationDelegate.Invoke(configuration);
 
-        return builder.AddConfiguration(typeof(TConfiguration).Name, "Settings.json", configuration);
+        return builder.AddConfiguration(section, "Settings.json", configuration);
     }
 
     public static IHostBuilder AddConfiguration<TConfiguration>(this IHostBuilder builder,
@@ -53,7 +60,8 @@ public static class IHostBuilderExtension
             builder.AddConfiguration(configuration.GetType().Name,
                 "Settings.json", (TConfiguration?)configuration);
 
-    public static IHostBuilder AddConfiguration<TConfiguration>(this IHostBuilder builder, string section,
+    public static IHostBuilder AddConfiguration<TConfiguration>(this IHostBuilder builder,
+        string section,
         string path = "Settings.json",
         TConfiguration? defaultConfiguration = null,
         Action<JsonSerializerOptions>? serializerDelegate = null)

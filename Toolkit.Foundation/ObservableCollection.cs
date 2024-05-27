@@ -193,7 +193,7 @@ public partial class ObservableCollection<TItem> :
             }
 
             object? key = this.GetPropertyValue(() => attribute.Key) is { } value ? value : attribute.Key;
-            Publisher.PublishUI(OnPrepareAggregation(key));
+            Publisher.PublishUI(OnAggerate(key));
         }
     }
 
@@ -494,7 +494,7 @@ public partial class ObservableCollection<TItem> :
         collection.Insert(index > Count ? Count : index, item);
     }
 
-    protected virtual IAggerate OnPrepareAggregation(object? key) =>
+    protected virtual IAggerate OnAggerate(object? key) =>
         new AggerateEventArgs<TItem>() with { Key = key };
 
     protected virtual void RemoveItem(int index) =>
