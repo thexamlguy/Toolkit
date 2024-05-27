@@ -2,5 +2,5 @@
 
 public interface IProxyService<TService>
 {
-    TService Proxy { get; }
+    TService Value { get; }
 }

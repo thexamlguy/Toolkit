@@ -4,7 +4,9 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.FileProviders.Physical;
 using Microsoft.Extensions.Hosting;
+using System.Collections.ObjectModel;
 using System.Text.Json;
+using static System.Collections.Specialized.BitVector32;
 
 namespace Toolkit.Foundation;
 
@@ -60,7 +62,6 @@ public static class IHostBuilderExtension
         builder.ConfigureServices((context, services) =>
         {
             HashSet<string> sections = [];
-
             if (section.EndsWith(":*"))
             {
                 section = section[..^1];
@@ -72,7 +73,7 @@ public static class IHostBuilderExtension
                         if (segments.Length > 2)
                         {
                             string keyPrefix = string.Join(':', segments.Take(2));
-                            if (!keyPrefix.EndsWith(":*"))
+                            if (keyPrefix.StartsWith(section) && !keyPrefix.EndsWith(":*"))
                             {
                                 sections.Add(keyPrefix);
                             }
@@ -82,11 +83,33 @@ public static class IHostBuilderExtension
             }
             else
             {
-                sections.Add(section);
+                if (context.Configuration is ConfigurationRoot root)
+                {
+                    sections.Add(section);
+                }
             }
-
+ 
             foreach (string section in sections)
             {
+                if (context.Properties.TryGetValue(section, out object? value))
+                {
+                    if (value is List<Type> configurations)
+                    {
+                        if (configurations.Contains(typeof(TConfiguration)))
+                        {
+                            return;
+                        }
+                        else
+                        {
+                            configurations.Add(typeof(TConfiguration));
+                        }
+                    }
+                }    
+                else
+                {
+                    context.Properties.Add(section, new List<Type> { typeof(TConfiguration) });
+                }
+
                 services.TryAddSingleton<IConfigurationFile<TConfiguration>>(provider =>
                 {
                     IFileInfo? fileInfo = null;
