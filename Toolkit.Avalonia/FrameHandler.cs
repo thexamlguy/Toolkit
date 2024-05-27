@@ -3,7 +3,6 @@ using Avalonia.Interactivity;
 using FluentAvalonia.UI.Media.Animation;
 using FluentAvalonia.UI.Navigation;
 using Toolkit.Foundation;
-using Toolkit.UI.Avalonia;
 using Toolkit.UI.Controls.Avalonia;
 
 namespace Toolkit.Avalonia;
@@ -24,8 +23,6 @@ public class FrameHandler :
                     async void HandleNavigatedTo(object? _,
                         NavigationEventArgs __)
                     {
-                        sender.RemoveHandler(Frame.NavigatedToEvent, HandleNavigatedTo);
-
                         async void HandleNavigatingFrom(object? _,
                             NavigatingCancelEventArgs args)
                         {
@@ -43,9 +40,13 @@ public class FrameHandler :
                                         await deactivated.OnDeactivated();
                                     }
 
-                                    if (content is IDisposable disposable)
+                                    
+                                    if (content is not IBackStack)
                                     {
-                                        disposable.Dispose();
+                                        if (content is IDisposable disposable)
+                                        {
+                                            disposable.Dispose();
+                                        }
                                     }
                                 }
                             }
@@ -85,7 +86,9 @@ public class FrameHandler :
 
                         async void HandleUnloaded(object? _, RoutedEventArgs __)
                         {
+                            sender.RemoveHandler(Frame.NavigatedToEvent, HandleNavigatedTo);
                             sender.RemoveHandler(Frame.NavigatingFromEvent, HandleNavigatingFrom);
+
                             control.Unloaded -= HandleUnloaded;
 
                             if (control.DataContext is object content)
@@ -116,18 +119,26 @@ public class FrameHandler :
                 {
                     if (args.Parameters.TryGetValue("Transition", out object? transition))
                     {
-                        switch($"{transition}")
+                        switch ($"{transition}")
                         {
                             case "FromLeft":
                             case "FromRight":
                             case "FromTop":
                             case "FromBottom":
                                 navigationOptions.TransitionInfoOverride =
-                                    new SlideNavigationTransitionInfo 
-                                    { 
+                                    new SlideNavigationTransitionInfo
+                                    {
                                         Effect = Enum.Parse<SlideNavigationTransitionEffect>($"{transition}")
                                     };
                                 break;
+                        }
+
+                        if (args.Parameters.TryGetValue("NavigationStackEnabled", out object? navigationStackEnabled))
+                        {
+                            if (navigationStackEnabled is bool value)
+                            {
+                                navigationOptions.IsNavigationStackEnabled = value;
+                            }
                         }
                     }
                 }
@@ -144,12 +155,6 @@ public class FrameHandler :
     {
         if (args.Context is Frame frame)
         {
-            //NavigationTransitionInfo? navigationTransitionInfo = null;
-            //if (frame.Content is IBackwardNavigation navigation)
-            //{
-            //    navigationTransitionInfo = navigation.Transition;
-            //}
-
             frame.GoBack();
         }
 
