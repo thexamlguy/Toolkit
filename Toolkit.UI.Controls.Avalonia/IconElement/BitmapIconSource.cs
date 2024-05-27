@@ -1,5 +1,3 @@
 ﻿namespace Toolkit.UI.Controls.Avalonia;
 
-public class BitmapIconSource : FluentAvalonia.UI.Controls.BitmapIconSource
-{
-}
+public class BitmapIconSource : FluentAvalonia.UI.Controls.BitmapIconSource;

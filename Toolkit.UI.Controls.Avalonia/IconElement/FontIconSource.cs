@@ -1,6 +1,3 @@
-﻿namespace Kromek.UI.Avalonia.Controls
-{
-    public class FontIconSource : FluentAvalonia.UI.Controls.FontIconSource
-    {
-    }
-}
+﻿namespace Toolkit.UI.Controls.Avalonia;
+
+public class FontIconSource : FluentAvalonia.UI.Controls.FontIconSource;
