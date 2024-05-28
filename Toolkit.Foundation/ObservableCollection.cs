@@ -1,5 +1,4 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using Microsoft.Extensions.DependencyInjection;
 using System.Collections;
 using System.Collections.Specialized;
 using System.Reactive.Disposables;
@@ -36,17 +35,18 @@ public partial class ObservableCollection<TItem> :
 {
     private readonly System.Collections.ObjectModel.ObservableCollection<TItem> collection = [];
 
-    private bool clearing;
+    private readonly Queue<object> pendingEvents = [];
+    [ObservableProperty]
+    private bool activated;
 
+    private bool clearing;
     [ObservableProperty]
     private bool initialized;
 
     [ObservableProperty]
-    private int selectedIndex = 0;
-
-    [ObservableProperty]
     private TItem? selectedItem;
 
+    private bool supressSelection;
     public ObservableCollection(IServiceProvider provider,
         IServiceFactory factory,
         IMediator mediator,
@@ -243,12 +243,19 @@ public partial class ObservableCollection<TItem> :
 
     public Task Handle(RemoveEventArgs<TItem> args)
     {
-        foreach (TItem item in this.ToList())
+        if (Activated)
         {
-            if (args.Value is not null && args.Value.Equals(item))
+            foreach (TItem item in this.ToList())
             {
-                Remove(item);
+                if (args.Value is not null && args.Value.Equals(item))
+                {
+                    Remove(item);
+                }
             }
+        }
+        else
+        {
+            pendingEvents.Enqueue(args);
         }
 
         return Task.CompletedTask;
@@ -256,9 +263,16 @@ public partial class ObservableCollection<TItem> :
 
     public Task Handle(CreateEventArgs<TItem> args)
     {
-        if (args.Value is TItem item)
+        if (Activated)
         {
-            Add(item);
+            if (args.Value is TItem item)
+            {
+                Add(item);
+            }
+        }
+        else
+        {
+            pendingEvents.Enqueue(args);
         }
 
         return Task.CompletedTask;
@@ -266,18 +280,29 @@ public partial class ObservableCollection<TItem> :
 
     public Task Handle(InsertEventArgs<TItem> args)
     {
-        if (args.Value is TItem item)
+        if (Activated)
         {
-            Insert(args.Index, item);
-
-            if (item is ISelectable selectable)
+            if (args.Value is TItem item)
             {
-                if (selectable.Selected)
+                Insert(args.Index, item);
+                if (item is ISelectable newSelection)
                 {
-                    SelectedItem = item;
-                    SelectedIndex = IndexOf(item);
+                    if (newSelection.Selected)
+                    {
+                        foreach (ISelectable oldSelection in this.OfType<ISelectable>().Where(x => x is 
+                            ISelectable oldSelection && oldSelection != newSelection))
+                        {
+                            oldSelection.Selected = false;
+                        }
+
+                        SelectedItem = item;
+                    }
                 }
             }
+        }
+        else
+        {
+            pendingEvents.Enqueue(args);
         }
 
         return Task.CompletedTask;
@@ -285,15 +310,30 @@ public partial class ObservableCollection<TItem> :
 
     public Task Handle(MoveToEventArgs<TItem> args)
     {
-        Move(args.OldIndex, args.NewIndex);
+        if (Activated)
+        {
+            Move(args.OldIndex, args.NewIndex);
+        }
+        else
+        {
+            pendingEvents.Enqueue(args);
+        }
+
         return Task.CompletedTask;
     }
 
     public Task Handle(MoveEventArgs<TItem> args)
     {
-        if (args.Value is TItem item)
+        if (Activated)
         {
-            Move(args.Index, item);
+            if (args.Value is TItem item)
+            {
+                Move(args.Index, item);
+            }
+        }
+        else
+        {
+            pendingEvents.Enqueue(args);
         }
 
         return Task.CompletedTask;
@@ -301,9 +341,16 @@ public partial class ObservableCollection<TItem> :
 
     public Task Handle(ReplaceEventArgs<TItem> args)
     {
-        if (args.Value is TItem item)
+        if (Activated)
         {
-            Replace(args.Index, item);
+            if (args.Value is TItem item)
+            {
+                Replace(args.Index, item);
+            }
+        }
+        else
+        {
+            pendingEvents.Enqueue(args);
         }
 
         return Task.CompletedTask;
@@ -311,10 +358,18 @@ public partial class ObservableCollection<TItem> :
 
     public Task Handle(RemoveAtEventArgs<TItem> args)
     {
-        if (args.Index >= 0 && args.Index <= Count - 1)
+        if (Activated)
         {
-            RemoveAt(args.Index);
+            if (args.Index >= 0 && args.Index <= Count - 1)
+            {
+                RemoveAt(args.Index);
+            }
         }
+        else
+        {
+            pendingEvents.Enqueue(args);
+        }
+
 
         return Task.CompletedTask;
     }
@@ -343,12 +398,12 @@ public partial class ObservableCollection<TItem> :
     }
 
     public TItem Insert<T>(int index = 0,
-                                                                                                                params object?[] parameters)
+        params object?[] parameters)
         where T :
         TItem
     {
         T? item = Factory.Create<T>(parameters);
-        InsertItem(0, item);
+        InsertItem(index, item);
 
         return item;
     }
@@ -377,9 +432,7 @@ public partial class ObservableCollection<TItem> :
         if (item is ISelectable selectable)
         {
             selected = selectable.Selected;
-
             SelectedItem = default;
-            SelectedIndex = -1;
         }
 
         RemoveItem(oldIndex);
@@ -387,9 +440,7 @@ public partial class ObservableCollection<TItem> :
 
         if (selected)
         {
-            SelectedIndex = newIndex;
             SelectedItem = item;
-
             if (item is ISelectable selectable2)
             {
                 selectable2.Selected = true;
@@ -413,11 +464,23 @@ public partial class ObservableCollection<TItem> :
         return true;
     }
 
-    public virtual Task OnActivated() =>
-        Task.CompletedTask;
+    public virtual Task OnActivated()
+    {
+        Activated = true;
+        while (pendingEvents.Count > 0)
+        {
+            object current = pendingEvents.Dequeue();
+            Handle((dynamic)current);
+        }
 
-    public virtual Task OnDeactivated() =>
-        Task.CompletedTask;
+        return Task.CompletedTask;
+    }
+
+    public virtual Task OnDeactivated()
+    {
+        Activated = false;
+        return Task.CompletedTask;
+    }
 
     public virtual Task OnDeactivating() =>
         Task.CompletedTask;
@@ -509,20 +572,8 @@ public partial class ObservableCollection<TItem> :
     private void OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs args) =>
         CollectionChanged?.Invoke(this, args);
 
-    partial void OnSelectedIndexChanged(int oldValue, int newValue)
-    {
-        if (oldValue >= 0 && oldValue <= this.Count - 1 && this[oldValue] is ISelectable removed)
-        {
-            removed.Selected = false;
-        }
-
-        if (newValue >= 0 && newValue <= this.Count - 1 && this[newValue] is ISelectable added)
-        {
-            added.Selected = true;
-        }
-    }
-
-    partial void OnSelectedItemChanged(TItem? oldValue, TItem? newValue)
+    partial void OnSelectedItemChanged(TItem? oldValue, 
+        TItem? newValue)
     {
         if (SelectedItem is not null && !SelectedItem.Equals(oldValue))
         {

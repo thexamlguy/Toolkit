@@ -2,7 +2,7 @@
 
 namespace Toolkit.Foundation;
 
-public class Cache<TValue>(IComparer<TValue>? comparer = default) :
+public class Cache<TValue>(IComparer<TValue> comparer) :
     ICache<TValue>
 {
     private readonly List<TValue> items = [];
@@ -15,15 +15,23 @@ public class Cache<TValue>(IComparer<TValue>? comparer = default) :
 
     public void Add(TValue item)
     {
-        int index = items.BinarySearch(item, comparer);
-        if (index < 0)
-        {
-            index = ~index;
-        }
+        int index = FindInsertIndex(item);
         items.Insert(index, item);
     }
 
-    public void Clear() => items.Clear();
+    public void Clear() =>
+        items.Clear();
+
+    public bool Contains(TValue item)
+    {
+        int index = items.IndexOf(item);
+        if (index >= 0)
+        {
+            return true;
+        }
+
+        return false;
+    }
 
     public IEnumerator<TValue> GetEnumerator() =>
         items.GetEnumerator();
@@ -31,24 +39,14 @@ public class Cache<TValue>(IComparer<TValue>? comparer = default) :
     IEnumerator IEnumerable.GetEnumerator() => items.GetEnumerator();
 
     public int IndexOf(TValue item) =>
-        items.BinarySearch(item, comparer);
+        items.IndexOf(item);
 
     public bool Remove(TValue item)
     {
-        int index = items.BinarySearch(item, comparer);
+        int index = items.IndexOf(item);
         if (index >= 0)
         {
             items.RemoveAt(index);
-            return true;
-        }
-        return false;
-    }
-
-    public bool Contains(TValue key)
-    {
-        int index = items.BinarySearch(key, comparer);
-        if (index >= 0)
-        {
             return true;
         }
 
@@ -57,7 +55,7 @@ public class Cache<TValue>(IComparer<TValue>? comparer = default) :
 
     public bool TryGetValue(TValue key, out TValue? item)
     {
-        int index = items.BinarySearch(key, comparer);
+        int index = items.IndexOf(key);
         if (index >= 0)
         {
             item = items[index];
@@ -66,6 +64,33 @@ public class Cache<TValue>(IComparer<TValue>? comparer = default) :
 
         item = default;
         return false;
+    }
+
+    private int FindInsertIndex(TValue item)
+    {
+        int low = 0, high = items.Count - 1;
+
+        while (low <= high)
+        {
+            int mid = (low + high) / 2;
+            int cmp = comparer.Compare(items[mid], item);
+
+            if (cmp < 0)
+            {
+                low = mid + 1;
+            }
+            else
+            {
+                high = mid - 1;
+            }
+        }
+
+        while (low < items.Count && comparer.Compare(items[low], item) == 0)
+        {
+            low++;
+        }
+
+        return low;
     }
 }
 
@@ -123,8 +148,19 @@ public class Cache<TKey, TValue>(IComparer<TKey> comparer) :
 
     public void Clear() => items.Clear();
 
+    public bool Contains(TKey key)
+    {
+        int index = items.FindIndex(kvp => comparer.Compare(kvp.Key, key) == 0);
+        if (index >= 0)
+        {
+            items.RemoveAt(index);
+            return true;
+        }
+        return false;
+    }
+
     public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator() =>
-        items.GetEnumerator();
+            items.GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator() =>
         GetEnumerator();
@@ -157,18 +193,6 @@ public class Cache<TKey, TValue>(IComparer<TKey> comparer) :
         value = default;
         return false;
     }
-
-    public bool Contains(TKey key)
-    {
-        int index = items.FindIndex(kvp => comparer.Compare(kvp.Key, key) == 0);
-        if (index >= 0)
-        {
-            items.RemoveAt(index);
-            return true;
-        }
-        return false;
-    }
-
     private class KeyValuePairComparer<TK, TV>(IComparer<TK> comparer) :
                                 IComparer<KeyValuePair<TK, TV>>
     {
