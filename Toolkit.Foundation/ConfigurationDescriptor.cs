@@ -9,4 +9,6 @@ public class ConfigurationDescriptor<TConfiguration>(string section,
     public TConfiguration Value => reader.Read();
 
     public string Section => section;
+
+    public string Name => section.Split(':').LastOrDefault() ?? section;
 }

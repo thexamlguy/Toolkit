@@ -4,7 +4,9 @@ public interface IConfigurationDescriptor<out TConfiguration>
     where TConfiguration :
     class
 {
-    TConfiguration Value { get; }
+    string Name { get; }
 
     string Section { get; }
+
+    TConfiguration Value { get; }
 }
