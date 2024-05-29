@@ -509,16 +509,9 @@ public partial class ObservableCollection<TItem> :
 
         if (item.Equals(SelectedItem))
         {
-            if (index <= Count - 1)
-            {
-                TItem selectedItem = this[index];
-                dispatcher.Invoke(() => SelectedItem = selectedItem);
-            }
-            else if (index - 1 >= 0)
-            {
-                TItem selectedItem = this[index - 1];
-                dispatcher.Invoke(() => SelectedItem = selectedItem);
-            }
+            int newIndex = Math.Min(index, Count - 1);
+            TItem? selectedItem = newIndex >= 0 ? this[newIndex] : default;
+            dispatcher.Invoke(() => SelectedItem = selectedItem);
         }
 
         return true;
