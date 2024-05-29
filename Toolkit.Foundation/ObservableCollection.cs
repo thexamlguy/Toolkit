@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.Extensions.DependencyInjection;
 using System.Collections;
 using System.Collections.Specialized;
 using System.Reactive.Disposables;
@@ -46,7 +47,7 @@ public partial class ObservableCollection<TItem> :
     [ObservableProperty]
     private TItem? selectedItem;
 
-    private bool supressSelection;
+    private IDispatcher dispatcher;
     public ObservableCollection(IServiceProvider provider,
         IServiceFactory factory,
         IMediator mediator,
@@ -62,6 +63,7 @@ public partial class ObservableCollection<TItem> :
 
         subscriber.Add(this);
 
+        dispatcher = Provider.GetRequiredService<IDispatcher>();
         collection.CollectionChanged += OnCollectionChanged;
     }
 
@@ -81,7 +83,9 @@ public partial class ObservableCollection<TItem> :
 
         subscriber.Add(this);
 
+        dispatcher = Provider.GetRequiredService<IDispatcher>();
         collection.CollectionChanged += OnCollectionChanged;
+
         AddRange(items);
     }
 
@@ -278,6 +282,22 @@ public partial class ObservableCollection<TItem> :
         return Task.CompletedTask;
     }
 
+    private void UpdateSelection(TItem item)
+    {
+        if (item is ISelectable newSelection)
+        {
+            if (newSelection.Selected)
+            {
+                if (SelectedItem is ISelectable oldSelection)
+                {
+                    oldSelection.Selected = false;
+                }
+
+                dispatcher.Invoke(() => SelectedItem = item);
+            }
+        }
+    }
+
     public Task Handle(InsertEventArgs<TItem> args)
     {
         if (Activated)
@@ -285,19 +305,6 @@ public partial class ObservableCollection<TItem> :
             if (args.Value is TItem item)
             {
                 Insert(args.Index, item);
-                if (item is ISelectable newSelection)
-                {
-                    if (newSelection.Selected)
-                    {
-                        foreach (ISelectable oldSelection in this.OfType<ISelectable>().Where(x => x is 
-                            ISelectable oldSelection && oldSelection != newSelection))
-                        {
-                            oldSelection.Selected = false;
-                        }
-
-                        SelectedItem = item;
-                    }
-                }
             }
         }
         else
@@ -360,9 +367,10 @@ public partial class ObservableCollection<TItem> :
     {
         if (Activated)
         {
-            if (args.Index >= 0 && args.Index <= Count - 1)
+            int index = args.Index;
+            if (index >= 0 && index <= Count - 1)
             {
-                RemoveAt(args.Index);
+                RemoveAt(index);
             }
         }
         else
@@ -407,6 +415,7 @@ public partial class ObservableCollection<TItem> :
 
         return item;
     }
+
     public void Insert(int index, TItem item) =>
         InsertItem(index, item);
 
@@ -498,6 +507,20 @@ public partial class ObservableCollection<TItem> :
 
         RemoveItem(index);
 
+        if (item.Equals(SelectedItem))
+        {
+            if (index <= Count - 1)
+            {
+                TItem selectedItem = this[index];
+                dispatcher.Invoke(() => SelectedItem = selectedItem);
+            }
+            else if (index - 1 >= 0)
+            {
+                TItem selectedItem = this[index - 1];
+                dispatcher.Invoke(() => SelectedItem = selectedItem);
+            }
+        }
+
         return true;
     }
 
@@ -528,12 +551,6 @@ public partial class ObservableCollection<TItem> :
         return true;
     }
 
-    public void ResetAndAddRange(Action<ObservableCollection<TItem>> args)
-    {
-        Clear();
-        args.Invoke(this);
-    }
-
     protected virtual void ClearItems() =>
         collection.Clear();
 
@@ -554,6 +571,7 @@ public partial class ObservableCollection<TItem> :
             }
         }));
 
+        UpdateSelection(item);
         collection.Insert(index > Count ? Count : index, item);
     }
 
@@ -571,18 +589,6 @@ public partial class ObservableCollection<TItem> :
 
     private void OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs args) =>
         CollectionChanged?.Invoke(this, args);
-
-    partial void OnSelectedItemChanged(TItem? oldValue, 
-        TItem? newValue)
-    {
-        if (SelectedItem is not null && !SelectedItem.Equals(oldValue))
-        {
-            if (oldValue is ISelectable selectable)
-            {
-                selectable.Selected = false;
-            }
-        }
-    }
 }
 
 public partial class ObservableCollection<TValue, TViewModel>(IServiceProvider provider,
