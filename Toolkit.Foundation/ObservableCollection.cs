@@ -437,24 +437,8 @@ public partial class ObservableCollection<TItem> :
 
         TItem item = this[oldIndex];
 
-        bool selected = false;
-        if (item is ISelectable selectable)
-        {
-            selected = selectable.Selected;
-            SelectedItem = default;
-        }
-
         RemoveItem(oldIndex);
         Insert(newIndex, item);
-
-        if (selected)
-        {
-            SelectedItem = item;
-            if (item is ISelectable selectable2)
-            {
-                selectable2.Selected = true;
-            }
-        }
 
         return true;
     }
