@@ -37,17 +37,22 @@ public partial class ObservableCollection<TItem> :
     private readonly System.Collections.ObjectModel.ObservableCollection<TItem> collection = [];
 
     private readonly Queue<object> pendingEvents = [];
+
     [ObservableProperty]
     private bool activated;
 
     private bool clearing;
+
+    [ObservableProperty]
+    private int count;
+
+    private IDispatcher dispatcher;
+
     [ObservableProperty]
     private bool initialized;
 
     [ObservableProperty]
     private TItem? selectedItem;
-
-    private IDispatcher dispatcher;
     public ObservableCollection(IServiceProvider provider,
         IServiceFactory factory,
         IMediator mediator,
@@ -92,9 +97,6 @@ public partial class ObservableCollection<TItem> :
     public event NotifyCollectionChangedEventHandler? CollectionChanged;
 
     public event EventHandler? DeactivateHandler;
-
-    public int Count => collection.Count;
-
     public IDisposer Disposer { get; private set; }
 
     public IServiceFactory Factory { get; private set; }
@@ -280,22 +282,6 @@ public partial class ObservableCollection<TItem> :
         }
 
         return Task.CompletedTask;
-    }
-
-    private void UpdateSelection(TItem item)
-    {
-        if (item is ISelectable newSelection)
-        {
-            if (newSelection.Selected)
-            {
-                if (SelectedItem is ISelectable oldSelection)
-                {
-                    oldSelection.Selected = false;
-                }
-
-                dispatcher.Invoke(() => SelectedItem = item);
-            }
-        }
     }
 
     public Task Handle(InsertEventArgs<TItem> args)
@@ -564,8 +550,27 @@ public partial class ObservableCollection<TItem> :
     private static bool IsCompatibleObject(object? value) =>
         (value is TItem) || (value == null && default(TItem) == null);
 
-    private void OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs args) =>
+    private void OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs args)
+    {
+        Count = collection.Count;
         CollectionChanged?.Invoke(this, args);
+    }
+
+    private void UpdateSelection(TItem item)
+    {
+        if (item is ISelectable newSelection)
+        {
+            if (newSelection.Selected)
+            {
+                if (SelectedItem is ISelectable oldSelection)
+                {
+                    oldSelection.Selected = false;
+                }
+
+                dispatcher.Invoke(() => SelectedItem = item);
+            }
+        }
+    }
 }
 
 public partial class ObservableCollection<TValue, TViewModel>(IServiceProvider provider,
