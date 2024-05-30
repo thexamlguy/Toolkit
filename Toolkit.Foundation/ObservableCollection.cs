@@ -53,6 +53,7 @@ public partial class ObservableCollection<TItem> :
 
     [ObservableProperty]
     private TItem? selectedItem;
+
     public ObservableCollection(IServiceProvider provider,
         IServiceFactory factory,
         IMediator mediator,
