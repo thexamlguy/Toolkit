@@ -557,6 +557,19 @@ public partial class ObservableCollection<TItem> :
         CollectionChanged?.Invoke(this, args);
     }
 
+    partial void OnSelectedItemChanged(TItem? oldValue, TItem? newValue)
+    {
+        if (oldValue is ISelectable oldSelection)
+        {
+            oldSelection.Selected = false;
+        }
+
+        if (newValue is ISelectable newSelection)
+        {
+            newSelection.Selected = true;
+        }
+    }
+
     private void UpdateSelection(TItem item)
     {
         if (item is ISelectable newSelection)
