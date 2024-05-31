@@ -32,7 +32,15 @@ public static class IServiceCollectionExtensions
     }
 
     public static IServiceCollection AddHandler<THandler>(this IServiceCollection services,
-        ServiceLifetime lifetime = ServiceLifetime.Transient)
+        string key)
+        where THandler : IHandler
+    {
+        return AddHandler<THandler>(services, ServiceLifetime.Transient, key);
+    }
+
+    public static IServiceCollection AddHandler<THandler>(this IServiceCollection services,
+        ServiceLifetime lifetime = ServiceLifetime.Transient, 
+        string? key = null)
         where THandler : IHandler
     {
         if (typeof(THandler).GetInterfaces() is Type[] contracts)
@@ -47,14 +55,34 @@ public static class IServiceCollectionExtensions
                     Type wrapperType = typeof(NotificationHandlerWrapper<>)
                         .MakeGenericType(notificationType);
 
-                    services.TryAdd(new ServiceDescriptor(typeof(INotificationHandler<>)
-                        .MakeGenericType(notificationType), typeof(THandler), lifetime));
+                    if (key is not null)
+                    {
+                        services.TryAdd(new ServiceDescriptor(typeof(INotificationHandler<>)
+                            .MakeGenericType(notificationType), key, typeof(THandler), lifetime));
+                    }
+                    else
+                    {
+                        services.TryAdd(new ServiceDescriptor(typeof(INotificationHandler<>)
+                            .MakeGenericType(notificationType), typeof(THandler), lifetime));
+                    }
 
-                    services.Add(new ServiceDescriptor(wrapperType, provider =>
-                        provider.GetService<IServiceFactory>()?.Create(wrapperType,
-                            provider.GetRequiredService(typeof(INotificationHandler<>).MakeGenericType(notificationType)),
-                            provider.GetServices(typeof(IPipelineBehaviour<>)
-                                .MakeGenericType(notificationType)))!, lifetime));
+
+                    if (key is not null)
+                    {
+                        services.Add(new ServiceDescriptor(wrapperType, key, (provider, key) =>
+                            provider.GetService<IServiceFactory>()?.Create(wrapperType,
+                                provider.GetRequiredKeyedService(typeof(INotificationHandler<>).MakeGenericType(notificationType), key),
+                                provider.GetServices(typeof(IPipelineBehaviour<>)
+                                    .MakeGenericType(notificationType)))!, lifetime));
+                    }
+                    else
+                    {
+                        services.Add(new ServiceDescriptor(wrapperType, provider =>
+                            provider.GetService<IServiceFactory>()?.Create(wrapperType,
+                                provider.GetRequiredService(typeof(INotificationHandler<>).MakeGenericType(notificationType)),
+                                provider.GetServices(typeof(IPipelineBehaviour<>)
+                                    .MakeGenericType(notificationType)))!, lifetime));
+                    }
                 }
 
                 if (contract.Name == typeof(IHandler<,>).Name &&

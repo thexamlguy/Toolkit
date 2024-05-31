@@ -9,11 +9,14 @@ public class Subscription(SubscriptionCollection subscriptions,
     public void Add(object subscriber)
     {
         Type handlerType = subscriber.GetType();
-        object? key = GetKeyFromHandler(subscriber);
+
+        IDictionary<Type, object> keys = GetKeysFromHandler(subscriber);
         foreach (Type interfaceType in GetHandlerInterfaces(handlerType))
         {
             if (interfaceType.GetGenericArguments().FirstOrDefault() is Type argumentType)
             {
+                keys.TryGetValue(argumentType, out object? key);
+
                 string subscriptionKey = $"{(key is not null ? $"{key}:" : "")}{argumentType}";
                 subscriptions.AddOrUpdate(subscriptionKey, _ => new List<WeakReference> { new(subscriber) }, (_, collection) =>
                 {
@@ -29,11 +32,13 @@ public class Subscription(SubscriptionCollection subscriptions,
     public void Remove(object subscriber)
     {
         Type handlerType = subscriber.GetType();
-        object? key = GetKeyFromHandler(subscriber);
+        IDictionary<Type, object> keys = GetKeysFromHandler(subscriber);
         foreach (Type interfaceType in GetHandlerInterfaces(handlerType))
         {
             if (interfaceType.GetGenericArguments().FirstOrDefault() is Type argumentType)
             {
+                keys.TryGetValue(argumentType, out object? key);
+
                 string subscriptionKey = $"{(key is not null ? $"{key}:" : "")}{argumentType}";
                 if (subscriptions.TryGetValue(subscriptionKey, out List<WeakReference>? subscribers))
                 {
@@ -69,9 +74,22 @@ public class Subscription(SubscriptionCollection subscriptions,
         }
     }
 
-    private object? GetKeyFromHandler(object handler) =>
-        handler.GetAttribute<NotificationAttribute>() is NotificationAttribute attribute
-            ? handler.GetPropertyValue(() => attribute.Key) is { } value ? value : attribute.Key : null;
+    //private object? GetKeyFromHandler(object handler) =>
+    //    handler.GetAttribute<NotificationAttribute>() is NotificationAttribute attribute
+    //        ? handler.GetPropertyValue(() => attribute.Key) is { } value ? value : attribute.Key : null;
+
+    private IDictionary<Type, object> GetKeysFromHandler(object handler)
+    {
+        Dictionary<Type, object> keys = [];
+
+        foreach (NotificationAttribute attribute in handler.GetAttributes<NotificationAttribute>())
+        {
+            keys.Add(attribute.Type, attribute.Key);
+        }
+
+        return keys;
+    }
+
 
     private IEnumerable<Type> GetHandlerInterfaces(Type handlerType) =>
         handlerType.GetInterfaces().Where(interfaceType =>

@@ -157,6 +157,8 @@ public partial class ObservableCollection<TItem> :
     {
         int index = collection.Count;
         InsertItem(index, item);
+
+        UpdateSelection(item);
     }
 
     public void Add(object item)
@@ -399,12 +401,17 @@ public partial class ObservableCollection<TItem> :
     {
         T? item = Factory.Create<T>(parameters);
         InsertItem(index, item);
+        UpdateSelection(item);
 
         return item;
     }
 
-    public void Insert(int index, TItem item) =>
+    public void Insert(int index, 
+        TItem item)
+    {
         InsertItem(index, item);
+        UpdateSelection(item);
+    }
 
     void IList.Insert(int index,
         object? value)
@@ -412,6 +419,7 @@ public partial class ObservableCollection<TItem> :
         if (value is TItem item)
         {
             Insert(index, item);
+            UpdateSelection(item);
         }
     }
 
@@ -424,8 +432,27 @@ public partial class ObservableCollection<TItem> :
 
         TItem item = this[oldIndex];
 
+        bool moveSelection = false;
+        if (item is ISelectable oldSelection)
+        {
+            if (oldSelection.Selected)
+            {
+                moveSelection = true;
+                SelectedItem = default;
+            }
+        }
+
         RemoveItem(oldIndex);
-        Insert(newIndex, item);
+        InsertItem(newIndex, item);
+
+        if (moveSelection)
+        {
+            if (item is ISelectable newSelection)
+            {
+                newSelection.Selected = true;
+                dispatcher.Invoke(() => SelectedItem = item);
+            }
+        }
 
         return true;
     }
@@ -535,7 +562,6 @@ public partial class ObservableCollection<TItem> :
             }
         }));
 
-        UpdateSelection(item);
         collection.Insert(index > Count ? Count : index, item);
     }
 

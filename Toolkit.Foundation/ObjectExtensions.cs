@@ -22,11 +22,23 @@ public static class ObjectExtensions
         where TAttribute : Attribute
     {
         Type type = obj.GetType();
-        if (type.GetAttribute<TAttribute>() is TAttribute attribute)
+        if (type.GetCustomAttribute<TAttribute>(true) is TAttribute attribute)
         {
             return attribute;
         }
 
         return null;
+    }
+
+    public static IEnumerable<TAttribute> GetAttributes<TAttribute>(this object obj)
+        where TAttribute : Attribute
+    {
+        Type type = obj.GetType();
+        if (type.GetCustomAttributes<TAttribute>(true) is IEnumerable<TAttribute> attributes)
+        {
+            return attributes;
+        }
+
+        return Enumerable.Empty<TAttribute>();
     }
 }

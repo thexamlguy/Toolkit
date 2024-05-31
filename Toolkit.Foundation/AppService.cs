@@ -13,7 +13,7 @@ public class AppService(IEnumerable<IInitializer> initializers,
             await initializer.Initialize();
         }
 
-        publisher.Publish<StartedEventArgs>(cancellationToken);
+        publisher.Publish<StartedEventArgs>();
     }
 
     public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
