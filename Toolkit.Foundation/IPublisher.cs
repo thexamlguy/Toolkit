@@ -2,14 +2,14 @@
 
 public interface IPublisher
 {
-    void Publish<TMessage>(object key)
+    void Publish<TMessage>(object? key = null)
         where TMessage : new();
 
     void Publish<TMessage>(TMessage message)
         where TMessage : notnull;
 
     void Publish<TMessage>(TMessage message,
-        object key)
+        object? key = null)
         where TMessage : notnull;
 
     void Publish(object message,
@@ -22,9 +22,9 @@ public interface IPublisher
     void Publish(object message);
 
     void PublishUI<TMessage>(TMessage message,
-        object key) where TMessage : notnull;
+        object? key = null) where TMessage : notnull;
 
-    void PublishUI<TMessage>(object key)
+    void PublishUI<TMessage>(object? key = null)
         where TMessage : new();
 
     void PublishUI<TMessage>(TMessage message)

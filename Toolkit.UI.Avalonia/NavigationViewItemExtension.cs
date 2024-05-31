@@ -5,22 +5,22 @@ using Toolkit.UI.Controls.Avalonia;
 
 namespace Toolkit.UI.Avalonia;
 
-public class NavigationViewItemExtension
+public class NavigationViewExtension
 {
-    public static readonly AttachedProperty<bool> IsItemClickEnabledProperty =
-        AvaloniaProperty.RegisterAttached<NavigationViewItem, bool>("IsItemClickEnabled",
-            typeof(NavigationViewItemExtension), false);
+    public static readonly AttachedProperty<bool> IsItemInvokedEnabledProperty =
+        AvaloniaProperty.RegisterAttached<NavigationViewItem, bool>("IsItemInvokedEnabled",
+            typeof(NavigationViewExtension), false);
 
-    public static readonly RoutedEvent<ItemInvokedEventArgs> ItemClickEvent =
-        RoutedEvent.Register<ItemInvokedEventArgs>("ItemClick",
-            RoutingStrategies.Bubble, typeof(NavigationViewItemExtension));
+    public static readonly RoutedEvent<ItemInvokedEventArgs> ItemInvokedEvent =
+        RoutedEvent.Register<ItemInvokedEventArgs>("ItemInvoked",
+            RoutingStrategies.Bubble, typeof(NavigationViewExtension));
 
-    static NavigationViewItemExtension()
+    static NavigationViewExtension()
     {
-        IsItemClickEnabledProperty.Changed.AddClassHandler<NavigationViewItem>(OnIsItemClickEnabledPropertyChanged);
+        IsItemInvokedEnabledProperty.Changed.AddClassHandler<NavigationViewItem>(OnIsItemInvokedEnabledPropertyChanged);
     }
 
-    private static void OnIsItemClickEnabledPropertyChanged(NavigationViewItem sender,
+    private static void OnIsItemInvokedEnabledPropertyChanged(NavigationViewItem sender,
         AvaloniaPropertyChangedEventArgs args)
     {
         bool TrySetupNavigationView()
@@ -31,10 +31,10 @@ public class NavigationViewItemExtension
                 {
                     if (args.InvokedItemContainer == sender)
                     {
-                        sender.RaiseEvent(new ItemInvokedEventArgs { RoutedEvent = ItemClickEvent });
+                        sender.RaiseEvent(new ItemInvokedEventArgs { RoutedEvent = ItemInvokedEvent });
                     }
                 }
-
+       
                 navigationView.ItemInvoked += OnItemInvoked;
                 return true;
             }
@@ -54,15 +54,15 @@ public class NavigationViewItemExtension
         }
     }
 
-    public static bool GetIsItemClickEnabled(NavigationViewItem element) =>
-        element.GetValue(IsItemClickEnabledProperty);
+    public static bool GetIsItemInvokedEnabled(NavigationViewItem element) =>
+        element.GetValue(IsItemInvokedEnabledProperty);
 
-    public static void SetIsItemClickEnabled(NavigationViewItem element, bool value) =>
-        element.SetValue(IsItemClickEnabledProperty, value);
+    public static void SetIsItemInvokedEnabled(NavigationViewItem element, bool value) =>
+        element.SetValue(IsItemInvokedEnabledProperty, value);
 
-    public static void AddItemClickHandler(NavigationViewItem element, EventHandler<ItemInvokedEventArgs> handler) =>
-        element.AddHandler(ItemClickEvent, handler);
+    public static void AddItemInvokedHandler(NavigationViewItem element, EventHandler<ItemInvokedEventArgs> handler) =>
+        element.AddHandler(ItemInvokedEvent, handler);
 
-    public static void RemoveItemClickHandler(NavigationViewItem element, EventHandler<ItemInvokedEventArgs> handler) =>
-        element.RemoveHandler(ItemClickEvent, handler);
+    public static void RemoveItemInvokedHandler(NavigationViewItem element, EventHandler<ItemInvokedEventArgs> handler) =>
+        element.RemoveHandler(ItemInvokedEvent, handler);
 }

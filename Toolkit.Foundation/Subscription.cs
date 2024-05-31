@@ -10,21 +10,37 @@ public class Subscription(SubscriptionCollection subscriptions,
     {
         Type handlerType = subscriber.GetType();
 
-        IDictionary<Type, object> keys = GetKeysFromHandler(subscriber);
+        IDictionary<Type, List<object>> subscribers = GetSubscriptionKeys(subscriber);
         foreach (Type interfaceType in GetHandlerInterfaces(handlerType))
         {
             if (interfaceType.GetGenericArguments().FirstOrDefault() is Type argumentType)
             {
-                keys.TryGetValue(argumentType, out object? key);
-
-                string subscriptionKey = $"{(key is not null ? $"{key}:" : "")}{argumentType}";
-                subscriptions.AddOrUpdate(subscriptionKey, _ => new List<WeakReference> { new(subscriber) }, (_, collection) =>
+                subscribers.TryGetValue(argumentType, out List<object>? keys);
+                if (keys is not null)
                 {
-                    collection.Add(new WeakReference(subscriber));
-                    return collection;
-                });
+                    foreach (object key in keys)
+                    {
+                        string subscriptionKey = $"{(key is not null ? $"{key}:" : "")}{argumentType}";
+                        subscriptions.AddOrUpdate(subscriptionKey, _ => new List<WeakReference> { new(subscriber) }, (_, collection) =>
+                        {
+                            collection.Add(new WeakReference(subscriber));
+                            return collection;
+                        });
 
-                disposer.Add(subscriber, Disposable.Create(() => RemoveSubscriber(subscriber, subscriptionKey)));
+                        disposer.Add(subscriber, Disposable.Create(() => RemoveSubscriber(subscriber, subscriptionKey)));
+                    }
+                }
+                else
+                {
+                    string subscriptionKey = $"{argumentType}";
+                    subscriptions.AddOrUpdate(subscriptionKey, _ => new List<WeakReference> { new(subscriber) }, (_, collection) =>
+                    {
+                        collection.Add(new WeakReference(subscriber));
+                        return collection;
+                    });
+
+                    disposer.Add(subscriber, Disposable.Create(() => RemoveSubscriber(subscriber, subscriptionKey)));
+                }
             }
         }
     }
@@ -32,21 +48,40 @@ public class Subscription(SubscriptionCollection subscriptions,
     public void Remove(object subscriber)
     {
         Type handlerType = subscriber.GetType();
-        IDictionary<Type, object> keys = GetKeysFromHandler(subscriber);
+        IDictionary<Type, List<object>> subscribers = GetSubscriptionKeys(subscriber);
         foreach (Type interfaceType in GetHandlerInterfaces(handlerType))
         {
             if (interfaceType.GetGenericArguments().FirstOrDefault() is Type argumentType)
             {
-                keys.TryGetValue(argumentType, out object? key);
-
-                string subscriptionKey = $"{(key is not null ? $"{key}:" : "")}{argumentType}";
-                if (subscriptions.TryGetValue(subscriptionKey, out List<WeakReference>? subscribers))
+                subscribers.TryGetValue(argumentType, out List<object>? keys);
+                if (keys is not null)
                 {
-                    for (int i = subscribers.Count - 1; i >= 0; i--)
+                    foreach (object key in keys)
                     {
-                        if (!subscribers[i].IsAlive || subscribers[i].Target == subscriber)
+                        string subscriptionKey = $"{(key is not null ? $"{key}:" : "")}{argumentType}";
+                        if (subscriptions.TryGetValue(subscriptionKey, out List<WeakReference>? existing))
                         {
-                            subscribers.RemoveAt(i);
+                            for (int i = existing.Count - 1; i >= 0; i--)
+                            {
+                                if (!existing[i].IsAlive || existing[i].Target == subscriber)
+                                {
+                                    existing.RemoveAt(i);
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    string subscriptionKey = $"{argumentType}";
+                    if (subscriptions.TryGetValue(subscriptionKey, out List<WeakReference>? existing))
+                    {
+                        for (int i = existing.Count - 1; i >= 0; i--)
+                        {
+                            if (!existing[i].IsAlive || existing[i].Target == subscriber)
+                            {
+                                existing.RemoveAt(i);
+                            }
                         }
                     }
                 }
@@ -74,22 +109,22 @@ public class Subscription(SubscriptionCollection subscriptions,
         }
     }
 
-    //private object? GetKeyFromHandler(object handler) =>
-    //    handler.GetAttribute<NotificationAttribute>() is NotificationAttribute attribute
-    //        ? handler.GetPropertyValue(() => attribute.Key) is { } value ? value : attribute.Key : null;
-
-    private IDictionary<Type, object> GetKeysFromHandler(object handler)
+    private IDictionary<Type, List<object>> GetSubscriptionKeys(object subscriber)
     {
-        Dictionary<Type, object> keys = [];
-
-        foreach (NotificationAttribute attribute in handler.GetAttributes<NotificationAttribute>())
+        Dictionary<Type, List<object>> keys = [];
+        foreach (NotificationAttribute attribute in subscriber.GetAttributes<NotificationAttribute>())
         {
-            keys.Add(attribute.Type, attribute.Key);
+            if (!keys.TryGetValue(attribute.Type, out List<object>? value))
+            {
+                value = ([]);
+                keys[attribute.Type] = value;
+            }
+
+            value.Add(attribute.Key);
         }
 
         return keys;
     }
-
 
     private IEnumerable<Type> GetHandlerInterfaces(Type handlerType) =>
         handlerType.GetInterfaces().Where(interfaceType =>

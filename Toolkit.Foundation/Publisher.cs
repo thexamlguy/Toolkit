@@ -9,7 +9,7 @@ public class Publisher(IHandlerProvider handlerProvider,
     IDispatcher dispatcher) :
     IPublisher
 {
-    public void Publish<TMessage>(object key)
+    public void Publish<TMessage>(object? key = null)
         where TMessage : new() =>
             Publish(serviceFactory.Create<TMessage>() ?? new TMessage(), async args => await args(), key);
 
@@ -17,7 +17,8 @@ public class Publisher(IHandlerProvider handlerProvider,
         where TMessage : notnull =>
             Publish(message, async args => await args(), null);
 
-    public void Publish<TMessage>(TMessage message, object key)
+    public void Publish<TMessage>(TMessage message,
+        object? key = null)
         where TMessage : notnull =>
             Publish(message, async args => await args(), key);
 
@@ -60,7 +61,7 @@ public class Publisher(IHandlerProvider handlerProvider,
         where TMessage : new() =>
             Publish(new TMessage(), async args => await args(), null);
 
-    public void PublishUI<TMessage>(object key)
+    public void PublishUI<TMessage>(object? key = null)
         where TMessage : new() =>
             Publish(new TMessage(), args => dispatcher.Invoke(async () => await args()), key);
 
@@ -69,7 +70,7 @@ public class Publisher(IHandlerProvider handlerProvider,
             Publish(message, args => dispatcher.Invoke(async () => await args()), null);
 
     public void PublishUI<TMessage>(TMessage message,
-        object key)
+        object? key = null)
         where TMessage : notnull =>
             Publish(message, args => dispatcher.Invoke(async () => await args()), key);
 

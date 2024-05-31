@@ -192,19 +192,19 @@ public partial class ObservableCollection<TItem> :
         }
     }
 
-    public void BeginAggregation()
+    public void Fetch(bool reset = false)
     {
-        if (this.GetAttribute<AggerateAttribute>() is AggerateAttribute attribute)
+        if (reset)
         {
-            if (attribute.Mode == AggerateMode.Reset)
-            {
-                Clear();
-            }
-
-            object? key = this.GetPropertyValue(() => attribute.Key) is { } value ? value : attribute.Key;
-            Publisher.PublishUI(OnAggerate(key));
+            Clear();
         }
+
+        AggregateExpression expression = CreateAggregateExpression();
+        Publisher.PublishUI(expression.Value, expression.Key);
     }
+
+    protected virtual IAggregate OnAggerate() =>
+        new AggerateEventArgs<TItem>();
 
     public void Clear()
     {
@@ -389,7 +389,7 @@ public partial class ObservableCollection<TItem> :
         }
 
         Initialized = true;
-        BeginAggregation();
+        Fetch();
 
         return Task.CompletedTask;
     }
@@ -565,8 +565,11 @@ public partial class ObservableCollection<TItem> :
         collection.Insert(index > Count ? Count : index, item);
     }
 
-    protected virtual IAggerate OnAggerate(object? key) =>
-        new AggerateEventArgs<TItem>() with { Key = key };
+    protected virtual AggregateExpression CreateAggregateExpression() => 
+        new AggregateExpression(new AggerateEventArgs<TItem>());
+
+    protected virtual object? CreateAggregationKey() =>
+        default;
 
     protected virtual void RemoveItem(int index) =>
         collection.RemoveAt(index);

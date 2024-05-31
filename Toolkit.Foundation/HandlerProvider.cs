@@ -6,6 +6,7 @@ public class HandlerProvider(SubscriptionCollection subscriptions) :
     public IEnumerable<object?> Get(Type type,
         object? key = null)
     {
+        var d = subscriptions;
         string subscriptionKey = $"{(key is not null ? $"{key}:" : "")}{type}";
         if (subscriptions.TryGetValue(subscriptionKey, out List<WeakReference>? subscribers))
         {
