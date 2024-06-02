@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace Toolkit.Foundation;
 
@@ -12,54 +13,35 @@ public class Mediator(IHandlerProvider handlerProvider,
         CancellationToken cancellationToken = default)
         where TMessage : notnull
     {
-        Type messageType = message.GetType();
-        Type handlerWrapperType = typeof(HandlerWrapper<,>).MakeGenericType(messageType, 
-            typeof(TResponse));
+        List<object?> handlers = GetHandlers<TMessage, TResponse>(message, key);
 
-        Dictionary<Type, List<object?>> handlers = [];
-        foreach (object? handler in key is not null ? provider.GetKeyedServices(handlerWrapperType, key) :
-            provider.GetServices(handlerWrapperType))
+        foreach (object? handler in handlers)
         {
-            if (handler?.GetType() is Type serviceType)
+            MethodInfo? handleMethod = handler?.GetType().GetMethod("Handle", [message.GetType(), typeof(CancellationToken)]);
+            if (handleMethod != null)
             {
-                if (!handlers.TryGetValue(serviceType, out List<object?>? handlerList))
-                {
-                    handlerList = [];
-                    handlers.Add(serviceType, handlerList);
-                }
-
-                handlerList.Add(handler);
-            }
-        }
-
-        foreach (object? handler in handlerProvider.Get(messageType, key))
-        {
-            if (handler is not null)
-            {
-                Type handlerType = handler.GetType();
-                if (!handlers.TryGetValue(handlerType, out List<object?>? handlerList))
-                {
-                    handlerList = [];
-                    handlers.Add(handlerType, handlerList);
-                }
-
-                handlerList.Add(handler);
-            }
-        }
-
-        foreach (KeyValuePair<Type, List<object?>> handlerEntry in handlers)
-        {
-            foreach (object? handler in handlerEntry.Value)
-            {
-                if (handler?.GetType().GetMethod("Handle", [messageType, typeof(CancellationToken)]) is MethodInfo handleMethod)
-                {
-                    return await (Task<TResponse?>)handleMethod.Invoke(handler,
-                        new object[] { message, cancellationToken })!;
-                }
+                return await (Task<TResponse?>)handleMethod.Invoke(handler, new object[] { message, cancellationToken })!;
             }
         }
 
         return default;
+    }
+
+    public async IAsyncEnumerable<TResponse?> HandleMany<TMessage, TResponse>(TMessage message,
+        object? key = null,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        where TMessage : notnull
+    {
+        List<object?> handlers = GetHandlers<TMessage, TResponse>(message, key);
+
+        foreach (object? handler in handlers)
+        {
+            MethodInfo? handleMethod = handler?.GetType().GetMethod("Handle", [message.GetType(), typeof(CancellationToken)]);
+            if (handleMethod != null)
+            {
+                yield return await (Task<TResponse?>)handleMethod.Invoke(handler, new object[] { message, cancellationToken })!;
+            }
+        }
     }
 
     public async Task<object?> Handle(object message,
@@ -72,54 +54,62 @@ public class Mediator(IHandlerProvider handlerProvider,
             requestType.GetGenericArguments().Length == 1)
         {
             Type responseType = requestType.GetGenericArguments()[0];
-            Type handlerWrapperType = typeof(HandlerWrapper<,>).MakeGenericType(message.GetType(),
-                responseType);
+            Type handlerWrapperType = typeof(HandlerWrapper<,>).MakeGenericType(message.GetType(), responseType);
 
-            Dictionary<Type, List<object?>> handlers = [];
+            List<object?> handlers = GetHandlers(message, handlerWrapperType, key);
 
-            foreach (object? handler in handlerProvider.Get(messageType))
+            foreach (object? handler in handlers)
             {
-                if (handler is not null)
+                MethodInfo? handleMethod = handler?.GetType().GetMethod("Handle", [messageType, typeof(CancellationToken)]);
+                if (handleMethod != null)
                 {
-                    Type handlerType = handler.GetType();
-                    if (!handlers.TryGetValue(handlerType, out List<object?>? handlerList))
-                    {
-                        handlerList = [];
-                        handlers.Add(handlerType, handlerList);
-                    }
-
-                    handlerList.Add(handler);
-                }
-            }
-
-            foreach (object? handler in key is not null ? provider.GetKeyedServices(handlerWrapperType, key) :
-                provider.GetServices(handlerWrapperType))
-            {
-                if (handler?.GetType() is Type serviceType)
-                {
-                    if (!handlers.TryGetValue(serviceType, out List<object?>? handlerList))
-                    {
-                        handlerList = [];
-                        handlers.Add(serviceType, handlerList);
-                    }
-
-                    handlerList.Add(handler);
-                }
-            }
-
-            foreach (KeyValuePair<Type, List<object?>> handlerEntry in handlers)
-            {
-                foreach (object? handler in handlerEntry.Value)
-                {
-                    if (handler?.GetType().GetMethod("Handle", [messageType, typeof(CancellationToken)]) is MethodInfo handleMethod)
-                    {
-                        return await(Task<object?>)handleMethod.Invoke(handler,
-                            new object[] { message, cancellationToken })!;
-                    }
+                    return await (Task<object?>)handleMethod.Invoke(handler, new object[] { message, cancellationToken })!;
                 }
             }
         }
 
         return default;
     }
+
+    private List<object?> GetHandlers<TMessage, TResponse>(TMessage message, object? key)
+        where TMessage : notnull
+    {
+        Type messageType = message.GetType();
+        Type handlerWrapperType = typeof(HandlerWrapper<,>).MakeGenericType(messageType, typeof(TResponse));
+
+        return GetHandlers(message, handlerWrapperType, key);
+    }
+
+    private List<object?> GetHandlers(object message, Type handlerWrapperType, object? key)
+    {
+        Type messageType = message.GetType();
+        Dictionary<Type, List<object?>> handlers = [];
+
+        void AddHandlers(IEnumerable<object?> newHandlers)
+        {
+            foreach (object? handler in newHandlers)
+            {
+                if (handler == null) continue;
+
+                Type serviceType = handler.GetType();
+                if (!handlers.TryGetValue(serviceType, out List<object?>? handlerList))
+                {
+                    handlerList = [];
+                    handlers.Add(serviceType, handlerList);
+                }
+
+                handlerList.Add(handler);
+            }
+        }
+
+        IEnumerable<object?> keyedServices = key != null ? provider.GetKeyedServices(handlerWrapperType, key) : 
+            provider.GetServices(handlerWrapperType);
+        AddHandlers(keyedServices);
+
+        IEnumerable<object?> additionalHandlers = handlerProvider.Get(messageType, key);
+        AddHandlers(additionalHandlers);
+
+        return handlers.SelectMany(entry => entry.Value).ToList();
+    }
+
 }
