@@ -120,17 +120,24 @@ public partial class Observable<TValue>(IServiceProvider provider,
     private TValue? value = value;
 }
 
-public partial class Observable<TKey, TValue>(IServiceProvider provider,
-    IServiceFactory factory,
-    IMediator mediator,
-    IPublisher publisher,
-    ISubscription subscriber,
-    IDisposer disposer,
-    TValue? value = default) : Observable(provider, factory, mediator, publisher, subscriber, disposer)
+public partial class Observable<TKey, TValue> : Observable
 {
     [ObservableProperty]
     private TKey? key;
 
     [ObservableProperty]
-    private TValue? value = value;
+    private TValue? value;
+
+    public Observable(IServiceProvider provider, 
+        IServiceFactory factory,
+        IMediator mediator, 
+        IPublisher publisher, 
+        ISubscription subscriber, 
+        IDisposer disposer,
+        TKey? key = default,
+        TValue? value = default) : base(provider, factory, mediator, publisher, subscriber, disposer)
+    {
+        Key = key;
+        Value = value;
+    }
 }

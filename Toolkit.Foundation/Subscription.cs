@@ -120,7 +120,14 @@ public class Subscription(SubscriptionCollection subscriptions,
                 keys[attribute.Type] = value;
             }
 
-            value.Add(attribute.Key);
+            if (subscriber.GetPropertyValue(() => attribute.Key) is object key)
+            {
+                value.Add(key);
+            }
+            else
+            {
+                value.Add(attribute.Key);
+            }
         }
 
         return keys;

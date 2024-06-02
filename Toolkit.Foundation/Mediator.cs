@@ -32,7 +32,7 @@ public class Mediator(IHandlerProvider handlerProvider,
             }
         }
 
-        foreach (object? handler in handlerProvider.Get(messageType))
+        foreach (object? handler in handlerProvider.Get(messageType, key))
         {
             if (handler is not null)
             {

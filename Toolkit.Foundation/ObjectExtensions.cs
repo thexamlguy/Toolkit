@@ -8,9 +8,8 @@ public static class ObjectExtensions
     {
         Type type = obj.GetType();
 
-        object? key = selector();
-        if (type.GetProperty($"{key}") is PropertyInfo property
-            && property.GetValue(obj) is { } value)
+        object? key = selector();        
+        if (type.GetProperty($"{key}") is PropertyInfo property && property.GetValue(obj) is { } value)
         {
             return value;
         }
