@@ -199,12 +199,22 @@ public partial class ObservableCollection<TItem> :
             Clear();
         }
 
-        AggregateExpression expression = CreateAggregateExpression();
+        AggregateExpression expression = BuildAggregateExpression();
         Publisher.PublishUI(expression.Value, expression.Key);
     }
 
-    protected virtual IAggregate OnAggerate() =>
-        new AggerateEventArgs<TItem>();
+    public void Fetch(Func<AggregateExpression> aggregateDelegate,
+        bool reset = false)
+    {
+        if (reset)
+        {
+            Clear();
+        }
+
+        AggregateExpression expression = aggregateDelegate.Invoke();
+        Publisher.PublishUI(expression.Value, expression.Key);
+    }
+
 
     public void Clear()
     {
@@ -565,11 +575,8 @@ public partial class ObservableCollection<TItem> :
         collection.Insert(index > Count ? Count : index, item);
     }
 
-    protected virtual AggregateExpression CreateAggregateExpression() => 
-        new AggregateExpression(new AggerateEventArgs<TItem>());
-
-    protected virtual object? CreateAggregationKey() =>
-        default;
+    protected virtual AggregateExpression BuildAggregateExpression() => 
+        new(new AggerateEventArgs<TItem>());
 
     protected virtual void RemoveItem(int index) =>
         collection.RemoveAt(index);

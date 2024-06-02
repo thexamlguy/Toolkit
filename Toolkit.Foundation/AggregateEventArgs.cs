@@ -1,8 +1,7 @@
 ﻿namespace Toolkit.Foundation;
 
-public record AggregateEventArgs<TValue, TOptions>(TOptions? Options = null) :
-    IAggregate
-    where TOptions : class;
+public record AggerateEventArgs<TType, TValue>(TValue? Value = default) :
+    IAggregate;
 
-public record AggerateEventArgs<TValue> :
+public record AggerateEventArgs<TType> :
     IAggregate;

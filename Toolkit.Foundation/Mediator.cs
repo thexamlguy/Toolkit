@@ -8,17 +8,19 @@ public class Mediator(IHandlerProvider handlerProvider,
     IMediator
 {
     public async Task<TResponse?> Handle<TMessage, TResponse>(TMessage message,
+        object? key = null,
         CancellationToken cancellationToken = default)
         where TMessage : notnull
     {
         Type messageType = message.GetType();
-        Type handlerWrapperType = typeof(HandlerWrapper<,>).MakeGenericType(messageType, typeof(TResponse));
+        Type handlerWrapperType = typeof(HandlerWrapper<,>).MakeGenericType(messageType, 
+            typeof(TResponse));
 
         Dictionary<Type, List<object?>> handlers = [];
-
-        foreach (object? service in provider.GetServices(handlerWrapperType))
+        foreach (object? handler in key is not null ? provider.GetKeyedServices(handlerWrapperType, key) :
+            provider.GetServices(handlerWrapperType))
         {
-            if (service?.GetType() is Type serviceType)
+            if (handler?.GetType() is Type serviceType)
             {
                 if (!handlers.TryGetValue(serviceType, out List<object?>? handlerList))
                 {
@@ -26,7 +28,7 @@ public class Mediator(IHandlerProvider handlerProvider,
                     handlers.Add(serviceType, handlerList);
                 }
 
-                handlerList.Add(service);
+                handlerList.Add(handler);
             }
         }
 
@@ -60,26 +62,64 @@ public class Mediator(IHandlerProvider handlerProvider,
         return default;
     }
 
-    public Task<object?> Handle(object message,
+    public async Task<object?> Handle(object message,
+        object? key = null,
         CancellationToken cancellationToken = default)
     {
-        if (message.GetType().GetInterface(message.GetType().Name) is Type requestType &&
+        Type messageType = message.GetType();
+
+        if (messageType.GetInterface(message.GetType().Name) is Type requestType &&
             requestType.GetGenericArguments().Length == 1)
         {
             Type responseType = requestType.GetGenericArguments()[0];
-            Type handlerType = typeof(HandlerWrapper<,>).MakeGenericType(message.GetType(),
+            Type handlerWrapperType = typeof(HandlerWrapper<,>).MakeGenericType(message.GetType(),
                 responseType);
 
-            if (provider.GetService(handlerType)
-                is object handler)
+            Dictionary<Type, List<object?>> handlers = [];
+
+            foreach (object? handler in handlerProvider.Get(messageType))
             {
-                if (handlerType.GetMethod("Handle") is MethodInfo handleMethod)
+                if (handler is not null)
                 {
-                    return (Task<object?>)handleMethod.Invoke(handler, new object[] { message, cancellationToken })!;
+                    Type handlerType = handler.GetType();
+                    if (!handlers.TryGetValue(handlerType, out List<object?>? handlerList))
+                    {
+                        handlerList = [];
+                        handlers.Add(handlerType, handlerList);
+                    }
+
+                    handlerList.Add(handler);
+                }
+            }
+
+            foreach (object? handler in key is not null ? provider.GetKeyedServices(handlerWrapperType, key) :
+                provider.GetServices(handlerWrapperType))
+            {
+                if (handler?.GetType() is Type serviceType)
+                {
+                    if (!handlers.TryGetValue(serviceType, out List<object?>? handlerList))
+                    {
+                        handlerList = [];
+                        handlers.Add(serviceType, handlerList);
+                    }
+
+                    handlerList.Add(handler);
+                }
+            }
+
+            foreach (KeyValuePair<Type, List<object?>> handlerEntry in handlers)
+            {
+                foreach (object? handler in handlerEntry.Value)
+                {
+                    if (handler?.GetType().GetMethod("Handle", [messageType, typeof(CancellationToken)]) is MethodInfo handleMethod)
+                    {
+                        return await(Task<object?>)handleMethod.Invoke(handler,
+                            new object[] { message, cancellationToken })!;
+                    }
                 }
             }
         }
 
-        return Task.FromResult<object?>(default);
+        return default;
     }
 }
