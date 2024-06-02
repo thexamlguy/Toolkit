@@ -27,29 +27,11 @@ public class Mediator(IHandlerProvider handlerProvider,
         return default;
     }
 
-    public async IAsyncEnumerable<TResponse?> HandleMany<TMessage, TResponse>(TMessage message,
-        object? key = null,
-        [EnumeratorCancellation] CancellationToken cancellationToken = default)
-        where TMessage : notnull
-    {
-        List<object?> handlers = GetHandlers<TMessage, TResponse>(message, key);
-
-        foreach (object? handler in handlers)
-        {
-            MethodInfo? handleMethod = handler?.GetType().GetMethod("Handle", [message.GetType(), typeof(CancellationToken)]);
-            if (handleMethod != null)
-            {
-                yield return await (Task<TResponse?>)handleMethod.Invoke(handler, new object[] { message, cancellationToken })!;
-            }
-        }
-    }
-
     public async Task<object?> Handle(object message,
         object? key = null,
         CancellationToken cancellationToken = default)
     {
         Type messageType = message.GetType();
-
         if (messageType.GetInterface(message.GetType().Name) is Type requestType &&
             requestType.GetGenericArguments().Length == 1)
         {
@@ -71,6 +53,46 @@ public class Mediator(IHandlerProvider handlerProvider,
         return default;
     }
 
+    public async IAsyncEnumerable<object?> HandleMany(object message,
+        object? key = null,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        Type messageType = message.GetType();
+
+        if (messageType.GetInterface(message.GetType().Name) is Type requestType &&
+            requestType.GetGenericArguments().Length == 1)
+        {
+            Type responseType = requestType.GetGenericArguments()[0];
+            Type handlerWrapperType = typeof(HandlerWrapper<,>).MakeGenericType(message.GetType(), responseType);
+
+            List<object?> handlers = GetHandlers(message, handlerWrapperType, key);
+            foreach (object? handler in handlers)
+            {
+                MethodInfo? handleMethod = handler?.GetType().GetMethod("Handle", [messageType, typeof(CancellationToken)]);
+                if (handleMethod != null)
+                {
+                    yield return await (Task<object?>)handleMethod.Invoke(handler, new object[] { message, cancellationToken })!;
+                }
+            }
+        }
+    }
+
+    public async IAsyncEnumerable<TResponse?> HandleMany<TMessage, TResponse>(TMessage message,
+        object? key = null,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        where TMessage : notnull
+    {
+        List<object?> handlers = GetHandlers<TMessage, TResponse>(message, key);
+
+        foreach (object? handler in handlers)
+        {
+            MethodInfo? handleMethod = handler?.GetType().GetMethod("Handle", [message.GetType(), typeof(CancellationToken)]);
+            if (handleMethod != null)
+            {
+                yield return await (Task<TResponse?>)handleMethod.Invoke(handler, new object[] { message, cancellationToken })!;
+            }
+        }
+    }
     private List<object?> GetHandlers<TMessage, TResponse>(TMessage message, object? key)
         where TMessage : notnull
     {
