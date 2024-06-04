@@ -81,7 +81,7 @@ public partial class ObservableCollection<TItem> :
     [ObservableProperty]
     private int count;
 
-    private IDispatcher dispatcher;
+    private readonly IDispatcher dispatcher;
 
     [ObservableProperty]
     private bool initialized;
