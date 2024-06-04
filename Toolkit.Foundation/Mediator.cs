@@ -53,8 +53,34 @@ public class Mediator(IHandlerProvider handlerProvider,
         return default;
     }
 
-    public async IAsyncEnumerable<object?> HandleMany(object message,
+    public async Task<List<object?>> HandleMany(object message,
         object? key = null,
+        CancellationToken cancellationToken = default)
+    {
+        List<object?> responses = [];
+        await foreach (object? response in HandleManyAsync(message, key, cancellationToken))
+        {
+            responses.Add(response);
+        }
+        return responses;
+    }
+
+    public async Task<IList<TResponse?>> HandleMany<TMessage, TResponse>(TMessage message,
+        object? key = null,
+        CancellationToken cancellationToken = default)
+        where TMessage : notnull
+    {
+        List<TResponse?> responses = [];
+        await foreach (TResponse? response in HandleManyAsync<TMessage, TResponse>(message, key, cancellationToken))
+        {
+            responses.Add(response);
+        }
+
+        return responses;
+    }
+
+    public async IAsyncEnumerable<object?> HandleManyAsync(object message,
+                object? key = null,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         Type messageType = message.GetType();
@@ -76,14 +102,12 @@ public class Mediator(IHandlerProvider handlerProvider,
             }
         }
     }
-
-    public async IAsyncEnumerable<TResponse?> HandleMany<TMessage, TResponse>(TMessage message,
+    public async IAsyncEnumerable<TResponse?> HandleManyAsync<TMessage, TResponse>(TMessage message,
         object? key = null,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
         where TMessage : notnull
     {
         List<object?> handlers = GetHandlers<TMessage, TResponse>(message, key);
-
         foreach (object? handler in handlers)
         {
             MethodInfo? handleMethod = handler?.GetType().GetMethod("Handle", [message.GetType(), typeof(CancellationToken)]);
@@ -93,6 +117,7 @@ public class Mediator(IHandlerProvider handlerProvider,
             }
         }
     }
+
     private List<object?> GetHandlers<TMessage, TResponse>(TMessage message, object? key)
         where TMessage : notnull
     {

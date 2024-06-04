@@ -45,6 +45,8 @@ public class ComponentBuilder :
 
                 services.AddHandler<NavigateHandler>();
                 services.AddHandler<NavigateBackHandler>();
+
+                services.AddTransient<ICollectionSynchronizer, CollectionSynchronizer>();
             });
     }
 

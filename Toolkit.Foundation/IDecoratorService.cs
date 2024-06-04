@@ -1,6 +1,6 @@
 ﻿namespace Toolkit.Foundation;
 
-public interface IValueStore<T>
+public interface IDecoratorService<T>
 {
     T? Value { get; }
 

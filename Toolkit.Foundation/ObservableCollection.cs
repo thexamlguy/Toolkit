@@ -6,6 +6,40 @@ using System.Reactive.Disposables;
 
 namespace Toolkit.Foundation;
 
+public interface IIndexable
+{
+    int Index { get; }
+}
+
+public interface ICollectionSynchronization<TItem> 
+    where TItem : notnull
+{
+    int IndexOf(TItem item);
+}
+
+public interface ICollectionSynchronizer 
+{
+    void Set<TItem>(ICollectionSynchronization<TItem> collection)
+        where TItem : notnull;
+}
+
+public class CollectionSynchronizer(IServiceProvider serviceProvider) : 
+    ICollectionSynchronizer
+{
+    private readonly IServiceProvider serviceProvider = serviceProvider;
+
+    public void Set<TItem>(ICollectionSynchronization<TItem> collection) 
+        where TItem : notnull
+    {
+        if (serviceProvider.GetService<IDecoratorService<ICollectionSynchronization<TItem>>>() 
+            is IDecoratorService<ICollectionSynchronization<TItem>> decoratorService)
+        {
+            decoratorService.Set(collection);
+        }
+    }
+}
+
+
 public partial class ObservableCollection<TItem> :
     ObservableObject,
     IObservableCollectionViewModel<TItem>,
@@ -18,6 +52,7 @@ public partial class ObservableCollection<TItem> :
     IList,
     IReadOnlyList<TItem>,
     INotifyCollectionChanged,
+    ICollectionSynchronization<TItem>,
     IServiceProviderRequired,
     IServiceFactoryRequired,
     IMediatorRequired,
@@ -31,7 +66,7 @@ public partial class ObservableCollection<TItem> :
     INotificationHandler<MoveToEventArgs<TItem>>,
     INotificationHandler<ReplaceEventArgs<TItem>>,
     INotificationHandler<SelectionEventArgs<TItem>>
-    where TItem :
+    where TItem : notnull, 
     IDisposable
 {
     private readonly System.Collections.ObjectModel.ObservableCollection<TItem> collection = [];
@@ -54,13 +89,16 @@ public partial class ObservableCollection<TItem> :
     [ObservableProperty]
     private TItem? selectedItem;
 
-    public ObservableCollection(IServiceProvider provider,
+    public ObservableCollection(ICollectionSynchronizer synchronizer,
+        IServiceProvider provider,
         IServiceFactory factory,
         IMediator mediator,
         IPublisher publisher,
         ISubscription subscriber,
         IDisposer disposer)
     {
+        synchronizer.Set(this);
+
         Provider = provider;
         Factory = factory;
         Mediator = mediator;
@@ -73,7 +111,8 @@ public partial class ObservableCollection<TItem> :
         collection.CollectionChanged += OnCollectionChanged;
     }
 
-    public ObservableCollection(IServiceProvider provider,
+    public ObservableCollection(ICollectionSynchronizer synchronizer, 
+        IServiceProvider provider,
         IServiceFactory factory,
         IMediator mediator,
         IPublisher publisher,
@@ -81,6 +120,8 @@ public partial class ObservableCollection<TItem> :
         IDisposer disposer,
         IEnumerable<TItem> items)
     {
+        synchronizer.Set(this);
+
         Provider = provider;
         Factory = factory;
         Mediator = mediator;
@@ -623,21 +664,24 @@ public partial class ObservableCollection<TItem> :
     }
 }
 
-public partial class ObservableCollection<TValue, TViewModel>(IServiceProvider provider,
+public partial class ObservableCollection<TValue, TViewModel>(ICollectionSynchronizer synchronizer, 
+    IServiceProvider provider,
     IServiceFactory factory,
     IMediator mediator,
     IPublisher publisher,
-    ISubscription subscriber, IDisposer disposer) : ObservableCollection<TViewModel>(provider, factory, mediator, publisher, subscriber, disposer)
-    where TViewModel : IDisposable
+    ISubscription subscriber, IDisposer disposer) : ObservableCollection<TViewModel>(synchronizer, provider, factory, mediator, publisher, subscriber, disposer)
+    where TViewModel : notnull,
+    IDisposable
 {
     [ObservableProperty]
     private TValue? value;
 }
 
-public class ObservableCollection(IServiceProvider provider,
+public class ObservableCollection(ICollectionSynchronizer synchronizer,
+    IServiceProvider provider,
     IServiceFactory factory,
     IMediator mediator,
     IPublisher publisher,
     ISubscription subscriber,
     IDisposer disposer) :
-    ObservableCollection<IDisposable>(provider, factory, mediator, publisher, subscriber, disposer);
+    ObservableCollection<IDisposable>(synchronizer, provider, factory, mediator, publisher, subscriber, disposer);
