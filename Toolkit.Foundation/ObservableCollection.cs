@@ -18,7 +18,7 @@ public partial class ObservableCollection<TItem> :
     IList,
     IReadOnlyList<TItem>,
     INotifyCollectionChanged,
-    ISynchronizationCollection<TItem>,
+    ICollectionSynchronization<TItem>,
     IServiceProviderRequired,
     IServiceFactoryRequired,
     IMediatorRequired,

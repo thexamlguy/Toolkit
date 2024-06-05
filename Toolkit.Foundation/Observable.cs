@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System.ComponentModel;
 
 namespace Toolkit.Foundation;
 
@@ -139,5 +140,12 @@ public partial class Observable<TKey, TValue> : Observable
     {
         Key = key;
         Value = value;
+    }
+
+    partial void OnValueChanged(TValue? value) => OnValueChanged();
+
+    protected virtual void OnValueChanged()
+    {
+
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace Toolkit.Foundation;
 
-public interface IIndexable
+public interface IIndexed
 {
     public int Index { get; }
 }
