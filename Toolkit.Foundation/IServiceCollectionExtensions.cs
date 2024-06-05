@@ -106,8 +106,7 @@ public static class IServiceCollectionExtensions
                     }
 
                     if (key is not null)
-                    {
-                        
+                    {              
                         services.Add(new ServiceDescriptor(wrapperType, key, (provider, key) =>
                             provider.GetService<IServiceFactory>()?.Create(wrapperType,
                                     provider.GetRequiredKeyedService<THandler>(key),

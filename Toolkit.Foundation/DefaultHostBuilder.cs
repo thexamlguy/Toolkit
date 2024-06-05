@@ -65,8 +65,6 @@ public class DefaultHostBuilder :
                 services.AddHandler<NavigateHandler>();
                 services.AddHandler<NavigateBackHandler>();
 
-                services.AddTransient<ICollectionSynchronizer, CollectionSynchronizer>();
-
                 services.AddInitializer<ComponentInitializer>();
                 services.AddHostedService<AppService>();
             });

@@ -2,7 +2,7 @@
 
 public class HandlerWrapper<TRequest, TResponse>(IHandler<TRequest, TResponse> handler,
     IEnumerable<IPipelineBehaviour<TRequest, TResponse>> pipelineBehaviours)
-    where TRequest : class
+    where TRequest : notnull
 {
     private readonly IEnumerable<IPipelineBehaviour<TRequest, TResponse>> pipelineBehaviours =
         pipelineBehaviours.Reverse();
