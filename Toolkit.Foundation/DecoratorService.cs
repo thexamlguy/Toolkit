@@ -3,7 +3,7 @@
 public class DecoratorService<T> :
     IDecoratorService<T>
 {
-    public T? Value { get; private set; }
+    public T? Service { get; private set; }
 
-    public void Set(T value) => Value = value;
+    public void Set(T value) => Service = value;
 }
