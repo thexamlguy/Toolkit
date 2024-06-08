@@ -1,5 +1,4 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using System.ComponentModel;
 
 namespace Toolkit.Foundation;
 
@@ -109,19 +108,46 @@ public partial class Observable :
     }
 }
 
-public partial class Observable<TValue>(IServiceProvider provider,
-    IServiceFactory factory,
-    IMediator mediator,
-    IPublisher publisher,
-    ISubscription subscriber,
-    IDisposer disposer,
-    TValue? value = default) : Observable(provider, factory, mediator, publisher, subscriber, disposer)
+public partial class Observable<TValue> :
+    Observable
+    where TValue : notnull
 {
     [ObservableProperty]
-    private TValue? value = value;
+    private TValue? value;
+
+    public Observable(IServiceProvider provider,
+        IServiceFactory factory,
+        IMediator mediator,
+        IPublisher publisher,
+        ISubscription subscriber,
+        IDisposer disposer,
+        TValue value) : base(provider, factory, mediator, publisher, subscriber, disposer)
+    {
+        Value = value;
+    }
+
+    public Observable(IServiceProvider provider, 
+        IServiceFactory factory,
+        IMediator mediator,
+        IPublisher publisher, 
+        ISubscription subscriber, 
+        IDisposer disposer) : base(provider, factory, mediator, publisher, subscriber, disposer)
+    {
+
+    }
+
+    protected virtual void OnValueChanged()
+    {
+
+    }
+
+    partial void OnValueChanged(TValue? value) => OnValueChanged();
 }
 
-public partial class Observable<TKey, TValue> : Observable
+public partial class Observable<TKey, TValue> :
+    Observable
+    where TKey : notnull
+    where TValue : notnull
 {
     [ObservableProperty]
     private TKey? key;
@@ -129,23 +155,33 @@ public partial class Observable<TKey, TValue> : Observable
     [ObservableProperty]
     private TValue? value;
 
-    public Observable(IServiceProvider provider, 
+    public Observable(IServiceProvider provider,
         IServiceFactory factory,
-        IMediator mediator, 
+        IMediator mediator,
         IPublisher publisher, 
         ISubscription subscriber, 
         IDisposer disposer,
-        TKey? key = default,
-        TValue? value = default) : base(provider, factory, mediator, publisher, subscriber, disposer)
+        TKey key,
+        TValue value) : base(provider, factory, mediator, publisher, subscriber, disposer)
     {
         Key = key;
         Value = value;
     }
 
-    partial void OnValueChanged(TValue? value) => OnValueChanged();
+    public Observable(IServiceProvider provider,
+        IServiceFactory factory,
+        IMediator mediator,
+        IPublisher publisher,
+        ISubscription subscriber,
+        IDisposer disposer) : base(provider, factory, mediator, publisher, subscriber, disposer)
+    {
+
+    }
 
     protected virtual void OnValueChanged()
     {
 
     }
+
+    partial void OnValueChanged(TValue? value) => OnValueChanged();
 }

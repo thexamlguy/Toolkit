@@ -37,7 +37,10 @@ public partial class ObservableCollection<TItem> :
 {
     private readonly System.Collections.ObjectModel.ObservableCollection<TItem> collection = [];
 
+    private readonly IDispatcher dispatcher;
     private readonly Queue<object> pendingEvents = [];
+
+    private readonly Dictionary<string, object> trackedProperties = [];
 
     [ObservableProperty]
     private bool activated;
@@ -46,9 +49,6 @@ public partial class ObservableCollection<TItem> :
 
     [ObservableProperty]
     private int count;
-
-    private readonly IDispatcher dispatcher;
-
     [ObservableProperty]
     private bool initialized;
 
@@ -194,30 +194,6 @@ public partial class ObservableCollection<TItem> :
         }
     }
 
-    public void Fetch(bool reset = false)
-    {
-        if (reset)
-        {
-            Clear();
-        }
-
-        SynchronizeExpression expression = BuildAggregateExpression();
-        Publisher.PublishUI(expression.Value, expression.Key);
-    }
-
-    public void Fetch(Func<SynchronizeExpression> aggregateDelegate,
-        bool reset = false)
-    {
-        if (reset)
-        {
-            Clear();
-        }
-
-        SynchronizeExpression expression = aggregateDelegate.Invoke();
-        Publisher.PublishUI(expression.Value, expression.Key);
-    }
-
-
     public void Clear()
     {
         clearing = true;
@@ -230,6 +206,14 @@ public partial class ObservableCollection<TItem> :
 
         ClearItems();
         clearing = false;
+    }
+
+    public void Commit()
+    {
+        foreach (object trackedProperty in trackedProperties.Values)
+        {
+            ((dynamic)trackedProperty).Commit();
+        }
     }
 
     public bool Contains(TItem item) =>
@@ -256,6 +240,28 @@ public partial class ObservableCollection<TItem> :
         Disposer.Dispose(this);
     }
 
+    public void Fetch(bool reset = false)
+    {
+        if (reset)
+        {
+            Clear();
+        }
+
+        SynchronizeExpression expression = BuildAggregateExpression();
+        Publisher.PublishUI(expression.Value, expression.Key);
+    }
+
+    public void Fetch(Func<SynchronizeExpression> aggregateDelegate,
+        bool reset = false)
+    {
+        if (reset)
+        {
+            Clear();
+        }
+
+        SynchronizeExpression expression = aggregateDelegate.Invoke();
+        Publisher.PublishUI(expression.Value, expression.Key);
+    }
     public IEnumerator<TItem> GetEnumerator() =>
         collection.GetEnumerator();
 
@@ -554,6 +560,26 @@ public partial class ObservableCollection<TItem> :
         return true;
     }
 
+    public void Revert()
+    {
+        foreach (object trackedProperty in trackedProperties.Values)
+        {
+            ((dynamic)trackedProperty).Revert();
+        }
+    }
+
+    public void Track<T>(string propertyName, Func<T> getter, Action<T> setter)
+    {
+        if (!trackedProperties.ContainsKey(propertyName))
+        {
+            T initialValue = getter();
+            trackedProperties[propertyName] = new TrackedProperty<T>(initialValue, setter, getter);
+        }
+    }
+
+    protected virtual SynchronizeExpression BuildAggregateExpression() =>
+        new(new SynchronizeEventArgs<TItem>());
+
     protected virtual void ClearItems() =>
         collection.Clear();
 
@@ -576,10 +602,6 @@ public partial class ObservableCollection<TItem> :
 
         collection.Insert(index > Count ? Count : index, item);
     }
-
-    protected virtual SynchronizeExpression BuildAggregateExpression() => 
-        new(new SynchronizeEventArgs<TItem>());
-
     protected virtual void RemoveItem(int index) =>
         collection.RemoveAt(index);
 
@@ -629,18 +651,88 @@ public partial class ObservableCollection<TValue, TViewModel>(IServiceProvider p
     IServiceFactory factory,
     IMediator mediator,
     IPublisher publisher,
-    ISubscription subscriber, IDisposer disposer) : ObservableCollection<TViewModel>(provider, factory, mediator, publisher, subscriber, disposer)
-    where TViewModel : notnull,
-    IDisposable
+    ISubscription subscriber, 
+    IDisposer disposer,
+    TValue value) : ObservableCollection<TViewModel>(provider, factory, mediator, publisher, subscriber, disposer)
+    where TViewModel : notnull, IDisposable
+    where TValue : notnull
 {
     [ObservableProperty]
-    private TValue? value;
+    private TValue value = value;
+
+    protected virtual void OnValueChanged()
+    {
+
+    }
+
+    partial void OnValueChanged(TValue value) => OnValueChanged();
 }
 
-public class ObservableCollection(IServiceProvider provider,
-    IServiceFactory factory,
-    IMediator mediator,
-    IPublisher publisher,
-    ISubscription subscriber,
-    IDisposer disposer) :
-    ObservableCollection<IDisposable>(provider, factory, mediator, publisher, subscriber, disposer);
+public partial class ObservableCollection<TViewModel, TKey, TValue> : 
+    ObservableCollection<TViewModel>
+    where TViewModel : notnull, IDisposable
+    where TKey : notnull
+    where TValue : notnull
+   {
+    [ObservableProperty]
+    private TKey key;
+
+    [ObservableProperty]
+    private TValue value;
+
+    public ObservableCollection(IServiceProvider provider, 
+        IServiceFactory factory, 
+        IMediator mediator,
+        IPublisher publisher,
+        ISubscription subscriber,
+        IDisposer disposer,
+        TKey key,
+        TValue value) : base(provider, factory, mediator, publisher, subscriber, disposer)
+    {
+        Key = key;
+        Value = value;
+    }
+
+    public ObservableCollection(IServiceProvider provider,
+        IServiceFactory factory,
+        IMediator mediator,
+        IPublisher publisher,
+        ISubscription subscriber, 
+        IDisposer disposer, 
+        IEnumerable<TViewModel> items,
+        TKey key,
+        TValue value) : base(provider, factory, mediator, publisher, subscriber, disposer, items)
+    {
+        Key = key;
+        Value = value;
+    }
+
+    protected virtual void OnValueChanged()
+    {
+
+    }
+
+    partial void OnValueChanged(TValue value) => OnValueChanged();
+}
+
+public class ObservableCollection : ObservableCollection<IDisposable>
+{
+    public ObservableCollection(IServiceProvider provider,
+        IServiceFactory factory,
+        IMediator mediator,
+        IPublisher publisher,
+        ISubscription subscriber,
+        IDisposer disposer) : base(provider, factory, mediator, publisher, subscriber, disposer)
+    {
+    }
+
+    public ObservableCollection(IServiceProvider provider,
+        IServiceFactory factory,
+        IMediator mediator,
+        IPublisher publisher,
+        ISubscription subscriber,
+        IDisposer disposer,
+        IEnumerable<IDisposable> items) : base(provider, factory, mediator, publisher, subscriber, disposer, items)
+    {
+    }
+}
