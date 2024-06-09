@@ -2,7 +2,7 @@
 
 public record Activate
 {
-    public static ActivateEventArgs<TValue> As<TValue>(TValue value) => new(value);
+    public static ActivateEventArgs<TSender> As<TSender>(TSender sender) => new(sender);
 
-    public static ActivateEventArgs<TValue> As<TValue>() where TValue : new() => new(new TValue());
+    public static ActivateEventArgs<TSender> As<TSender>() where TSender : new() => new(new TSender());
 }

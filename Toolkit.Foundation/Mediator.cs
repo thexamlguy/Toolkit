@@ -27,41 +27,42 @@ public class Mediator(IHandlerProvider handlerProvider,
         return default;
     }
 
-    public async Task<object?> Handle(object message,
+    public async Task<object?> Handle(Type responseType, 
+        object message,
         object? key = null,
         CancellationToken cancellationToken = default)
     {
         Type messageType = message.GetType();
-        if (messageType.GetInterface(message.GetType().Name) is Type requestType &&
-            requestType.GetGenericArguments().Length == 1)
+        Type handlerWrapperType = typeof(HandlerWrapper<,>).MakeGenericType(message.GetType(), responseType);
+
+        List<object?> handlers = GetHandlers(message, handlerWrapperType, key);
+
+        foreach (object? handler in handlers)
         {
-            Type responseType = requestType.GetGenericArguments()[0];
-            Type handlerWrapperType = typeof(HandlerWrapper<,>).MakeGenericType(message.GetType(), responseType);
-
-            List<object?> handlers = GetHandlers(message, handlerWrapperType, key);
-
-            foreach (object? handler in handlers)
+            MethodInfo? handleMethod = handler?.GetType().GetMethod("Handle", [messageType, typeof(CancellationToken)]);
+            if (handleMethod != null)
             {
-                MethodInfo? handleMethod = handler?.GetType().GetMethod("Handle", [messageType, typeof(CancellationToken)]);
-                if (handleMethod != null)
-                {
-                    return await (Task<object?>)handleMethod.Invoke(handler, new object[] { message, cancellationToken })!;
-                }
+                dynamic task = handleMethod.Invoke(handler, new object[] { message, cancellationToken })!;
+                await task;
+
+                return task.Result;
             }
         }
 
         return default;
     }
 
-    public async Task<List<object?>> HandleMany(object message,
+    public async Task<List<object?>> HandleMany(Type responseType, 
+        object message,
         object? key = null,
         CancellationToken cancellationToken = default)
     {
         List<object?> responses = [];
-        await foreach (object? response in HandleManyAsync(message, key, cancellationToken))
+        await foreach (object? response in HandleManyAsync(responseType, message, key, cancellationToken))
         {
             responses.Add(response);
         }
+
         return responses;
     }
 
@@ -79,26 +80,21 @@ public class Mediator(IHandlerProvider handlerProvider,
         return responses;
     }
 
-    public async IAsyncEnumerable<object?> HandleManyAsync(object message,
-                object? key = null,
+    public async IAsyncEnumerable<object?> HandleManyAsync(Type responseType,
+        object message,
+        object? key = null,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         Type messageType = message.GetType();
+        Type handlerWrapperType = typeof(HandlerWrapper<,>).MakeGenericType(message.GetType(), responseType);
 
-        if (messageType.GetInterface(message.GetType().Name) is Type requestType &&
-            requestType.GetGenericArguments().Length == 1)
+        List<object?> handlers = GetHandlers(message, handlerWrapperType, key);
+        foreach (object? handler in handlers)
         {
-            Type responseType = requestType.GetGenericArguments()[0];
-            Type handlerWrapperType = typeof(HandlerWrapper<,>).MakeGenericType(message.GetType(), responseType);
-
-            List<object?> handlers = GetHandlers(message, handlerWrapperType, key);
-            foreach (object? handler in handlers)
+            MethodInfo? handleMethod = handler?.GetType().GetMethod("Handle", [messageType, typeof(CancellationToken)]);
+            if (handleMethod != null)
             {
-                MethodInfo? handleMethod = handler?.GetType().GetMethod("Handle", [messageType, typeof(CancellationToken)]);
-                if (handleMethod != null)
-                {
-                    yield return await (Task<object?>)handleMethod.Invoke(handler, new object[] { message, cancellationToken })!;
-                }
+                yield return await (Task<object?>)handleMethod.Invoke(handler, new object[] { message, cancellationToken })!;
             }
         }
     }

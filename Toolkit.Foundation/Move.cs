@@ -2,9 +2,7 @@
 
 public record Move
 {
-    public static MoveEventArgs<TValue> As<TValue>(int index, TValue value) =>
-        new(index, value);
+    public static MoveEventArgs<TSender> As<TSender>(int index, TSender sender) => new(index, sender);
 
-    public static InsertEventArgs<TValue> As<TValue>(int index) where TValue : new() =>
-        new(index, new TValue());
+    public static InsertEventArgs<TSender> As<TSender>(int index) where TSender : new() => new(index, new TSender());
 }

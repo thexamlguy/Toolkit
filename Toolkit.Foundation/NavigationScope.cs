@@ -3,6 +3,7 @@
 namespace Toolkit.Foundation;
 
 public class NavigationScope(IPublisher publisher,
+    IMediator mediator,
     IServiceProvider provider,
     IServiceFactory factory,
     INavigationProvider navigationProvider,
@@ -10,7 +11,7 @@ public class NavigationScope(IPublisher publisher,
     IContentTemplateDescriptorProvider contentTemplateDescriptorProvider) :
     INavigationScope
 {
-    public void Navigate(string route,
+    public async void Navigate(string route,
         object? sender = null,
         object? region = null,
         EventHandler? navigated = null,
@@ -63,16 +64,34 @@ public class NavigationScope(IPublisher publisher,
 
                     if (region is not null)
                     {
-                        if ((resolvedArguments is { Length: > 0 }
-                            ? factory.Create(descriptor.ContentType, resolvedArguments)
-                            : provider.GetRequiredKeyedService(descriptor.ContentType, segment)) is object viewModel)
+                        Type createEventType = typeof(CreateEventArgs<>).MakeGenericType(descriptor.ContentType);
+
+                        object? content = null;
+                        if (Activator.CreateInstance(createEventType, [null, resolvedArguments]) is object createEvent)
+                        {
+                            content = await mediator.Handle(descriptor.ContentType, createEvent, descriptor.Key);
+                        }
+
+                        if (content is null)
+                        {
+                            if (resolvedArguments is { Length: > 0 })
+                            {
+                                content = factory.Create(descriptor.ContentType, resolvedArguments);
+                            }
+                            else
+                            {
+                                content = provider.GetRequiredKeyedService(descriptor.ContentType, segment);
+                            }
+                        }
+
+                        if (content is not null)
                         {
                             if (navigationProvider.Get(region is Type type ? type : region.GetType()) is INavigation navigation)
                             {
-                                Type navigateType = typeof(NavigateEventArgs<>).MakeGenericType(navigation.Type);
-                                if (Activator.CreateInstance(navigateType, [region, view, viewModel, sender, parameters]) is object navigate)
+                                Type navigateEventType = typeof(NavigateEventArgs<>).MakeGenericType(navigation.Type);
+                                if (Activator.CreateInstance(navigateEventType, [region, view, content, sender, parameters]) is object navigateEvent)
                                 {
-                                    publisher.Publish(navigate);
+                                    publisher.Publish(navigateEvent);
                                     if (currentSegmentIndex == segmentCount)
                                     {
                                         navigated?.Invoke(this, EventArgs.Empty);

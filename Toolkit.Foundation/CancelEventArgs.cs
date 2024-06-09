@@ -1,3 +1,3 @@
 ﻿namespace Toolkit.Foundation;
 
-public record CancelEventArgs<TValue>(TValue Value);
+public record CancelEventArgs<TSender>(TSender sender);

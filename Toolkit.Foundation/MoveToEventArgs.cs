@@ -1,3 +1,3 @@
 ﻿namespace Toolkit.Foundation;
 
-public record MoveToEventArgs<TValue>(int OldIndex, int NewIndex);
+public record MoveToEventArgs<TSender>(int OldIndex, int NewIndex);

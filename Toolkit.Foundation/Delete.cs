@@ -2,9 +2,9 @@
 
 public record Delete
 {
-    public static DeleteEventArgs<TValue> As<TValue>(TValue value) =>
-        new(value);
+    public static DeleteEventArgs<TSender> As<TSender>(TSender sender) =>
+        new(sender);
 
-    public static DeleteEventArgs<TValue> As<TValue>() where TValue : new() =>
-        new(new TValue());
+    public static DeleteEventArgs<TSender> As<TSender>() where TSender : new() =>
+        new(new TSender());
 }

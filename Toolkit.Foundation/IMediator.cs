@@ -2,7 +2,8 @@
 
 public interface IMediator
 {
-    Task<object?> Handle(object message,
+    Task<object?> Handle(Type responseType,
+        object message,
         object? key = null,
         CancellationToken cancellationToken = default);
 
@@ -11,7 +12,8 @@ public interface IMediator
         CancellationToken cancellationToken = default)
         where TMessage : notnull;
 
-    IAsyncEnumerable<object?> HandleManyAsync(object message,
+    IAsyncEnumerable<object?> HandleManyAsync(Type responseType,
+        object message,
         object? key = null,
         CancellationToken cancellationToken = default);
 

@@ -155,6 +155,12 @@ public partial class ObservableCollection<TItem> :
         return item;
     }
 
+    public void Clear(Action<ObservableCollection<TItem>> factory)
+    {
+        Clear();
+        factory.Invoke(this);
+    }
+
     public void Add(TItem item)
     {
         int index = collection.Count;
@@ -274,7 +280,7 @@ public partial class ObservableCollection<TItem> :
         {
             foreach (TItem item in this.ToList())
             {
-                if (args.Value is not null && args.Value.Equals(item))
+                if (args.Sender is not null && args.Sender.Equals(item))
                 {
                     Remove(item);
                 }
@@ -292,7 +298,7 @@ public partial class ObservableCollection<TItem> :
     {
         if (Activated)
         {
-            if (args.Value is TItem item)
+            if (args.Sender is TItem item)
             {
                 Add(item);
             }
@@ -340,7 +346,7 @@ public partial class ObservableCollection<TItem> :
     {
         if (Activated)
         {
-            if (args.Value is TItem item)
+            if (args.Sender is TItem item)
             {
                 Move(args.Index, item);
             }
@@ -357,7 +363,7 @@ public partial class ObservableCollection<TItem> :
     {
         if (Activated)
         {
-            if (args.Value is TItem item)
+            if (args.Sender is TItem item)
             {
                 Replace(args.Index, item);
             }
@@ -715,7 +721,8 @@ public partial class ObservableCollection<TViewModel, TKey, TValue> :
     partial void OnValueChanged(TValue value) => OnValueChanged();
 }
 
-public class ObservableCollection : ObservableCollection<IDisposable>
+public class ObservableCollection : 
+    ObservableCollection<IDisposable>
 {
     public ObservableCollection(IServiceProvider provider,
         IServiceFactory factory,

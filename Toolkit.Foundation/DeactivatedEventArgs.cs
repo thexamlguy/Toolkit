@@ -1,3 +1,3 @@
 ﻿namespace Toolkit.Foundation;
 
-public record DeactivatedEventArgs<TValue>(TValue? Value = default);
+public record DeactivatedEventArgs<TSender>(TSender? Sender = default);

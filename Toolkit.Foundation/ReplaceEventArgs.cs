@@ -1,3 +1,3 @@
 ﻿namespace Toolkit.Foundation;
 
-public record ReplaceEventArgs<TValue>(int Index, TValue Value);
+public record ReplaceEventArgs<TSender>(int Index, TSender? Sender = default);

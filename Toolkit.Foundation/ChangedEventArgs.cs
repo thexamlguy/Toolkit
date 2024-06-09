@@ -1,3 +1,3 @@
 ﻿namespace Toolkit.Foundation;
 
-public record ChangedEventArgs<TValue>(TValue? Value = default);
+public record ChangedEventArgs<TSender>(TSender? Sender = default);

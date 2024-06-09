@@ -59,7 +59,7 @@ public partial class ComponentConfigurationViewModel<TConfiguration, TValue, TAc
 
     public Task Handle(ChangedEventArgs<TConfiguration> args)
     {
-        if (args.Value is TConfiguration configuration)
+        if (args.Sender is TConfiguration configuration)
         {
             Value = valueDelegate.Invoke(configuration);
         }
@@ -101,7 +101,7 @@ public partial class ComponentConfigurationViewModel<TConfiguration, TValue, TDe
 
     public Task Handle(ChangedEventArgs<TConfiguration> args)
     {
-        if (args.Value is TConfiguration configuration)
+        if (args.Sender is TConfiguration configuration)
         {
             Value = valueDelegate.Invoke(configuration);
         }
