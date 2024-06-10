@@ -315,7 +315,7 @@ public partial class ObservableCollection<TItem> :
     {
         if (Activated)
         {
-            if (args.Value is TItem item)
+            if (args.Sender is TItem item)
             {
                 Insert(args.Index, item);
             }

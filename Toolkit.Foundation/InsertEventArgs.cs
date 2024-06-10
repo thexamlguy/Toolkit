@@ -1,3 +1,3 @@
 ﻿namespace Toolkit.Foundation;
 
-public record InsertEventArgs<TValue>(int Index, TValue Value);
+public record InsertEventArgs<TSender>(int Index, TSender Sender);
