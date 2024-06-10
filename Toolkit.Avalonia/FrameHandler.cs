@@ -40,8 +40,7 @@ public class FrameHandler :
                                         await deactivated.OnDeactivated();
                                     }
 
-                                    
-                                    if (content is not IBackStack)
+                                    if (content is not INavigationBackStack)
                                     {
                                         if (content is IDisposable disposable)
                                         {
@@ -115,6 +114,27 @@ public class FrameHandler :
                 NavigatedTo(control);
 
                 FrameNavigationOptions navigationOptions = new();
+                List<Action> postNavigateActions = [];
+
+                void CleanUp()
+                {
+                    foreach (PageStackEntry? entry in frame.BackStack)
+                    {
+                        if (entry.Context is Control control)
+                        {
+                            if (control.DataContext is object content)
+                            {
+                                if (content is IDisposable disposable)
+                                {
+                                    disposable.Dispose();
+                                }
+                            }
+                        }
+                    }
+
+                    frame.BackStack.Clear();
+                }
+
                 if (args.Parameters is not null)
                 {
                     if (args.Parameters.TryGetValue("Transition", out object? transition))
@@ -133,18 +153,32 @@ public class FrameHandler :
                                 break;
                         }
 
-                        if (args.Parameters.TryGetValue("NavigationStackEnabled", out object? navigationStackEnabled))
+                        if (args.Parameters.TryGetValue("IsBackStackEnabled", out object? isBackStackEnabled))
                         {
-                            if (navigationStackEnabled is bool value)
+                            if (isBackStackEnabled is bool value)
                             {
                                 navigationOptions.IsNavigationStackEnabled = value;
+                            }
+                        }
+
+                        if (args.Parameters.TryGetValue("ClearBackStack", out object? clearBackStack))
+                        {
+                            if (clearBackStack is bool value)
+                            {
+                                if (value)
+                                {
+                                    postNavigateActions.Add(() => CleanUp());
+                                }
                             }
                         }
                     }
                 }
 
-
                 frame.NavigateFromObject(control, navigationOptions);
+                foreach (Action postAction in postNavigateActions)
+                {
+                    postAction.Invoke();
+                }
             }
         }
 
