@@ -1,4 +1,5 @@
-﻿using Toolkit.Foundation;
+﻿using FluentAvalonia.Core;
+using Toolkit.Foundation;
 using Toolkit.UI.Controls.Avalonia;
 
 namespace Toolkit.Avalonia;
@@ -20,10 +21,24 @@ public class ContentDialogHandler(IDispatcher dispatcher) :
                 {
                     if (content is IPrimaryConfirmation primaryConfirmation)
                     {
+                        List<Action> postActions = [];
+                        if (content is IActivityIndicator activityIndicator)
+                        {
+                            activityIndicator.Active = true;
+                            postActions.Add(() => activityIndicator.Active = false);
+                        }
+
+                        Deferral deferral = args.GetDeferral();
                         if (!await primaryConfirmation.Confirm())
                         {
                             args.Cancel = true;
                             contentDialog.PrimaryButtonClick += HandlePrimaryButtonClick;
+                        }
+
+                        deferral.Complete();
+                        foreach (Action action in postActions)
+                        {
+                            action.Invoke();
                         }
                     }
                 }
@@ -37,10 +52,24 @@ public class ContentDialogHandler(IDispatcher dispatcher) :
                 {
                     if (content is ISecondaryConfirmation secondaryConfirmation)
                     {
+                        List<Action> postActions = [];
+                        if (content is IActivityIndicator activityIndicator)
+                        {
+                            activityIndicator.Active = true;
+                            postActions.Add(() => activityIndicator.Active = false);
+                        }
+
+                        Deferral deferral = args.GetDeferral();
                         if (!await secondaryConfirmation.Confirm())
                         {
                             args.Cancel = true;
                             contentDialog.SecondaryButtonClick += HandleSecondaryButtonClick;
+                        }
+
+                        deferral.Complete();
+                        foreach (Action action in postActions)
+                        {
+                            action.Invoke();
                         }
                     }
                 }
@@ -57,10 +86,24 @@ public class ContentDialogHandler(IDispatcher dispatcher) :
                     {
                         if (content is IConfirmation confirmation)
                         {
+                            List<Action> postActions = [];
+                            if (content is IActivityIndicator activityIndicator)
+                            {
+                                activityIndicator.Active = true;
+                                postActions.Add(() => activityIndicator.Active = false);
+                            }
+
+                            Deferral deferral = args.GetDeferral();
                             if (!await confirmation.Confirm())
                             {
                                 args.Cancel = true;
                                 contentDialog.Closing += HandleClosing;
+                            }
+
+                            deferral.Complete();
+                            foreach (Action action in postActions)
+                            {
+                                action.Invoke();
                             }
                         }
                     }

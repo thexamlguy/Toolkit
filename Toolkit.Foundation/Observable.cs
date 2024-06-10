@@ -5,6 +5,7 @@ namespace Toolkit.Foundation;
 public partial class Observable :
     ObservableObject,
     IObservableViewModel,
+    IActivityIndicator,
     IInitializer,
     IActivated,
     IDeactivating,
@@ -20,9 +21,13 @@ public partial class Observable :
     private readonly Dictionary<string, object> trackedProperties = [];
 
     [ObservableProperty]
-    private bool isInitialized;
+    private bool initialized;
 
-    public Observable(IServiceProvider provider,
+    [ObservableProperty]
+    private bool active;
+
+    public Observable(IServiceProvider
+        provider,
         IServiceFactory factory,
         IMediator mediator,
         IPublisher publisher,
@@ -72,12 +77,12 @@ public partial class Observable :
 
     public Task Initialize()
     {
-        if (IsInitialized)
+        if (Initialized)
         {
             return Task.CompletedTask;
         }
 
-        IsInitialized = true;
+        Initialized = true;
         return Task.CompletedTask;
     }
 
