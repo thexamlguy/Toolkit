@@ -113,7 +113,7 @@ public partial class Observable<TValue> :
     where TValue : notnull
 {
     [ObservableProperty]
-    private TValue? value;
+    private TValue value;
 
     public Observable(IServiceProvider provider,
         IServiceFactory factory,
@@ -126,22 +126,12 @@ public partial class Observable<TValue> :
         Value = value;
     }
 
-    public Observable(IServiceProvider provider, 
-        IServiceFactory factory,
-        IMediator mediator,
-        IPublisher publisher, 
-        ISubscription subscriber, 
-        IDisposer disposer) : base(provider, factory, mediator, publisher, subscriber, disposer)
-    {
-
-    }
-
     protected virtual void OnValueChanged()
     {
 
     }
 
-    partial void OnValueChanged(TValue? value) => OnValueChanged();
+    partial void OnValueChanged(TValue value) => OnValueChanged();
 }
 
 public partial class Observable<TKey, TValue> :
@@ -150,10 +140,10 @@ public partial class Observable<TKey, TValue> :
     where TValue : notnull
 {
     [ObservableProperty]
-    private TKey? key;
+    private TKey key;
 
     [ObservableProperty]
-    private TValue? value;
+    private TValue value;
 
     public Observable(IServiceProvider provider,
         IServiceFactory factory,
@@ -168,20 +158,10 @@ public partial class Observable<TKey, TValue> :
         Value = value;
     }
 
-    public Observable(IServiceProvider provider,
-        IServiceFactory factory,
-        IMediator mediator,
-        IPublisher publisher,
-        ISubscription subscriber,
-        IDisposer disposer) : base(provider, factory, mediator, publisher, subscriber, disposer)
-    {
-
-    }
-
     protected virtual void OnValueChanged()
     {
 
     }
 
-    partial void OnValueChanged(TValue? value) => OnValueChanged();
+    partial void OnValueChanged(TValue value) => OnValueChanged();
 }
