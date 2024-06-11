@@ -1,3 +1,3 @@
 ﻿namespace Toolkit.Foundation;
 
-public record QueryEventArgs<TValue>(TValue Value);
+public record QueryEventArgs<TSender>(TSender Sender);
