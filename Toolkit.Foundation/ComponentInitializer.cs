@@ -7,7 +7,7 @@ public class ComponentInitializer(IEnumerable<IComponent> components,
     IComponentHostCollection hosts,
     IComponentScopeCollection scopes,
     IServiceProvider provider) :
-    IInitializer
+    IInitialization
 {
     public async Task Initialize()
     {

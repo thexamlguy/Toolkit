@@ -16,10 +16,10 @@ public class ContentTemplate :
         {
             if (observableViewModel.Provider is IServiceProvider provider)
             {
-                IContentTemplateDescriptorProvider? contentTemplateProvider = provider.GetService<IContentTemplateDescriptorProvider>();
-                INavigationRegion? viewModelContentBinder = provider.GetService<INavigationRegion>();
+                Type itemType = item.GetType();
 
-                if (contentTemplateProvider?.Get(item.GetType().Name) is IContentTemplateDescriptor descriptor)
+                if (provider.GetRequiredKeyedService<IContentTemplateDescriptor>(itemType.Name.Replace("ViewModel", ""))
+                    is IContentTemplateDescriptor descriptor)
                 {
                     if (provider.GetRequiredKeyedService(descriptor.TemplateType, descriptor.Key) is Control control)
                     {
@@ -28,7 +28,7 @@ public class ContentTemplate :
                             control.Loaded -= HandleLoaded;
                             if (control.DataContext is object content)
                             {
-                                if (content is IInitializer initializer)
+                                if (content is IInitialization initializer)
                                 {
                                     await initializer.Initialize();
                                 }

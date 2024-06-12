@@ -129,7 +129,7 @@ public class ContentDialogHandler(IDispatcher dispatcher) :
 
                     // A hack to wait for the dialog to finish loading up to make it appear more responsive
                     await Task.Delay(250);
-                    if (content is IInitializer initializer)
+                    if (content is IInitialization initializer)
                     {
                         await initializer.Initialize();
                     }

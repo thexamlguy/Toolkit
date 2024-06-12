@@ -3,6 +3,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Toolkit.Foundation;
+using Toolkit.UI.Controls.Avalonia;
 
 namespace Toolkit.Avalonia;
 
@@ -128,11 +129,11 @@ public static class IServiceCollectionExtensions
         services.AddTransient<IContentTemplate, ContentTemplate>();
         services.AddTransient<INavigationRegion, NavigationRegion>();
 
-        services.AddNavigateHandler<ClassicDesktopStyleApplicationHandler>();
-        services.AddNavigateHandler<SingleViewApplicationHandler>();
-        services.AddNavigateHandler<ContentControlHandler>();
-        services.AddNavigateHandler<FrameHandler>();
-        services.AddNavigateHandler<ContentDialogHandler>();
+        services.AddHandler<ClassicDesktopStyleApplicationHandler>(nameof(IClassicDesktopStyleApplicationLifetime));
+        services.AddHandler<SingleViewApplicationHandler>(nameof(ISingleViewApplicationLifetime));
+        services.AddHandler<ContentControlHandler>(nameof(ContentControl));
+        services.AddHandler<FrameHandler>(nameof(Frame));
+        services.AddHandler<ContentDialogHandler>(nameof(ContentDialog));
 
         services.AddScoped<INavigationRegionCollection, NavigationRegionCollection>(provider => new NavigationRegionCollection
         {
@@ -144,15 +145,13 @@ public static class IServiceCollectionExtensions
             new ProxyServiceCollection<IComponentBuilder>(services =>
             {
                 services.AddSingleton(provider.GetRequiredService<IDispatcher>());
-
-                services.AddTransient<IContentTemplateDescriptorProvider, ContentTemplateDescriptorProvider>();
                 services.AddTransient<IContentTemplate, ContentTemplate>();
 
                 services.AddTransient<INavigationRegion, NavigationRegion>();
 
-                services.AddNavigateHandler<ContentControlHandler>();
-                services.AddNavigateHandler<FrameHandler>();
-                services.AddNavigateHandler<ContentDialogHandler>();
+                services.AddHandler<ContentControlHandler>(nameof(ContentControl));
+                services.AddHandler<FrameHandler>(nameof(Frame));
+                services.AddHandler<ContentDialogHandler>(nameof(ContentDialog));
             })));
 
         return services;

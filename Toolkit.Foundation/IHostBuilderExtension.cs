@@ -156,7 +156,7 @@ public static class IHostBuilderExtension
                 services.TryAddKeyedTransient<IConfigurationFactory<TConfiguration>>(section, (provider, key) =>
                     new ConfigurationFactory<TConfiguration>(() => defaultConfiguration ?? provider.GetRequiredKeyedService<TConfiguration>(key)));
 
-                services.AddTransient<IInitializer, ConfigurationInitializer<TConfiguration>>(provider =>
+                services.AddTransient<IInitialization, ConfigurationInitializer<TConfiguration>>(provider =>
                     new ConfigurationInitializer<TConfiguration>(provider.GetRequiredKeyedService<IConfigurationReader<TConfiguration>>(section),
                         provider.GetRequiredKeyedService<IConfigurationWriter<TConfiguration>>(section),
                         provider.GetRequiredKeyedService<IConfigurationFactory<TConfiguration>>(section),

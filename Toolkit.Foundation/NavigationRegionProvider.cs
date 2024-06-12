@@ -1,15 +1,15 @@
 ﻿namespace Toolkit.Foundation;
 
-public class NavigationRegionProvider(INavigationRegionCollection contexts) :
+public class NavigationRegionProvider(INavigationRegionCollection collection) :
     INavigationRegionProvider
 {
     public object? Get(object key) =>
-        contexts.TryGetValue(key, out object? target) ? target : default;
+        collection.TryGetValue(key, out object? target) ? target : default;
 
     public bool TryGet(object name,
         out object? value)
     {
-        if (contexts.TryGetValue(name,
+        if (collection.TryGetValue(name,
             out object? target))
         {
             value = target;

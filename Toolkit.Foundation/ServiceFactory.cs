@@ -17,4 +17,13 @@ public class ServiceFactory(Func<Type, object?[]?, object> factory) :
 
     public object Create(Type type, params object?[]? parameters) =>
         factory(type, parameters);
+
+    public object Create(Type type, Action<object> serviceDelegate, 
+        params object?[]? parameters)
+    {
+        object service = factory(type, parameters);
+        serviceDelegate.Invoke(service);
+
+        return service;
+    }
 }

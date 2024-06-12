@@ -1,8 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Toolkit.Foundation;
-
 public static class IServiceCollectionExtensions
 {
     public static IServiceCollection AddCache<TKey, TValue>(this IServiceCollection services)
@@ -132,31 +130,9 @@ public static class IServiceCollectionExtensions
 
     public static IServiceCollection AddInitializer<TInitializer>(this IServiceCollection services)
         where TInitializer : class,
-        IInitializer
+        IInitialization
     {
-        services.AddTransient<IInitializer, TInitializer>();
-        return services;
-    }
-
-    public static IServiceCollection AddNavigateHandler<THandler>(this IServiceCollection services)
-        where THandler : INavigateHandler,
-        IHandler
-    {
-        IEnumerable<Type> contracts = typeof(THandler).GetInterfaces()
-            .Where(x => x.Name == typeof(INavigateHandler<>).Name || x.Name == typeof(INavigateBackHandler<>).Name);
-
-        foreach (Type contract in contracts)
-        {
-            if (contract.GetGenericArguments() is { Length: 1 } arguments)
-            {
-                services.AddTransient<INavigation>(provider => new Navigation
-                {
-                    Type = arguments[0]
-                });
-            }
-        }
-
-        services.AddHandler<THandler>();
+        services.AddTransient<IInitialization, TInitializer>();
         return services;
     }
 
@@ -205,7 +181,7 @@ public static class IServiceCollectionExtensions
 
         services.Add(new ServiceDescriptor(viewType, key, viewType, serviceLifetime));
 
-        services.AddTransient<IContentTemplateDescriptor>(provider =>
+        services.AddKeyedTransient<IContentTemplateDescriptor>(key, (provider, _) =>
             new ContentTemplateDescriptor(key, viewModelType, viewType, parameters));
 
         return services;

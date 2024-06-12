@@ -19,7 +19,7 @@ public class ContentControlHandler :
                     control.Loaded -= HandleLoaded;
                     if (control.DataContext is object content)
                     {
-                        if (content is IInitializer initializer)
+                        if (content is IInitialization initializer)
                         {
                             await initializer.Initialize();
                         }

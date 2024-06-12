@@ -5,7 +5,7 @@ public class ConfigurationInitializer<TConfiguration>(IConfigurationReader<TConf
     IConfigurationFactory<TConfiguration> factory,
     IPublisher publisher) :
     IConfigurationInitializer<TConfiguration>,
-    IInitializer
+    IInitialization
     where TConfiguration :
     class
 {

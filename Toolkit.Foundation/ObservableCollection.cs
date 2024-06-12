@@ -9,7 +9,8 @@ namespace Toolkit.Foundation;
 public partial class ObservableCollection<TItem> :
     ObservableObject,
     IObservableCollectionViewModel<TItem>,
-    IInitializer,
+    IPostInitialization,
+    IInitialization,
     IActivated,
     IDeactivating,
     IDeactivated,
@@ -32,7 +33,7 @@ public partial class ObservableCollection<TItem> :
     INotificationHandler<MoveToEventArgs<TItem>>,
     INotificationHandler<ReplaceEventArgs<TItem>>,
     INotificationHandler<SelectionEventArgs<TItem>>
-    where TItem : notnull, 
+    where TItem : notnull,
     IDisposable
 {
     private readonly System.Collections.ObjectModel.ObservableCollection<TItem> collection = [];
@@ -52,6 +53,8 @@ public partial class ObservableCollection<TItem> :
     [ObservableProperty]
     private bool initialized;
 
+    private bool postInitialized;
+
     [ObservableProperty]
     private TItem? selectedItem;
 
@@ -59,16 +62,15 @@ public partial class ObservableCollection<TItem> :
         IServiceFactory factory,
         IMediator mediator,
         IPublisher publisher,
-        ISubscription subscriber,
+        ISubscriber subscriber,
         IDisposer disposer)
     {
         Provider = provider;
         Factory = factory;
         Mediator = mediator;
         Publisher = publisher;
+        Subscriber = subscriber;
         Disposer = disposer;
-
-        subscriber.Add(this);
 
         dispatcher = Provider.GetRequiredService<IDispatcher>();
         collection.CollectionChanged += OnCollectionChanged;
@@ -78,7 +80,7 @@ public partial class ObservableCollection<TItem> :
         IServiceFactory factory,
         IMediator mediator,
         IPublisher publisher,
-        ISubscription subscriber,
+        ISubscriber subscriber,
         IDisposer disposer,
         IEnumerable<TItem> items)
     {
@@ -86,9 +88,8 @@ public partial class ObservableCollection<TItem> :
         Factory = factory;
         Mediator = mediator;
         Publisher = publisher;
+        Subscriber = subscriber;
         Disposer = disposer;
-
-        subscriber.Add(this);
 
         dispatcher = Provider.GetRequiredService<IDispatcher>();
         collection.CollectionChanged += OnCollectionChanged;
@@ -117,6 +118,7 @@ public partial class ObservableCollection<TItem> :
     public IServiceProvider Provider { get; private set; }
 
     public IPublisher Publisher { get; private set; }
+    public ISubscriber Subscriber { get; }
 
     object ICollection.SyncRoot => this;
 
@@ -149,16 +151,17 @@ public partial class ObservableCollection<TItem> :
         where T :
         TItem
     {
-        T? item = Factory.Create<T>(parameters);
+        T? item = Factory.Create<T>(args => 
+        { 
+            if (args is IPostInitialization initialization)
+            {
+                initialization.PostInitialize();
+            }
+        }, parameters);
+
         Add(item);
 
         return item;
-    }
-
-    public void Clear(Action<ObservableCollection<TItem>> factory)
-    {
-        Clear();
-        factory.Invoke(this);
     }
 
     public void Add(TItem item)
@@ -200,6 +203,11 @@ public partial class ObservableCollection<TItem> :
         }
     }
 
+    public void Clear(Action<ObservableCollection<TItem>> factory)
+    {
+        Clear();
+        factory.Invoke(this);
+    }
     public void Clear()
     {
         clearing = true;
@@ -246,17 +254,6 @@ public partial class ObservableCollection<TItem> :
         Disposer.Dispose(this);
     }
 
-    public void Fetch(bool reset = false)
-    {
-        if (reset)
-        {
-            Clear();
-        }
-
-        SynchronizeExpression expression = BuildAggregateExpression();
-        Publisher.PublishUI(expression.Value, expression.Key);
-    }
-
     public void Fetch(Func<SynchronizeExpression> aggregateDelegate,
         bool reset = false)
     {
@@ -268,6 +265,7 @@ public partial class ObservableCollection<TItem> :
         SynchronizeExpression expression = aggregateDelegate.Invoke();
         Publisher.PublishUI(expression.Value, expression.Key);
     }
+
     public IEnumerator<TItem> GetEnumerator() =>
         collection.GetEnumerator();
 
@@ -413,7 +411,7 @@ public partial class ObservableCollection<TItem> :
         }
 
         Initialized = true;
-        Fetch();
+        Synchronize();
 
         return Task.CompletedTask;
     }
@@ -423,14 +421,21 @@ public partial class ObservableCollection<TItem> :
         where T :
         TItem
     {
-        T? item = Factory.Create<T>(parameters);
+        T? item = Factory.Create<T>(args =>
+        {
+            if (args is IPostInitialization initialization)
+            {
+                initialization.PostInitialize();
+            }
+        }, parameters);
+
         InsertItem(index, item);
         UpdateSelection(item);
 
         return item;
     }
 
-    public void Insert(int index, 
+    public void Insert(int index,
         TItem item)
     {
         InsertItem(index, item);
@@ -516,6 +521,17 @@ public partial class ObservableCollection<TItem> :
     public virtual Task OnDeactivating() =>
         Task.CompletedTask;
 
+    public virtual void PostInitialize()
+    {
+        if (postInitialized)
+        {
+            return;
+        }
+
+        postInitialized = true;
+        Subscriber.Subscribe(this);
+    }
+
     public bool Remove(TItem item)
     {
         int index = collection.IndexOf(item);
@@ -574,6 +590,16 @@ public partial class ObservableCollection<TItem> :
         }
     }
 
+    public void Synchronize(bool reset = false)
+    {
+        if (reset)
+        {
+            Clear();
+        }
+
+        SynchronizeExpression expression = BuildAggregateExpression();
+        Publisher.PublishUI(expression.Value, expression.Key);
+    }
     public void Track<T>(string propertyName, Func<T> getter, Action<T> setter)
     {
         if (!trackedProperties.ContainsKey(propertyName))
@@ -657,7 +683,7 @@ public partial class ObservableCollection<TValue, TViewModel>(IServiceProvider p
     IServiceFactory factory,
     IMediator mediator,
     IPublisher publisher,
-    ISubscription subscriber, 
+    ISubscriber subscriber, 
     IDisposer disposer,
     TValue value) : ObservableCollection<TViewModel>(provider, factory, mediator, publisher, subscriber, disposer)
     where TViewModel : notnull, IDisposable
@@ -690,7 +716,7 @@ public partial class ObservableCollection<TViewModel, TKey, TValue> :
         IServiceFactory factory, 
         IMediator mediator,
         IPublisher publisher,
-        ISubscription subscriber,
+        ISubscriber subscriber,
         IDisposer disposer,
         TKey key,
         TValue value) : base(provider, factory, mediator, publisher, subscriber, disposer)
@@ -703,7 +729,7 @@ public partial class ObservableCollection<TViewModel, TKey, TValue> :
         IServiceFactory factory,
         IMediator mediator,
         IPublisher publisher,
-        ISubscription subscriber, 
+        ISubscriber subscriber, 
         IDisposer disposer, 
         IEnumerable<TViewModel> items,
         TKey key,
@@ -728,7 +754,7 @@ public class ObservableCollection :
         IServiceFactory factory,
         IMediator mediator,
         IPublisher publisher,
-        ISubscription subscriber,
+        ISubscriber subscriber,
         IDisposer disposer) : base(provider, factory, mediator, publisher, subscriber, disposer)
     {
     }
@@ -737,7 +763,7 @@ public class ObservableCollection :
         IServiceFactory factory,
         IMediator mediator,
         IPublisher publisher,
-        ISubscription subscriber,
+        ISubscriber subscriber,
         IDisposer disposer,
         IEnumerable<IDisposable> items) : base(provider, factory, mediator, publisher, subscriber, disposer, items)
     {

@@ -2,11 +2,11 @@
 
 namespace Toolkit.Foundation;
 
-public class Subscription(SubscriptionCollection subscriptions,
+public class Subscriber(SubscriptionCollection subscriptions,
     IDisposer disposer) :
-    ISubscription
+    ISubscriber
 {
-    public void Add(object subscriber)
+    public void Subscribe(object subscriber)
     {
         Type handlerType = subscriber.GetType();
 
@@ -45,7 +45,7 @@ public class Subscription(SubscriptionCollection subscriptions,
         }
     }
 
-    public void Remove(object subscriber)
+    public void Unsubscribe(object subscriber)
     {
         Type handlerType = subscriber.GetType();
         IDictionary<Type, List<object>> subscribers = GetSubscriptionKeys(subscriber);

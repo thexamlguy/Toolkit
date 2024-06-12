@@ -72,7 +72,7 @@ public class FrameHandler :
                         sender.AddHandler(Frame.NavigatingFromEvent, HandleNavigatingFrom);
                         if (sender.DataContext is object content)
                         {
-                            if (content is IInitializer initializer)
+                            if (content is IInitialization initializer)
                             {
                                 await initializer.Initialize();
                             }

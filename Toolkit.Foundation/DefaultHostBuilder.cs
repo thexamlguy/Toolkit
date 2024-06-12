@@ -29,9 +29,9 @@ public class DefaultHostBuilder :
                 services.AddScoped<SubscriptionCollection>();
 
                 services.AddTransient<IHandlerProvider, HandlerProvider>();
-                services.AddTransient<ISubscription, Subscription>();
+                services.AddTransient<ISubscriber, Subscriber>();
 
-                services.AddTransient<ISubscription, Subscription>();
+                services.AddTransient<ISubscriber, Subscriber>();
 
                 services.AddTransient<IPublisher, Publisher>();
                 services.AddTransient<IMediator, Mediator>();
@@ -45,9 +45,7 @@ public class DefaultHostBuilder :
                 services.AddScoped<IProxyService<IComponentHostCollection>>(provider =>
                     new ProxyService<IComponentHostCollection>(provider.GetRequiredService<IComponentHostCollection>()));
 
-                services.AddTransient<IContentTemplateDescriptorProvider, ContentTemplateDescriptorProvider>();
-
-                services.AddTransient<INavigationProvider, NavigationProvider>();
+                services.AddTransient<IContentFactory, ContentFactory>();
 
                 services.AddScoped<INavigationRegionCollection, NavigationRegionCollection>();
                 services.AddTransient<INavigationRegionProvider, NavigationRegionProvider>();

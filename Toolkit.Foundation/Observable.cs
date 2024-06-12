@@ -2,11 +2,18 @@
 
 namespace Toolkit.Foundation;
 
-public partial class Observable :
+public partial class Observable(IServiceProvider
+        provider,
+    IServiceFactory factory,
+    IMediator mediator,
+    IPublisher publisher,
+    ISubscriber subscriber,
+    IDisposer disposer) :
     ObservableObject,
     IObservableViewModel,
     IActivityIndicator,
-    IInitializer,
+    IPostInitialization,
+    IInitialization,
     IActivated,
     IDeactivating,
     IDeactivated,
@@ -21,39 +28,24 @@ public partial class Observable :
     private readonly Dictionary<string, object> trackedProperties = [];
 
     [ObservableProperty]
-    private bool initialized;
-
-    [ObservableProperty]
     private bool active;
 
-    public Observable(IServiceProvider
-        provider,
-        IServiceFactory factory,
-        IMediator mediator,
-        IPublisher publisher,
-        ISubscription subscriber,
-        IDisposer disposer)
-    {
-        Provider = provider;
-        Factory = factory;
-        Mediator = mediator;
-        Publisher = publisher;
-        Disposer = disposer;
-
-        subscriber.Add(this);
-    }
+    [ObservableProperty]
+    private bool initialized;
+    private bool postInitialized;
 
     public event EventHandler? DeactivateHandler;
 
-    public IDisposer Disposer { get; }
+    public IDisposer Disposer { get; } = disposer;
 
-    public IServiceFactory Factory { get; }
+    public IServiceFactory Factory { get; } = factory;
 
-    public IMediator Mediator { get; }
+    public IMediator Mediator { get; } = mediator;
 
-    public IServiceProvider Provider { get; }
+    public IServiceProvider Provider { get; } = provider;
 
-    public IPublisher Publisher { get; }
+    public IPublisher Publisher { get; } = publisher;
+    public ISubscriber Subscriber { get; } = subscriber;
 
     public void Commit()
     {
@@ -95,6 +87,17 @@ public partial class Observable :
     public virtual Task OnDeactivating() =>
         Task.CompletedTask;
 
+    public virtual void PostInitialize()
+    {
+        if (postInitialized)
+        {
+            return;
+        }
+
+        postInitialized = true;
+        Subscriber.Subscribe(this);
+    }
+
     public void Revert()
     {
         foreach (object trackedProperty in trackedProperties.Values)
@@ -124,7 +127,7 @@ public partial class Observable<TValue> :
         IServiceFactory factory,
         IMediator mediator,
         IPublisher publisher,
-        ISubscription subscriber,
+        ISubscriber subscriber,
         IDisposer disposer,
         TValue value) : base(provider, factory, mediator, publisher, subscriber, disposer)
     {
@@ -154,7 +157,7 @@ public partial class Observable<TKey, TValue> :
         IServiceFactory factory,
         IMediator mediator,
         IPublisher publisher, 
-        ISubscription subscriber, 
+        ISubscriber subscriber, 
         IDisposer disposer,
         TKey key,
         TValue value) : base(provider, factory, mediator, publisher, subscriber, disposer)

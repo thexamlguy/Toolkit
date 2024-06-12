@@ -4,7 +4,7 @@ using Microsoft.Extensions.Hosting;
 namespace Toolkit.Foundation;
 
 public class ComponentHost(IServiceProvider services,
-    IEnumerable<IInitializer> initializers,
+    IEnumerable<IInitialization> initializers,
     IEnumerable<IHostedService> hostedServices) :
     IComponentHost
 {
@@ -21,7 +21,7 @@ public class ComponentHost(IServiceProvider services,
 
     public async Task StartAsync(CancellationToken cancellationToken = default)
     {
-        foreach (IInitializer initializer in initializers)
+        foreach (IInitialization initializer in initializers)
         {
             await initializer.Initialize();
         }

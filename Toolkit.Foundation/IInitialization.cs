@@ -1,11 +1,11 @@
 ﻿namespace Toolkit.Foundation;
 
-public interface IInitializer
+public interface IInitialization
 {
     Task Initialize();
 }
 
-public interface IInitializer<T>
+public interface IInitialization<T>
 {
     Task<T> Initialize();
 }

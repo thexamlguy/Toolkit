@@ -2,13 +2,13 @@
 
 namespace Toolkit.Foundation;
 
-public class AppService(IEnumerable<IInitializer> initializers,
+public class AppService(IEnumerable<IInitialization> initializers,
     IPublisher publisher) :
     IHostedService
 {
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        foreach (IInitializer initializer in initializers)
+        foreach (IInitialization initializer in initializers)
         {
             await initializer.Initialize();
         }
