@@ -72,11 +72,6 @@ public class FrameHandler :
                         sender.AddHandler(Frame.NavigatingFromEvent, HandleNavigatingFrom);
                         if (sender.DataContext is object content)
                         {
-                            if (content is IInitialization initializer)
-                            {
-                                await initializer.Initialize();
-                            }
-
                             if (content is IActivated activated)
                             {
                                 await activated.OnActivated();

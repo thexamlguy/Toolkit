@@ -2,8 +2,7 @@
 
 namespace Toolkit.Foundation;
 
-public partial class Observable(IServiceProvider
-        provider,
+public partial class Observable(IServiceProvider provider,
     IServiceFactory factory,
     IMediator mediator,
     IPublisher publisher,
@@ -12,7 +11,6 @@ public partial class Observable(IServiceProvider
     ObservableObject,
     IObservableViewModel,
     IActivityIndicator,
-    IPostInitialization,
     IInitialization,
     IActivated,
     IDeactivating,
@@ -32,7 +30,6 @@ public partial class Observable(IServiceProvider
 
     [ObservableProperty]
     private bool initialized;
-    private bool postInitialized;
 
     public event EventHandler? DeactivateHandler;
 
@@ -67,7 +64,7 @@ public partial class Observable(IServiceProvider
         Disposer.Dispose(this);
     }
 
-    public Task Initialize()
+    public virtual Task Initialize()
     {
         if (Initialized)
         {
@@ -75,6 +72,8 @@ public partial class Observable(IServiceProvider
         }
 
         Initialized = true;
+
+        Subscriber.Subscribe(this);
         return Task.CompletedTask;
     }
 
@@ -86,17 +85,6 @@ public partial class Observable(IServiceProvider
 
     public virtual Task OnDeactivating() =>
         Task.CompletedTask;
-
-    public virtual void PostInitialize()
-    {
-        if (postInitialized)
-        {
-            return;
-        }
-
-        postInitialized = true;
-        Subscriber.Subscribe(this);
-    }
 
     public void Revert()
     {

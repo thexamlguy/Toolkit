@@ -17,7 +17,6 @@ public class ContentTemplate :
             if (observableViewModel.Provider is IServiceProvider provider)
             {
                 Type itemType = item.GetType();
-
                 if (provider.GetRequiredKeyedService<IContentTemplateDescriptor>(itemType.Name.Replace("ViewModel", ""))
                     is IContentTemplateDescriptor descriptor)
                 {
@@ -28,11 +27,6 @@ public class ContentTemplate :
                             control.Loaded -= HandleLoaded;
                             if (control.DataContext is object content)
                             {
-                                if (content is IInitialization initializer)
-                                {
-                                    await initializer.Initialize();
-                                }
-
                                 if (content is IActivated activated)
                                 {
                                     await activated.OnActivated();

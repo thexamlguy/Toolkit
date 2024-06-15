@@ -17,29 +17,15 @@ public class ContentFactory(IMediator mediator,
             content = await mediator.Handle(descriptor.ContentType, createEvent, descriptor.Key);
         }
 
-        if (content is null)
-        {
-            if (parameters is { Length: > 0 })
-            {
-                content = factory.Create(descriptor.ContentType, args =>
+        content ??= parameters is { Length: > 0 }
+                ? factory.Create(descriptor.ContentType, args =>
                 {
-                    if (args is IPostInitialization initialization)
+                    if (args is IInitialization initialization)
                     {
-                        initialization.PostInitialize();
+                        initialization.Initialize();
                     }
-                }, parameters);
-            }
-            else
-            {
-                content = provider.GetRequiredKeyedService(descriptor.ContentType, args =>
-                    {
-                        if (args is IPostInitialization initialization)
-                        {
-                            initialization.PostInitialize();
-                        }
-                    }, descriptor.Key);
-            }
-        }
+                }, parameters)
+                : provider.GetRequiredKeyedService(descriptor.ContentType, descriptor.Key);
 
         return content;
     }

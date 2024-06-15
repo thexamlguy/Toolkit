@@ -9,7 +9,6 @@ namespace Toolkit.Foundation;
 public partial class ObservableCollection<TItem> :
     ObservableObject,
     IObservableCollectionViewModel<TItem>,
-    IPostInitialization,
     IInitialization,
     IActivated,
     IDeactivating,
@@ -50,10 +49,9 @@ public partial class ObservableCollection<TItem> :
 
     [ObservableProperty]
     private int count;
+
     [ObservableProperty]
     private bool initialized;
-
-    private bool postInitialized;
 
     [ObservableProperty]
     private TItem? selectedItem;
@@ -118,6 +116,7 @@ public partial class ObservableCollection<TItem> :
     public IServiceProvider Provider { get; private set; }
 
     public IPublisher Publisher { get; private set; }
+
     public ISubscriber Subscriber { get; }
 
     object ICollection.SyncRoot => this;
@@ -151,11 +150,11 @@ public partial class ObservableCollection<TItem> :
         where T :
         TItem
     {
-        T? item = Factory.Create<T>(args => 
-        { 
-            if (args is IPostInitialization initialization)
+        T? item = Factory.Create<T>(args =>
+        {
+            if (args is IInitialization initialization)
             {
-                initialization.PostInitialize();
+                initialization.Initialize();
             }
         }, parameters);
 
@@ -208,6 +207,7 @@ public partial class ObservableCollection<TItem> :
         Clear();
         factory.Invoke(this);
     }
+
     public void Clear()
     {
         clearing = true;
@@ -411,6 +411,8 @@ public partial class ObservableCollection<TItem> :
         }
 
         Initialized = true;
+
+        Subscriber.Subscribe(this);
         Synchronize();
 
         return Task.CompletedTask;
@@ -423,9 +425,9 @@ public partial class ObservableCollection<TItem> :
     {
         T? item = Factory.Create<T>(args =>
         {
-            if (args is IPostInitialization initialization)
+            if (args is IInitialization initialization)
             {
-                initialization.PostInitialize();
+                initialization.Initialize();
             }
         }, parameters);
 
@@ -520,17 +522,6 @@ public partial class ObservableCollection<TItem> :
 
     public virtual Task OnDeactivating() =>
         Task.CompletedTask;
-
-    public virtual void PostInitialize()
-    {
-        if (postInitialized)
-        {
-            return;
-        }
-
-        postInitialized = true;
-        Subscriber.Subscribe(this);
-    }
 
     public bool Remove(TItem item)
     {
