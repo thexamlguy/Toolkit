@@ -96,7 +96,7 @@ public class NavigationScope(IServiceProvider provider,
             Type navigateType = typeof(NavigateBackEventArgs<>).MakeGenericType(navigationType);
             if (Activator.CreateInstance(navigateType, [region]) is object navigate)
             {
-                publisher.Publish(navigate);
+                publisher.Publish(navigate, navigationType.Name);
             }
         }
     }

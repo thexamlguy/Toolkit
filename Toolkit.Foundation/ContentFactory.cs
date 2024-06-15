@@ -25,7 +25,13 @@ public class ContentFactory(IMediator mediator,
                         initialization.Initialize();
                     }
                 }, parameters)
-                : provider.GetRequiredKeyedService(descriptor.ContentType, descriptor.Key);
+                : provider.GetRequiredKeyedService(descriptor.ContentType, args =>
+                {
+                    if (args is IInitialization initialization)
+                    {
+                        initialization.Initialize();
+                    }
+                }, descriptor.Key);
 
         return content;
     }

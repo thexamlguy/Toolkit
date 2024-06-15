@@ -6,7 +6,7 @@ using Toolkit.Foundation;
 namespace Toolkit.Avalonia;
 
 public class ClassicDesktopStyleApplicationHandler :
-    INavigateHandler<IClassicDesktopStyleApplicationLifetime>
+    INotificationHandler<NavigateEventArgs<IClassicDesktopStyleApplicationLifetime>>
 {
     public Task Handle(NavigateEventArgs<IClassicDesktopStyleApplicationLifetime> args)
     {

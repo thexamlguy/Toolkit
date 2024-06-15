@@ -8,8 +8,8 @@ using Toolkit.UI.Controls.Avalonia;
 namespace Toolkit.Avalonia;
 
 public class FrameHandler :
-    INavigateHandler<Frame>,
-    INavigateBackHandler<Frame>
+    INotificationHandler<NavigateEventArgs<Frame>>,
+    INotificationHandler<NavigateBackEventArgs<Frame>>
 {
     public Task Handle(NavigateEventArgs<Frame> args)
     {

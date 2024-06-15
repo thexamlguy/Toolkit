@@ -5,7 +5,7 @@ using Toolkit.Foundation;
 namespace Toolkit.Avalonia;
 
 public class ContentControlHandler :
-    INavigateHandler<ContentControl>
+    INotificationHandler<NavigateEventArgs<ContentControl>>
 {
     public async Task Handle(NavigateEventArgs<ContentControl> args)
     {
@@ -19,11 +19,6 @@ public class ContentControlHandler :
                     control.Loaded -= HandleLoaded;
                     if (control.DataContext is object content)
                     {
-                        if (content is IInitialization initializer)
-                        {
-                            await initializer.Initialize();
-                        }
-
                         if (content is IActivated activated)
                         {
                             await activated.OnActivated();

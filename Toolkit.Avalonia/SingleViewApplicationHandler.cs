@@ -6,7 +6,7 @@ using Toolkit.Foundation;
 namespace Toolkit.Avalonia;
 
 public class SingleViewApplicationHandler :
-    INavigateHandler<ISingleViewApplicationLifetime>
+    INotificationHandler<NavigateEventArgs<ISingleViewApplicationLifetime>>
 {
     public Task Handle(NavigateEventArgs<ISingleViewApplicationLifetime> args)
     {

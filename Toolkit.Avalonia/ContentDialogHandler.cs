@@ -5,7 +5,7 @@ using Toolkit.UI.Controls.Avalonia;
 namespace Toolkit.Avalonia;
 
 public class ContentDialogHandler(IDispatcher dispatcher) :
-    INavigateHandler<ContentDialog>
+    INotificationHandler<NavigateEventArgs<ContentDialog>>
 {
     public async Task Handle(NavigateEventArgs<ContentDialog> args)
     {

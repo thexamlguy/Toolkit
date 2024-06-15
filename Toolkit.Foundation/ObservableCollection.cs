@@ -403,7 +403,7 @@ public partial class ObservableCollection<TItem> :
         IsCompatibleObject(value) ?
         IndexOf((TItem)value!) : -1;
 
-    public Task Initialize()
+    public virtual Task Initialize()
     {
         if (Initialized)
         {
