@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-
-namespace Toolkit.Foundation;
+﻿namespace Toolkit.Foundation;
 
 public class ContentFactory(IMediator mediator,
     IServiceProvider provider,

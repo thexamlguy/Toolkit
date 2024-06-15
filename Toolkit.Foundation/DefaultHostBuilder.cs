@@ -50,7 +50,7 @@ public class DefaultHostBuilder :
                 services.AddScoped<INavigationRegionCollection, NavigationRegionCollection>();
                 services.AddTransient<INavigationRegionProvider, NavigationRegionProvider>();
 
-                services.AddScoped<INavigationScope, NavigationScope>();
+                services.AddScoped<INavigation, Navigation>();
 
                 services.AddSingleton(new NamedComponent("Root"));
                 services.AddScoped<IComponentScopeCollection, ComponentScopeCollection>(provider => new ComponentScopeCollection

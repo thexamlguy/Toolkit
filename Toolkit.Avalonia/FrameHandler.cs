@@ -40,7 +40,7 @@ public class FrameHandler :
                                         await deactivated.OnDeactivated();
                                     }
 
-                                    if (content is not INavigationBackStack)
+                                    if (content is not IKeepAlive)
                                     {
                                         if (content is IDisposable disposable)
                                         {

@@ -37,7 +37,7 @@ public class ComponentBuilder :
                 services.AddTransient<IMediator, Mediator>();
 
                 services.AddTransient<IContentFactory, ContentFactory>();
-                services.AddTransient<INavigationScope, NavigationScope>();
+                services.AddTransient<INavigation, Navigation>();
 
                 services.AddScoped<INavigationRegionCollection, NavigationRegionCollection>();
                 services.AddTransient<INavigationRegionProvider, NavigationRegionProvider>();
