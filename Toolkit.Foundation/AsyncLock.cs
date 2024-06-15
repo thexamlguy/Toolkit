@@ -2,18 +2,33 @@
 
 namespace Toolkit.Foundation;
 
+public class ActivityLock(IActivityIndicator activityIndicator) : AsyncLock
+{
+    public override TaskAwaiter<AsyncLock> GetAwaiter()
+    {
+        activityIndicator.Active = true;
+        return base.GetAwaiter();
+    }
+
+    public override void Dispose()
+    {
+        activityIndicator.Active = false;
+        base.Dispose();
+    }
+}
+
 public class AsyncLock(int initial = 1,
     int maximum = 1) :
     IDisposable
 {
     private readonly SemaphoreSlim semaphore = new(initial, maximum);
 
-    public void Dispose()
+    public virtual void Dispose()
     {
         semaphore.Release();
     }
 
-    public TaskAwaiter<AsyncLock> GetAwaiter() => LockAsync().GetAwaiter();
+    public virtual TaskAwaiter<AsyncLock> GetAwaiter() => LockAsync().GetAwaiter();
 
     private async Task<AsyncLock> LockAsync()
     {

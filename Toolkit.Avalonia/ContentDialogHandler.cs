@@ -21,13 +21,6 @@ public class ContentDialogHandler(IDispatcher dispatcher) :
                 {
                     if (content is IPrimaryConfirmation primaryConfirmation)
                     {
-                        List<Action> postActions = [];
-                        if (content is IActivityIndicator activityIndicator)
-                        {
-                            activityIndicator.Active = true;
-                            postActions.Add(() => activityIndicator.Active = false);
-                        }
-
                         Deferral deferral = args.GetDeferral();
                         if (!await primaryConfirmation.Confirm())
                         {
@@ -36,10 +29,6 @@ public class ContentDialogHandler(IDispatcher dispatcher) :
                         }
 
                         deferral.Complete();
-                        foreach (Action action in postActions)
-                        {
-                            action.Invoke();
-                        }
                     }
                 }
             }
@@ -52,13 +41,6 @@ public class ContentDialogHandler(IDispatcher dispatcher) :
                 {
                     if (content is ISecondaryConfirmation secondaryConfirmation)
                     {
-                        List<Action> postActions = [];
-                        if (content is IActivityIndicator activityIndicator)
-                        {
-                            activityIndicator.Active = true;
-                            postActions.Add(() => activityIndicator.Active = false);
-                        }
-
                         Deferral deferral = args.GetDeferral();
                         if (!await secondaryConfirmation.Confirm())
                         {
@@ -67,10 +49,6 @@ public class ContentDialogHandler(IDispatcher dispatcher) :
                         }
 
                         deferral.Complete();
-                        foreach (Action action in postActions)
-                        {
-                            action.Invoke();
-                        }
                     }
                 }
             }
