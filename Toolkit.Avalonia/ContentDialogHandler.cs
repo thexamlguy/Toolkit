@@ -22,7 +22,7 @@ public class ContentDialogHandler(IDispatcher dispatcher) :
                     if (content is IPrimaryConfirmation primaryConfirmation)
                     {
                         Deferral deferral = args.GetDeferral();
-                        if (!await primaryConfirmation.Confirm())
+                        if (!await primaryConfirmation.ConfirmPrimary())
                         {
                             args.Cancel = true;
                             contentDialog.PrimaryButtonClick += HandlePrimaryButtonClick;
@@ -64,13 +64,6 @@ public class ContentDialogHandler(IDispatcher dispatcher) :
                     {
                         if (content is IConfirmation confirmation)
                         {
-                            List<Action> postActions = [];
-                            if (content is IActivityIndicator activityIndicator)
-                            {
-                                activityIndicator.Active = true;
-                                postActions.Add(() => activityIndicator.Active = false);
-                            }
-
                             Deferral deferral = args.GetDeferral();
                             if (!await confirmation.Confirm())
                             {
@@ -79,10 +72,6 @@ public class ContentDialogHandler(IDispatcher dispatcher) :
                             }
 
                             deferral.Complete();
-                            foreach (Action action in postActions)
-                            {
-                                action.Invoke();
-                            }
                         }
                     }
                 }
