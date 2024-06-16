@@ -2,5 +2,5 @@
 
 public interface IActivityIndicator
 {
-    bool Active { get; set; }
+    bool IsActive { get; set; }
 }

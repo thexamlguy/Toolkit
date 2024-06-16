@@ -4,5 +4,5 @@ public interface IConfigurationInitializer<TConfiguration>
     where TConfiguration :
     class
 {
-    Task Initialize();
+    Task OnInitialize();
 }

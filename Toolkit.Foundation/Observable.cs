@@ -15,7 +15,6 @@ public partial class Observable(IServiceProvider provider,
     IActivated,
     IDeactivating,
     IDeactivated,
-    IDeactivatable,
     IDisposable,
     IServiceProviderRequired,
     IServiceFactoryRequired,
@@ -26,12 +25,10 @@ public partial class Observable(IServiceProvider provider,
     private readonly Dictionary<string, object> trackedProperties = [];
 
     [ObservableProperty]
-    private bool active;
+    private bool isActive;
 
     [ObservableProperty]
-    private bool initialized;
-
-    public event EventHandler? DeactivateHandler;
+    private bool isInitialized;
 
     public IDisposer Disposer { get; } = disposer;
 
@@ -42,6 +39,7 @@ public partial class Observable(IServiceProvider provider,
     public IServiceProvider Provider { get; } = provider;
 
     public IPublisher Publisher { get; } = publisher;
+
     public ISubscriber Subscriber { get; } = subscriber;
 
     public void Commit()
@@ -52,36 +50,40 @@ public partial class Observable(IServiceProvider provider,
         }
     }
 
-    public Task Deactivate()
-    {
-        DeactivateHandler?.Invoke(this, new EventArgs());
-        return Task.CompletedTask;
-    }
-
     public virtual void Dispose()
     {
         GC.SuppressFinalize(this);
         Disposer.Dispose(this);
     }
 
-    public virtual Task Initialize()
+    public virtual Task OnInitialize()
     {
-        if (Initialized)
+        if (IsInitialized)
         {
             return Task.CompletedTask;
         }
 
-        Initialized = true;
+        IsInitialized = true;
 
         Subscriber.Subscribe(this);
         return Task.CompletedTask;
     }
 
-    public virtual Task OnActivated() =>
-        Task.CompletedTask;
+    [ObservableProperty]
+    private bool isActivated;
 
-    public virtual Task OnDeactivated() =>
-        Task.CompletedTask;
+    public virtual Task OnActivated()
+    {
+        IsActivated = true;
+        return Task.CompletedTask;
+    }
+
+
+    public virtual Task OnDeactivated()
+    {
+        IsActivated = false;
+        return Task.CompletedTask;
+    }
 
     public virtual Task OnDeactivating() =>
         Task.CompletedTask;

@@ -13,7 +13,6 @@ public partial class ObservableCollection<TItem> :
     IActivated,
     IDeactivating,
     IDeactivated,
-    IDeactivatable,
     IList<TItem>,
     IList,
     IReadOnlyList<TItem>,
@@ -43,15 +42,15 @@ public partial class ObservableCollection<TItem> :
     private readonly Dictionary<string, object> trackedProperties = [];
 
     [ObservableProperty]
-    private bool activated;
-
-    private bool clearing;
-
-    [ObservableProperty]
     private int count;
 
     [ObservableProperty]
-    private bool initialized;
+    private bool isActivated;
+
+    private bool isClearing;
+
+    [ObservableProperty]
+    private bool isInitialized;
 
     [ObservableProperty]
     private TItem? selectedItem;
@@ -96,8 +95,6 @@ public partial class ObservableCollection<TItem> :
     }
 
     public event NotifyCollectionChangedEventHandler? CollectionChanged;
-
-    public event EventHandler? DeactivateHandler;
 
     public IDisposer Disposer { get; private set; }
 
@@ -154,7 +151,7 @@ public partial class ObservableCollection<TItem> :
         {
             if (args is IInitialization initialization)
             {
-                initialization.Initialize();
+                initialization.OnInitialize();
             }
         }, parameters);
 
@@ -210,7 +207,7 @@ public partial class ObservableCollection<TItem> :
 
     public void Clear()
     {
-        clearing = true;
+        isClearing = true;
 
         foreach (TItem item in this.ToList())
         {
@@ -219,7 +216,7 @@ public partial class ObservableCollection<TItem> :
         }
 
         ClearItems();
-        clearing = false;
+        isClearing = false;
     }
 
     public void Commit()
@@ -241,12 +238,6 @@ public partial class ObservableCollection<TItem> :
 
     void ICollection.CopyTo(Array array, int index) =>
         collection.CopyTo((TItem[])array, index);
-
-    public Task Deactivate()
-    {
-        DeactivateHandler?.Invoke(this, new EventArgs());
-        return Task.CompletedTask;
-    }
 
     public virtual void Dispose()
     {
@@ -274,7 +265,7 @@ public partial class ObservableCollection<TItem> :
 
     public Task Handle(RemoveEventArgs<TItem> args)
     {
-        if (Activated)
+        if (IsActivated)
         {
             foreach (TItem item in this.ToList())
             {
@@ -294,7 +285,7 @@ public partial class ObservableCollection<TItem> :
 
     public Task Handle(CreateEventArgs<TItem> args)
     {
-        if (Activated)
+        if (IsActivated)
         {
             if (args.Sender is TItem item)
             {
@@ -311,7 +302,7 @@ public partial class ObservableCollection<TItem> :
 
     public Task Handle(InsertEventArgs<TItem> args)
     {
-        if (Activated)
+        if (IsActivated)
         {
             if (args.Sender is TItem item)
             {
@@ -328,7 +319,7 @@ public partial class ObservableCollection<TItem> :
 
     public Task Handle(MoveToEventArgs<TItem> args)
     {
-        if (Activated)
+        if (IsActivated)
         {
             Move(args.OldIndex, args.NewIndex);
         }
@@ -342,7 +333,7 @@ public partial class ObservableCollection<TItem> :
 
     public Task Handle(MoveEventArgs<TItem> args)
     {
-        if (Activated)
+        if (IsActivated)
         {
             if (args.Sender is TItem item)
             {
@@ -359,7 +350,7 @@ public partial class ObservableCollection<TItem> :
 
     public Task Handle(ReplaceEventArgs<TItem> args)
     {
-        if (Activated)
+        if (IsActivated)
         {
             if (args.Sender is TItem item)
             {
@@ -376,7 +367,7 @@ public partial class ObservableCollection<TItem> :
 
     public Task Handle(RemoveAtEventArgs<TItem> args)
     {
-        if (Activated)
+        if (IsActivated)
         {
             int index = args.Index;
             if (index >= 0 && index <= Count - 1)
@@ -403,21 +394,6 @@ public partial class ObservableCollection<TItem> :
         IsCompatibleObject(value) ?
         IndexOf((TItem)value!) : -1;
 
-    public virtual Task Initialize()
-    {
-        if (Initialized)
-        {
-            return Task.CompletedTask;
-        }
-
-        Initialized = true;
-
-        Subscriber.Subscribe(this);
-        Synchronize();
-
-        return Task.CompletedTask;
-    }
-
     public TItem Insert<T>(int index = 0,
         params object?[] parameters)
         where T :
@@ -427,7 +403,7 @@ public partial class ObservableCollection<TItem> :
         {
             if (args is IInitialization initialization)
             {
-                initialization.Initialize();
+                initialization.OnInitialize();
             }
         }, parameters);
 
@@ -504,7 +480,7 @@ public partial class ObservableCollection<TItem> :
 
     public virtual Task OnActivated()
     {
-        Activated = true;
+        IsActivated = true;
         while (pendingEvents.Count > 0)
         {
             object current = pendingEvents.Dequeue();
@@ -516,13 +492,27 @@ public partial class ObservableCollection<TItem> :
 
     public virtual Task OnDeactivated()
     {
-        Activated = false;
+        IsActivated = false;
         return Task.CompletedTask;
     }
 
     public virtual Task OnDeactivating() =>
         Task.CompletedTask;
 
+    public virtual Task OnInitialize()
+    {
+        if (IsInitialized)
+        {
+            return Task.CompletedTask;
+        }
+
+        IsInitialized = true;
+
+        Subscriber.Subscribe(this);
+        Synchronize();
+
+        return Task.CompletedTask;
+    }
     public bool Remove(TItem item)
     {
         int index = collection.IndexOf(item);
@@ -612,7 +602,7 @@ public partial class ObservableCollection<TItem> :
         Disposer.Add(this, item);
         Disposer.Add(item, Disposable.Create(() =>
         {
-            if (item is IRemovable && !clearing)
+            if (item is IRemovable && !isClearing)
             {
                 if (item is IList collection)
                 {

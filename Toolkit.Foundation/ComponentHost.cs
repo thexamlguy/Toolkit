@@ -23,7 +23,7 @@ public class ComponentHost(IServiceProvider services,
     {
         foreach (IInitialization initializer in initializers)
         {
-            await initializer.Initialize();
+            await initializer.OnInitialize();
         }
 
         foreach (IHostedService service in hostedServices)

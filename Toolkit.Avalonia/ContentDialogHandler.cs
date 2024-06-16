@@ -62,17 +62,28 @@ public class ContentDialogHandler(IDispatcher dispatcher) :
                     contentDialog.Closing -= HandleClosing;
                     if (contentDialog.DataContext is object content)
                     {
+                        bool cancelled = false;
                         if (content is IConfirmation confirmation)
                         {
                             Deferral deferral = args.GetDeferral();
                             if (!await confirmation.Confirm())
                             {
                                 args.Cancel = true;
+                                cancelled = true;
+
                                 contentDialog.Closing += HandleClosing;
                             }
 
                             deferral.Complete();
                         }
+
+                        if (!cancelled)
+                        {
+                            if (content is IDeactivating deactivating)
+                            {
+                                await deactivating.OnDeactivating();
+                            }
+                       }
                     }
                 }
             }
@@ -83,17 +94,6 @@ public class ContentDialogHandler(IDispatcher dispatcher) :
                 contentDialog.Opened -= HandleOpened;
                 if (contentDialog.DataContext is object content)
                 {
-                    if (content is IDeactivatable deactivatable)
-                    {
-                        async void DeactivateHandler(object? sender, EventArgs args)
-                        {
-                            deactivatable.DeactivateHandler -= DeactivateHandler;
-                            await dispatcher.Invoke(contentDialog.Hide);
-                        }
-
-                        deactivatable.DeactivateHandler += DeactivateHandler;
-                    }
-
                     if (content is IActivated activated)
                     {
                         await activated.OnActivated();
@@ -101,8 +101,23 @@ public class ContentDialogHandler(IDispatcher dispatcher) :
                 }
             }
 
+            async void HandleClosed(FluentAvalonia.UI.Controls.ContentDialog sender,
+                FluentAvalonia.UI.Controls.ContentDialogClosedEventArgs args)
+            {
+                contentDialog.Closed -= HandleClosed;
+                if (contentDialog.DataContext is object content)
+                {
+                    if (content is IDeactivated deactivated)
+                    {
+                        await deactivated.OnDeactivated();
+                    }
+                }
+            }
+
             contentDialog.Opened += HandleOpened;
             contentDialog.Closing += HandleClosing;
+            contentDialog.Closed += HandleClosed;
+
             contentDialog.PrimaryButtonClick += HandlePrimaryButtonClick;
             contentDialog.SecondaryButtonClick += HandleSecondaryButtonClick;
 

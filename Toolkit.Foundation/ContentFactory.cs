@@ -20,14 +20,14 @@ public class ContentFactory(IMediator mediator,
                 {
                     if (args is IInitialization initialization)
                     {
-                        initialization.Initialize();
+                        initialization.OnInitialize();
                     }
                 }, parameters)
                 : provider.GetRequiredKeyedService(descriptor.ContentType, args =>
                 {
                     if (args is IInitialization initialization)
                     {
-                        initialization.Initialize();
+                        initialization.OnInitialize();
                     }
                 }, descriptor.Key);
 

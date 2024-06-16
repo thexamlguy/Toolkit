@@ -6,13 +6,13 @@ public class ActivityLock(IActivityIndicator activityIndicator) : AsyncLock
 {
     public override TaskAwaiter<AsyncLock> GetAwaiter()
     {
-        activityIndicator.Active = true;
+        activityIndicator.IsActive = true;
         return base.GetAwaiter();
     }
 
     public override void Dispose()
     {
-        activityIndicator.Active = false;
+        activityIndicator.IsActive = false;
         base.Dispose();
     }
 }
