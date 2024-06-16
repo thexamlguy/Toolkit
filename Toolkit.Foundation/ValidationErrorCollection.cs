@@ -5,10 +5,11 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Toolkit.Foundation;
 
-public class ValidationErrorCollection : IDictionary<string, string>,
-   IDictionary,
-   INotifyCollectionChanged,
-   INotifyPropertyChanged
+public class ValidationErrorCollection :
+    IDictionary<string, string>,
+    IDictionary,
+    INotifyCollectionChanged,
+    INotifyPropertyChanged
 {
     private Dictionary<string, string> items;
 
@@ -41,11 +42,7 @@ public class ValidationErrorCollection : IDictionary<string, string>,
 
     public string this[string key]
     {
-        get
-        {
-            return items[key];
-        }
-
+        get => items.ContainsKey(key) ? items[key] : "";
         set
         {
             bool replace = items.TryGetValue(key, out var old);
@@ -54,7 +51,8 @@ public class ValidationErrorCollection : IDictionary<string, string>,
             if (replace)
             {
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs($"Item[{key}]"));
-                CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, new KeyValuePair<string, string>(key, value), new KeyValuePair<string, string>(key, old!)));
+                CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace,
+                    new KeyValuePair<string, string>(key, value), new KeyValuePair<string, string>(key, old!)));
             }
             else
             {

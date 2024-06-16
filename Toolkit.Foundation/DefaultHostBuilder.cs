@@ -29,12 +29,12 @@ public class DefaultHostBuilder :
                 services.AddScoped<SubscriptionCollection>();
 
                 services.AddTransient<IHandlerProvider, HandlerProvider>();
-                services.AddTransient<ISubscriber, Subscriber>();
-
-                services.AddTransient<ISubscriber, Subscriber>();
-
+                services.AddScoped<ISubscriber, Subscriber>();
                 services.AddTransient<IPublisher, Publisher>();
                 services.AddTransient<IMediator, Mediator>();
+
+                services.AddTransient<IValidation, Validation>();
+                services.AddTransient<IValidatorCollection, ValidatorCollection>();
 
                 services.AddScoped<IProxyService<IPublisher>>(provider =>
                     new ProxyService<IPublisher>(provider.GetRequiredService<IPublisher>()));

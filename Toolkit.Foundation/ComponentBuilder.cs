@@ -36,6 +36,9 @@ public class ComponentBuilder :
                 services.AddTransient<IPublisher, Publisher>();
                 services.AddTransient<IMediator, Mediator>();
 
+                services.AddTransient<IValidation, Validation>();
+                services.AddTransient<IValidatorCollection, ValidatorCollection>();
+
                 services.AddTransient<IContentFactory, ContentFactory>();
                 services.AddTransient<INavigation, Navigation>();
 
