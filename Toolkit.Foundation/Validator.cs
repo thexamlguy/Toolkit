@@ -1,33 +1,22 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿namespace Toolkit.Foundation;
 
-namespace Toolkit.Foundation;
-
-public class Validator
+public class Validator(string propertyName,
+    ValidationRule[] rules)
 {
-    private readonly ValidationRule[] rules = [];
+    private readonly ValidationRule[] rules = rules;
 
-    public Validator(string propertyName,
-        ValidationRule[] rules)
+    public string? PropertyName { get; } = propertyName;
+
+    public async Task<(bool isValid, string? message)> TryValidate()
     {
-        PropertyName = propertyName;
-        this.rules = rules;
-    }
-
-    public string? PropertyName { get; }
-
-    public bool TryValidate([MaybeNull] out string message)
-    {
-        message = "";
-
         foreach (ValidationRule rule in rules)
         {
-            if (rule.Validation?.Invoke() == false)
+            if (!await rule.ValidateAsync())
             {
-                message = rule.Message?.Invoke();
-                return false;
+                return (false, rule.Message);
             }
         }
 
-        return true;
+        return (true, null);
     }
 }

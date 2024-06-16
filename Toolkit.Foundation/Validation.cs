@@ -27,7 +27,7 @@ public class Validation(IValidatorCollection validators) :
 
         if (trigger is ValidationTrigger.Immediate)
         {
-            Validate(name);
+            _ = Validate(name);
         }
     }
 
@@ -37,7 +37,28 @@ public class Validation(IValidatorCollection validators) :
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
-    public bool Validate(string name)
+
+    public async Task<bool> Validate<TProperty>(Expression<Func<TProperty>> property, 
+        ValidationRule[] rules)
+    {
+        string? name = GetPropertyName(property);
+        Validator validator = new(name, rules);
+
+        (bool isValid, string? message) = await validator.TryValidate();
+
+        if (!isValid)
+        {
+            errors[name] = message ?? "";
+        }
+
+        OnPropertyChanged(nameof(Errors), null, null);
+        OnPropertyChanged(nameof(HasErrors), null, null);
+
+        return !HasErrors;
+    }
+
+
+    public async Task<bool> Validate(string name)
     {
         if (Errors.ContainsKey(name))
         {
@@ -48,7 +69,8 @@ public class Validation(IValidatorCollection validators) :
         {
             if (validator is not null)
             {
-                if (!validator.TryValidate(out string? message))
+                (bool isValid, string? message) = await validator.TryValidate();
+                if (!isValid)
                 {
                     errors[name] = message ?? "";
                 }
@@ -61,14 +83,15 @@ public class Validation(IValidatorCollection validators) :
         return !HasErrors;
     }
 
-    public bool Validate()
+    public async Task<bool> Validate()
     {
         errors.Clear();
         foreach (Validator? validator in Validators)
         {
             if (validator.PropertyName is string name)
             {
-                if (!validator.TryValidate(out string? message))
+                (bool isValid, string? message) = await validator.TryValidate();
+                if (!isValid)
                 {
                     errors[name] = message ?? "";
                 }

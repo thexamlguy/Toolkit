@@ -2,26 +2,49 @@
 
 public class ValidationRule
 {
-    public ValidationRule(Func<bool> validation,
+    private readonly Func<bool>? syncValidation;
+    private readonly Func<Task<bool>>? asyncValidation;
+
+    public ValidationRule(Func<bool> validation, 
         string message)
     {
-        Validation = validation;
-        Message = new Func<string>(() => message);
+        syncValidation = validation;
+        Message = message;
+    }
+
+    public ValidationRule(Func<Task<bool>> validation,
+        string message)
+    {
+        asyncValidation = validation;
+        Message = message;
     }
 
     public ValidationRule(Func<bool> validation)
     {
-        Validation = validation;
+        syncValidation = validation;
+        Message = "";
     }
 
-    public ValidationRule(Func<bool> validation,
-        Func<string> message)
+    public ValidationRule(Func<Task<bool>> validation)
     {
-        Validation = validation;
-        Message = message;
+        asyncValidation = validation;
+        Message = "";
     }
 
-    public Func<string>? Message { get; }
+    public async Task<bool> ValidateAsync()
+    {
+        if (syncValidation is not null)
+        {
+            return syncValidation();
+        }
 
-    public Func<bool>? Validation { get; }
+        if (asyncValidation is not null)
+        {
+            return await asyncValidation();
+        }
+
+        return false;
+    }
+
+    public string Message { get; }
 }
