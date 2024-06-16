@@ -51,10 +51,10 @@ public partial class ComponentConfigurationViewModel<TConfiguration, TValue, TAc
     [ObservableProperty]
     private object description = description;
 
-    public override Task OnActivated()
+    public override Task Activated()
     {
         Value = valueDelegate.Invoke(configuration);
-        return base.OnActivated();
+        return base.Activated();
     }
 
     public Task Handle(ChangedEventArgs<TConfiguration> args)
@@ -93,10 +93,10 @@ public partial class ComponentConfigurationViewModel<TConfiguration, TValue, TDe
     [ObservableProperty]
     private TDescription description = description;
 
-    public override Task OnActivated()
+    public override Task Activated()
     {
         Value = valueDelegate.Invoke(configuration);
-        return base.OnActivated();
+        return base.Activated();
     }
 
     public Task Handle(ChangedEventArgs<TConfiguration> args)

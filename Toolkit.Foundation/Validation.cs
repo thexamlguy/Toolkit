@@ -8,7 +8,10 @@ public class Validation(IValidatorCollection validators) :
 {
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    public ValidationErrorCollection Errors { get; } = [];
+    private readonly ValidationErrorCollection errors = [];
+
+    public IReadOnlyDictionary<string, string> Errors => 
+        errors.AsReadOnly();
 
     public bool HasErrors => 
         Errors.Count > 0;
@@ -38,7 +41,7 @@ public class Validation(IValidatorCollection validators) :
     {
         if (Errors.ContainsKey(name))
         {
-            Errors.Remove(name);
+            errors.Remove(name);
         }
 
         if (Validators.TryGet(name, out Validator? validator))
@@ -47,7 +50,7 @@ public class Validation(IValidatorCollection validators) :
             {
                 if (!validator.TryValidate(out string? message))
                 {
-                    Errors[name] = message ?? "";
+                    errors[name] = message ?? "";
                 }
             }
         }
@@ -60,14 +63,14 @@ public class Validation(IValidatorCollection validators) :
 
     public bool Validate()
     {
-        Errors.Clear();
+        errors.Clear();
         foreach (Validator? validator in Validators)
         {
             if (validator.PropertyName is string name)
             {
                 if (!validator.TryValidate(out string? message))
                 {
-                    Errors[name] = message ?? "";
+                    errors[name] = message ?? "";
                 }
             }
         }

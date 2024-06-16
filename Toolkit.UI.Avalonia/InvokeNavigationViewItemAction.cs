@@ -21,7 +21,7 @@ public class InvokeNavigationViewItemAction :
                 {
                     if (collection is { Count: > 0 } && collection[0] is ISelectable selectable)
                     {
-                        selectable.Selected = true;
+                        selectable.IsSelected = true;
                     }
                 }
             }, DispatcherPriority.ContextIdle);
@@ -35,7 +35,7 @@ public class InvokeNavigationViewItemAction :
                 {
                     if (collection is { Count: > 0 } && collection[0] is ISelectable selectable)
                     {
-                        selectable.Selected = true;
+                        selectable.IsSelected = true;
                     }
                 }
             }, DispatcherPriority.ContextIdle);

@@ -42,7 +42,7 @@ public class ValidationErrorCollection :
 
     public string this[string key]
     {
-        get => items.ContainsKey(key) ? items[key] : "";
+        get => items.TryGetValue(key, out string? value) ? value : "";
         set
         {
             bool replace = items.TryGetValue(key, out var old);

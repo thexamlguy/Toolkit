@@ -10,7 +10,7 @@ public class AppService(IEnumerable<IInitialization> initializers,
     {
         foreach (IInitialization initializer in initializers)
         {
-            await initializer.OnInitialize();
+            await initializer.Initialize();
         }
 
         publisher.Publish<StartedEventArgs>();

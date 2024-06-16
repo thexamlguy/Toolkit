@@ -37,6 +37,7 @@ public partial class ObservableCollection<TItem> :
     private readonly System.Collections.ObjectModel.ObservableCollection<TItem> collection = [];
 
     private readonly IDispatcher dispatcher;
+
     private readonly Queue<object> pendingEvents = [];
 
     private readonly Dictionary<string, object> trackedProperties = [];
@@ -151,7 +152,7 @@ public partial class ObservableCollection<TItem> :
         {
             if (args is IInitialization initialization)
             {
-                initialization.OnInitialize();
+                initialization.Initialize();
             }
         }, parameters);
 
@@ -403,7 +404,7 @@ public partial class ObservableCollection<TItem> :
         {
             if (args is IInitialization initialization)
             {
-                initialization.OnInitialize();
+                initialization.Initialize();
             }
         }, parameters);
 
@@ -442,7 +443,7 @@ public partial class ObservableCollection<TItem> :
         bool moveSelection = false;
         if (item is ISelectable oldSelection)
         {
-            if (oldSelection.Selected)
+            if (oldSelection.IsSelected)
             {
                 moveSelection = true;
                 SelectedItem = default;
@@ -456,7 +457,7 @@ public partial class ObservableCollection<TItem> :
         {
             if (item is ISelectable newSelection)
             {
-                newSelection.Selected = true;
+                newSelection.IsSelected = true;
                 dispatcher.Invoke(() => SelectedItem = item);
             }
         }
@@ -478,7 +479,7 @@ public partial class ObservableCollection<TItem> :
         return true;
     }
 
-    public virtual Task OnActivated()
+    public virtual Task Activated()
     {
         IsActivated = true;
         while (pendingEvents.Count > 0)
@@ -490,16 +491,16 @@ public partial class ObservableCollection<TItem> :
         return Task.CompletedTask;
     }
 
-    public virtual Task OnDeactivated()
+    public virtual Task Deactivated()
     {
         IsActivated = false;
         return Task.CompletedTask;
     }
 
-    public virtual Task OnDeactivating() =>
+    public virtual Task Deactivating() =>
         Task.CompletedTask;
 
-    public virtual Task OnInitialize()
+    public virtual Task Initialize()
     {
         if (IsInitialized)
         {
@@ -634,12 +635,12 @@ public partial class ObservableCollection<TItem> :
     {
         if (oldValue is ISelectable oldSelection)
         {
-            oldSelection.Selected = false;
+            oldSelection.IsSelected = false;
         }
 
         if (newValue is ISelectable newSelection)
         {
-            newSelection.Selected = true;
+            newSelection.IsSelected = true;
         }
     }
 
@@ -647,11 +648,11 @@ public partial class ObservableCollection<TItem> :
     {
         if (item is ISelectable newSelection)
         {
-            if (newSelection.Selected)
+            if (newSelection.IsSelected)
             {
                 if (SelectedItem is ISelectable oldSelection)
                 {
-                    oldSelection.Selected = false;
+                    oldSelection.IsSelected = false;
                 }
 
                 dispatcher.Invoke(() => SelectedItem = item);

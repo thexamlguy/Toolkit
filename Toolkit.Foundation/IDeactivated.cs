@@ -2,5 +2,5 @@
 
 public interface IDeactivated
 {
-    Task OnDeactivated();
+    Task Deactivated();
 }

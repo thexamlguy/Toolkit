@@ -56,7 +56,7 @@ public partial class Observable(IServiceProvider provider,
         Disposer.Dispose(this);
     }
 
-    public virtual Task OnInitialize()
+    public virtual Task Initialize()
     {
         if (IsInitialized)
         {
@@ -72,20 +72,20 @@ public partial class Observable(IServiceProvider provider,
     [ObservableProperty]
     private bool isActivated;
 
-    public virtual Task OnActivated()
+    public virtual Task Activated()
     {
         IsActivated = true;
         return Task.CompletedTask;
     }
 
 
-    public virtual Task OnDeactivated()
+    public virtual Task Deactivated()
     {
         IsActivated = false;
         return Task.CompletedTask;
     }
 
-    public virtual Task OnDeactivating() =>
+    public virtual Task Deactivating() =>
         Task.CompletedTask;
 
     public void Revert()

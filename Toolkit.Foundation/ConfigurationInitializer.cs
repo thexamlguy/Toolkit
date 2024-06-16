@@ -9,7 +9,7 @@ public class ConfigurationInitializer<TConfiguration>(IConfigurationReader<TConf
     where TConfiguration :
     class
 {
-    public Task OnInitialize()
+    public Task Initialize()
     {
         if (!reader.TryRead(out TConfiguration? configuration))
         {

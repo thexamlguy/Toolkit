@@ -37,7 +37,7 @@ public class FrameHandler :
                                 {
                                     if (content is IDeactivated deactivated)
                                     {
-                                        await deactivated.OnDeactivated();
+                                        await deactivated.Deactivated();
                                     }
 
                                     if (content is not IKeepAlive)
@@ -63,7 +63,7 @@ public class FrameHandler :
                                 {
                                     if (content is IDeactivating deactivating)
                                     {
-                                        await deactivating.OnDeactivating();
+                                        await deactivating.Deactivating();
                                     }
                                 }
                             }
@@ -74,7 +74,7 @@ public class FrameHandler :
                         {
                             if (content is IActivated activated)
                             {
-                                await activated.OnActivated();
+                                await activated.Activated();
                             }
                         }
 
@@ -89,7 +89,7 @@ public class FrameHandler :
                             {
                                 if (content is IDeactivated deactivated)
                                 {
-                                    await deactivated.OnDeactivated();
+                                    await deactivated.Deactivated();
                                 }
 
                                 if (content is IDisposable disposable)
