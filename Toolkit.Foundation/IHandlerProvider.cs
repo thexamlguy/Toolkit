@@ -2,6 +2,5 @@
 
 public interface IHandlerProvider
 {
-    IEnumerable<object?> Get(Type type,
-        object? key = null);
+    IEnumerable<object?> Get(object key);
 }

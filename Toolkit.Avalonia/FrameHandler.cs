@@ -147,23 +147,23 @@ public class FrameHandler :
                                     };
                                 break;
                         }
+                    }
 
-                        if (args.Parameters.TryGetValue("IsBackStackEnabled", out object? isBackStackEnabled))
+                    if (args.Parameters.TryGetValue("IsBackStackEnabled", out object? isBackStackEnabled))
+                    {
+                        if (isBackStackEnabled is bool value)
                         {
-                            if (isBackStackEnabled is bool value)
-                            {
-                                navigationOptions.IsNavigationStackEnabled = value;
-                            }
+                            navigationOptions.IsNavigationStackEnabled = value;
                         }
+                    }
 
-                        if (args.Parameters.TryGetValue("ClearBackStack", out object? clearBackStack))
+                    if (args.Parameters.TryGetValue("ClearBackStack", out object? clearBackStack))
+                    {
+                        if (clearBackStack is bool value)
                         {
-                            if (clearBackStack is bool value)
+                            if (value)
                             {
-                                if (value)
-                                {
-                                    postNavigateActions.Add(() => CleanUp());
-                                }
+                                postNavigateActions.Add(() => CleanUp());
                             }
                         }
                     }

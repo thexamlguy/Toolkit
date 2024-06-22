@@ -3,12 +3,10 @@
 public class HandlerProvider(SubscriptionCollection subscriptions) :
     IHandlerProvider
 {
-    public IEnumerable<object?> Get(Type type,
-        object? key = null)
+    public IEnumerable<object?> Get(object key)
     {
         var d = subscriptions;
-        string subscriptionKey = $"{(key is not null ? $"{key}:" : "")}{type}";
-        if (subscriptions.TryGetValue(subscriptionKey, out List<WeakReference>? subscribers))
+        if (subscriptions.TryGetValue(key, out List<WeakReference>? subscribers))
         {
             foreach (WeakReference weakRef in subscribers.ToArray())
             {

@@ -2,6 +2,7 @@
 using Avalonia.Controls.Primitives;
 using Avalonia.Xaml.Interactivity;
 using Toolkit.Foundation;
+using Toolkit.UI.Controls.Avalonia;
 
 namespace Toolkit.UI.Avalonia;
 

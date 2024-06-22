@@ -24,8 +24,7 @@ public class ComponentBuilder :
                 services.AddScoped<IComponentHost, ComponentHost>();
 
                 services.AddScoped<IServiceFactory>(provider =>
-                    new ServiceFactory((type, parameters) => ActivatorUtilities.CreateInstance(provider, type,
-                    parameters?.Where(x => x is not null).ToArray()!)));
+                    new ServiceFactory((type, parameters) => ActivatorUtilities.CreateInstance(provider, type, parameters!)));
 
                 services.AddSingleton<IDisposer, Disposer>();
 

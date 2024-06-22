@@ -30,10 +30,15 @@ public class Publisher(IHandlerProvider handlerProvider,
         Type handlerType = typeof(NotificationHandlerWrapper<>)
             .MakeGenericType(notificationType);
 
-        List<object?> handlers = key is not null ? serviceProvider.GetKeyedServices(handlerType, key).ToList() :
-            serviceProvider.GetServices(handlerType).ToList();
+        key = $"{(key is not null ? $"{key}:" : "")}{notificationType}";
 
-        foreach (object? handler in handlerProvider.Get(notificationType, key))
+        List<object?> handlers = [];
+        foreach (object? handler in handlerProvider.Get(key))
+        {
+            handlers.Add(handler);
+        }
+
+        foreach (object? handler in serviceProvider.GetKeyedServices(handlerType, key))
         {
             handlers.Add(handler);
         }
