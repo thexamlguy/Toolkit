@@ -6,10 +6,9 @@ namespace Toolkit.Foundation;
 public class Validation(IValidatorCollection validators) :
     IValidation
 {
-    public event PropertyChangedEventHandler? PropertyChanged;
-
     private readonly ValidationErrorCollection errors = [];
 
+    public event PropertyChangedEventHandler? PropertyChanged;
     public IReadOnlyDictionary<string, string> Errors => 
         errors.AsReadOnly();
 
@@ -44,6 +43,8 @@ public class Validation(IValidatorCollection validators) :
         string? name = GetPropertyName(property);
         Validator validator = new(name, rules);
 
+        Clear(name);
+
         (bool isValid, string? message) = await validator.TryValidate();
 
         if (!isValid)
@@ -57,13 +58,9 @@ public class Validation(IValidatorCollection validators) :
         return !HasErrors;
     }
 
-
     public async Task<bool> Validate(string name)
     {
-        if (Errors.ContainsKey(name))
-        {
-            errors.Remove(name);
-        }
+        Clear(name);
 
         if (Validators.TryGet(name, out Validator? validator))
         {
@@ -85,7 +82,7 @@ public class Validation(IValidatorCollection validators) :
 
     public async Task<bool> Validate()
     {
-        errors.Clear();
+        Clear();
         foreach (Validator? validator in Validators)
         {
             if (validator.PropertyName is string name)
@@ -104,12 +101,26 @@ public class Validation(IValidatorCollection validators) :
         return !HasErrors;
     }
 
-    private string GetPropertyName<T>(Expression<Func<T>> predicate)
+    private void Clear(string name)
     {
-        Expression? body = predicate.Body;
-        MemberExpression? memberExpression = body as MemberExpression ??
-            (MemberExpression)((UnaryExpression)body).Operand;
-
-        return memberExpression.Member.Name;
+        if (Errors.ContainsKey(name))
+        {
+            errors.Remove(name);
+            OnPropertyChanged(nameof(Errors), null, null);
+        }
+    }
+    private void Clear()
+    {
+        errors.Clear();
+        OnPropertyChanged(nameof(Errors), null, null);
+    }
+    private string GetPropertyName<T>(Expression<Func<T>> expression)
+    {
+        return expression.Body switch
+        {
+            MemberExpression memberExpression => memberExpression.Member.Name,
+            UnaryExpression unaryExpression when unaryExpression.Operand is MemberExpression operand => operand.Member.Name,
+            _ => string.Empty
+        };
     }
 }
