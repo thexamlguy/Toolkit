@@ -9,16 +9,27 @@ public class ComponentBuilder :
 {
     private readonly IHostBuilder hostBuilder;
 
-    private bool configurationRegistered;
+    private ContentRootConfiguration rootConfiguration = new();
+
+    public void SetRootConfiguration(Action<ContentRootConfiguration> configurationDelegate)
+    {
+        ContentRootConfiguration rootConfiguration = new();
+        configurationDelegate.Invoke(rootConfiguration);
+
+        this.rootConfiguration = rootConfiguration;
+    }
+
+    public void SetAppConfiguration(Action<ContentRootConfiguration> rootConfigurationDelegate)
+    {
+        ContentRootConfiguration rootConfiguration = new();
+        rootConfigurationDelegate.Invoke(rootConfiguration);
+
+        this.rootConfiguration = rootConfiguration;
+    }
 
     private ComponentBuilder()
     {
         hostBuilder = new HostBuilder()
-            .UseContentRoot("Local", true)
-            .ConfigureAppConfiguration(config =>
-            {
-                config.AddJsonFile("Settings.json", true, true);
-            })
             .ConfigureServices((context, services) =>
             {
                 services.AddScoped<IComponentHost, ComponentHost>();
@@ -72,13 +83,6 @@ public class ComponentBuilder :
         where TConfiguration :
         ComponentConfiguration, new()
     {
-        if (configurationRegistered)
-        {
-            return this;
-        }
-
-        configurationRegistered = true;
-
         hostBuilder.AddConfiguration(section: section,
             defaultConfiguration: configuration);
 
@@ -100,6 +104,12 @@ public class ComponentBuilder :
 
     public IComponentHost Build()
     {
+        hostBuilder.UseContentRoot(rootConfiguration.ContentRoot, true)
+            .ConfigureAppConfiguration(config =>
+            {
+                config.AddJsonFile(rootConfiguration.JsonFileName, true, true);
+            });
+
         IHost host = hostBuilder.Build();
         return host.Services.GetRequiredService<IComponentHost>();
     }

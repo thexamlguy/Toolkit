@@ -8,7 +8,7 @@ public class ComponentFactory(IServiceProvider provider,
     IComponentFactory
 {
     public IComponentHost? Create<TComponent, TConfiguration>(string name,
-        TConfiguration configuration,
+        TConfiguration? configuration = null,
         Action<IServiceCollection>? servicesDelegate = null)
         where TComponent : IComponent
         where TConfiguration : ComponentConfiguration, new()
@@ -16,6 +16,7 @@ public class ComponentFactory(IServiceProvider provider,
         if (provider.GetRequiredService<TComponent>() is TComponent component)
         {
             IComponentBuilder builder = component.Create();
+
             builder.AddServices(services =>
             {
                 services.AddTransient(_ =>

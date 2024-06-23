@@ -12,7 +12,7 @@ public class Component :
         this.builder = builder;
     }
 
-    public static TComponent? Create<TComponent>(IServiceProvider provider,
+    public static TComponent? Register<TComponent>(IServiceProvider provider,
         Action<IComponentBuilder> builderDelegate)
         where TComponent : class, IComponent
     {
