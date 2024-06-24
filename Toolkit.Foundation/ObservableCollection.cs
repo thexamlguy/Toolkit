@@ -144,8 +144,20 @@ public partial class ObservableCollection<TItem> :
         }
     }
 
+    public virtual Task Activated()
+    {
+        IsActivated = true;
+        while (pendingEvents.Count > 0)
+        {
+            object current = pendingEvents.Dequeue();
+            Handle((dynamic)current);
+        }
+
+        return Task.CompletedTask;
+    }
+
     public TItem Add<T>(params object?[] parameters)
-        where T :
+            where T :
         TItem
     {
         T? item = Factory.Create<T>(args =>
@@ -239,6 +251,15 @@ public partial class ObservableCollection<TItem> :
 
     void ICollection.CopyTo(Array array, int index) =>
         collection.CopyTo((TItem[])array, index);
+
+    public virtual Task Deactivated()
+    {
+        IsActivated = false;
+        return Task.CompletedTask;
+    }
+
+    public virtual Task Deactivating() =>
+        Task.CompletedTask;
 
     public virtual void Dispose()
     {
@@ -395,6 +416,21 @@ public partial class ObservableCollection<TItem> :
         IsCompatibleObject(value) ?
         IndexOf((TItem)value!) : -1;
 
+    public virtual Task Initialize()
+    {
+        if (IsInitialized)
+        {
+            return Task.CompletedTask;
+        }
+
+        IsInitialized = true;
+
+        Subscriber.Subscribe(this);
+        Synchronize();
+
+        return Task.CompletedTask;
+    }
+
     public TItem Insert<T>(int index = 0,
         params object?[] parameters)
         where T :
@@ -479,41 +515,6 @@ public partial class ObservableCollection<TItem> :
         return true;
     }
 
-    public virtual Task Activated()
-    {
-        IsActivated = true;
-        while (pendingEvents.Count > 0)
-        {
-            object current = pendingEvents.Dequeue();
-            Handle((dynamic)current);
-        }
-
-        return Task.CompletedTask;
-    }
-
-    public virtual Task Deactivated()
-    {
-        IsActivated = false;
-        return Task.CompletedTask;
-    }
-
-    public virtual Task Deactivating() =>
-        Task.CompletedTask;
-
-    public virtual Task Initialize()
-    {
-        if (IsInitialized)
-        {
-            return Task.CompletedTask;
-        }
-
-        IsInitialized = true;
-
-        Subscriber.Subscribe(this);
-        Synchronize();
-
-        return Task.CompletedTask;
-    }
     public bool Remove(TItem item)
     {
         int index = collection.IndexOf(item);
@@ -582,6 +583,7 @@ public partial class ObservableCollection<TItem> :
         SynchronizeExpression expression = BuildAggregateExpression();
         Publisher.PublishUI(expression.Value, expression.Key);
     }
+
     public void Track<T>(string propertyName, Func<T> getter, Action<T> setter)
     {
         if (!trackedProperties.ContainsKey(propertyName))
@@ -616,6 +618,7 @@ public partial class ObservableCollection<TItem> :
 
         collection.Insert(index > Count ? Count : index, item);
     }
+
     protected virtual void RemoveItem(int index) =>
         collection.RemoveAt(index);
 
@@ -631,6 +634,17 @@ public partial class ObservableCollection<TItem> :
         CollectionChanged?.Invoke(this, args);
     }
 
+    partial void OnIsActivatedChanged(bool value)
+    {
+        if (value)
+        {
+            while (pendingEvents.Count > 0)
+            {
+                object current = pendingEvents.Dequeue();
+                Handle((dynamic)current);
+            }
+        }
+    }
     partial void OnSelectedItemChanged(TItem? oldValue, TItem? newValue)
     {
         if (oldValue is ISelectable oldSelection)

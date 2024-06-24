@@ -34,6 +34,17 @@ public class ContentTemplate :
                             }
                         }
 
+                        async void HandleDataContextChanged(object? sender, EventArgs args)
+                        {
+                            if (control.DataContext is object content)
+                            {
+                                if (content is IActivated activated)
+                                {
+                                    await activated.Activated();
+                                }
+                            }
+                        }
+
                         async void HandleUnloaded(object? sender, RoutedEventArgs args)
                         {
                             control.Unloaded -= HandleUnloaded;
@@ -48,6 +59,8 @@ public class ContentTemplate :
 
                         control.Loaded += HandleLoaded;
                         control.Unloaded += HandleUnloaded;
+                        control.DataContextChanged += HandleDataContextChanged; ;
+
                         return control;
                     }
                 }

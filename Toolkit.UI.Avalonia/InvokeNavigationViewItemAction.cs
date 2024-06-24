@@ -2,7 +2,6 @@
 using Avalonia.Threading;
 using Avalonia.Xaml.Interactivity;
 using System.Collections;
-using Toolkit.Foundation;
 using Toolkit.UI.Controls.Avalonia;
 
 namespace Toolkit.UI.Avalonia;
@@ -19,9 +18,9 @@ public class InvokeNavigationViewItemAction :
             {
                 if (navigationViewItem.MenuItemsSource is IList collection)
                 {
-                    if (collection is { Count: > 0 } && collection[0] is ISelectable selectable)
+                    if (collection is { Count: > 0 })
                     {
-                        selectable.IsSelected = true;
+                        navigationViewItem.SetValue(NavigationView.SelectedItemProperty, collection[0]);
                     }
                 }
             }, DispatcherPriority.ContextIdle);
@@ -29,13 +28,13 @@ public class InvokeNavigationViewItemAction :
 
         if (sender is NavigationView navigationView)
         {
-            Dispatcher.UIThread.Post(() =>
+            Dispatcher.UIThread.Invoke(() =>
             {
                 if (navigationView.MenuItemsSource is IList collection)
                 {
-                    if (collection is { Count: > 0 } && collection[0] is ISelectable selectable)
+                    if (collection is { Count: > 0 })
                     {
-                        selectable.IsSelected = true;
+                        navigationView.SetValue(NavigationView.SelectedItemProperty, collection[0]);
                     }
                 }
             }, DispatcherPriority.ContextIdle);
@@ -43,4 +42,5 @@ public class InvokeNavigationViewItemAction :
 
         return true;
     }
+
 }

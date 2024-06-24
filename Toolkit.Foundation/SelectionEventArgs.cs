@@ -1,3 +1,3 @@
 ﻿namespace Toolkit.Foundation;
 
-public record SelectionEventArgs<TValue>(TValue? Value);
+public record SelectionEventArgs<TSender>(TSender? Sender);
