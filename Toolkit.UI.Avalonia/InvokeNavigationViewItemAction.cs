@@ -10,6 +10,15 @@ public class InvokeNavigationViewItemAction :
     AvaloniaObject,
     IAction
 {
+    public static readonly StyledProperty<int> SelectedIndexProperty =
+        AvaloniaProperty.Register<InvokeNavigationViewItemAction, int>(nameof(SelectedIndex), 0);
+
+    public int SelectedIndex
+    {
+        get => GetValue(SelectedIndexProperty);
+        set => SetValue(SelectedIndexProperty, value);
+    }
+
     public object? Execute(object? sender, object? parameter)
     {
         if (sender is NavigationViewItem navigationViewItem)
@@ -20,7 +29,7 @@ public class InvokeNavigationViewItemAction :
                 {
                     if (collection is { Count: > 0 })
                     {
-                        navigationViewItem.SetValue(NavigationView.SelectedItemProperty, collection[0]);
+                        navigationViewItem.SetValue(NavigationView.SelectedItemProperty, collection[SelectedIndex]);
                     }
                 }
             }, DispatcherPriority.ContextIdle);
@@ -34,7 +43,7 @@ public class InvokeNavigationViewItemAction :
                 {
                     if (collection is { Count: > 0 })
                     {
-                        navigationView.SetValue(NavigationView.SelectedItemProperty, collection[0]);
+                        navigationView.SetValue(NavigationView.SelectedItemProperty, collection[SelectedIndex]);
                     }
                 }
             }, DispatcherPriority.ContextIdle);
