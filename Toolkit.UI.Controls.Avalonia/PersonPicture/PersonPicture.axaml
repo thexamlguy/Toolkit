@@ -4,19 +4,19 @@
     xmlns:controls="using:Toolkit.UI.Controls.Avalonia">
     <ResourceDictionary.ThemeDictionaries>
         <ResourceDictionary x:Key="Light">
-            <StaticResource x:Key="PersonPictureForegroundThemeBrush" ResourceKey="TextFillColorPrimaryBrush" />
+            <StaticResource x:Key="PersonPictureForegroundThemeBrush" ResourceKey="TextOnAccentFillColorSelectedText" />
             <StaticResource x:Key="PersonPictureEllipseBadgeForegroundThemeBrush" ResourceKey="TextOnAccentFillColorPrimaryBrush" />
             <StaticResource x:Key="PersonPictureEllipseBadgeFillThemeBrush" ResourceKey="AccentFillColorDefaultBrush" />
             <StaticResource x:Key="PersonPictureEllipseBadgeStrokeThemeBrush" ResourceKey="ControlFillColorTransparentBrush" />
-            <StaticResource x:Key="PersonPictureEllipseFillThemeBrush" ResourceKey="ControlAltFillColorQuarternaryBrush" />
+            <StaticResource x:Key="PersonPictureEllipseFillThemeBrush" ResourceKey="ControlFillColorDefaultBrush" />
             <StaticResource x:Key="PersonPictureEllipseFillStrokeBrush" ResourceKey="CardStrokeColorDefaultBrush" />
         </ResourceDictionary>
         <ResourceDictionary x:Key="Dark">
-            <StaticResource x:Key="PersonPictureForegroundThemeBrush" ResourceKey="TextFillColorPrimaryBrush" />
+            <StaticResource x:Key="PersonPictureForegroundThemeBrush" ResourceKey="TextOnAccentFillColorSelectedText" />
             <StaticResource x:Key="PersonPictureEllipseBadgeForegroundThemeBrush" ResourceKey="TextOnAccentFillColorPrimaryBrush" />
             <StaticResource x:Key="PersonPictureEllipseBadgeFillThemeBrush" ResourceKey="AccentFillColorDefaultBrush" />
             <StaticResource x:Key="PersonPictureEllipseBadgeStrokeThemeBrush" ResourceKey="ControlFillColorTransparentBrush" />
-            <StaticResource x:Key="PersonPictureEllipseFillThemeBrush" ResourceKey="ControlAltFillColorQuarternaryBrush" />
+            <StaticResource x:Key="PersonPictureEllipseFillThemeBrush" ResourceKey="ControlFillColorDefaultBrush" />
             <StaticResource x:Key="PersonPictureEllipseFillStrokeBrush" ResourceKey="CardStrokeColorDefaultBrush" />
         </ResourceDictionary>
     </ResourceDictionary.ThemeDictionaries>
@@ -27,18 +27,19 @@
     <Thickness x:Key="PersonPictureBadgeGridMargin">0,-4,-4,0</Thickness>
     <ControlTheme x:Key="{x:Type controls:PersonPicture}" TargetType="controls:PersonPicture">
         <Setter Property="Foreground" Value="{DynamicResource PersonPictureForegroundThemeBrush}" />
+        <Setter Property="FontFamily" Value="{DynamicResource ContentControlThemeFontFamily}" />
+        <Setter Property="Background" Value="{DynamicResource PersonPictureEllipseFillThemeBrush}" />
+        <Setter Property="FontWeight" Value="600" />
+        <Setter Property="IsTabStop" Value="False" />
         <Setter Property="Width" Value="100" />
         <Setter Property="Height" Value="100" />
-        <Setter Property="FontFamily" Value="{DynamicResource ContentControlThemeFontFamily}" />
-        <Setter Property="FontWeight" Value="350" />
-        <Setter Property="IsTabStop" Value="False" />
         <Setter Property="Template">
             <ControlTemplate>
                 <Grid x:Name="RootGrid">
                     <Ellipse
                         Width="{TemplateBinding Width}"
                         Height="{TemplateBinding Height}"
-                        Fill="{DynamicResource PersonPictureEllipseFillThemeBrush}"
+                        Fill="{TemplateBinding Background}"
                         Stroke="{DynamicResource PersonPictureEllipseFillStrokeBrush}"
                         StrokeThickness="{DynamicResource PersonPictureEllipseStrokeThickness}" />
                     <TextBlock

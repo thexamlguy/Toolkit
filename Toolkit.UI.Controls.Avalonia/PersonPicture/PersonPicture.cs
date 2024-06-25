@@ -7,6 +7,7 @@ using Avalonia.Media.Imaging;
 
 namespace Toolkit.UI.Controls.Avalonia;
 
+
 public class PersonPicture : TemplatedControl
 {
     public static readonly StyledProperty<string> BadgeGlyphProperty =
@@ -36,11 +37,12 @@ public class PersonPicture : TemplatedControl
     private static readonly StyledProperty<PersonPictureTemplateSettings> TemplateSettingsProperty =
         AvaloniaProperty.Register<PersonPicture, PersonPictureTemplateSettings>(nameof(TemplateSettings));
 
+    private readonly ImageBrush? badgeImageBrush;
     private FontIcon? badgeGlyphIcon;
-    private ImageBrush? badgeImageBrush;
     private TextBlock? badgeNumberTextBlock;
     private Ellipse? badgingBackgroundEllipse;
     private Ellipse? badgingEllipse;
+    private PersonPictureColourGenerator colourGenerator = new(hue: 210, saturation: 0.8f, lightness: 0.6f);
     private string? displayNameInitials;
     private TextBlock? initialsTextBlock;
 
@@ -334,6 +336,12 @@ public class PersonPicture : TemplatedControl
 
         PersonPictureTemplateSettings templateSettings = TemplateSettings;
         templateSettings.ActualInitials = initials;
+
+        if (DisplayName is { Length: > 0 })
+        {
+            Color rgb = colourGenerator.Create(DisplayName);
+            SetValue(BackgroundProperty, new SolidColorBrush(Color.FromArgb(rgb.A, rgb.R, rgb.G, rgb.B)));
+        }
 
         if (imageSource is not null)
         {

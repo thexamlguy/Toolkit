@@ -168,12 +168,13 @@ public class FrameHandler :
                         }
                     }
                 }
-
-                frame.NavigateFromObject(control, navigationOptions);
                 foreach (Action postAction in postNavigateActions)
                 {
                     postAction.Invoke();
                 }
+
+                frame.NavigateFromObject(control, navigationOptions);
+
             }
         }
 
