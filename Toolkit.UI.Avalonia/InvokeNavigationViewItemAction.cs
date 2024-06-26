@@ -1,4 +1,5 @@
 ﻿using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Threading;
 using Avalonia.Xaml.Interactivity;
 using System.Collections;
@@ -43,6 +44,11 @@ public class InvokeNavigationViewItemAction :
                 {
                     if (collection is { Count: > 0 })
                     {
+                        if (collection[SelectedIndex] is ISelectable selectable)
+                        {
+                            selectable.IsSelected = true;
+                        }
+
                         navigationView.SetValue(NavigationView.SelectedItemProperty, collection[SelectedIndex]);
                     }
                 }
