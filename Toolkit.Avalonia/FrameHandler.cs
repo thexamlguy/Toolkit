@@ -111,28 +111,30 @@ public class FrameHandler :
                 FrameNavigationOptions navigationOptions = new();
                 List<Action> postNavigateActions = [];
 
-                void CleanUp()
+                void CleanUp(int start, int end)
                 {
-                    foreach (PageStackEntry? entry in frame.BackStack)
+                    int startIndex = Math.Max(0, start - 1);
+                    int endIndex = Math.Min(frame.BackStack.Count - 1, end - 1);
+
+                    for (int i = endIndex; i >= startIndex; i--)
                     {
+                        PageStackEntry? entry = frame.BackStack[i];
                         if (entry.Context is Control control)
                         {
-                            if (control.DataContext is object content)
+                            if (control.DataContext is IDisposable disposable)
                             {
-                                if (content is IDisposable disposable)
-                                {
-                                    disposable.Dispose();
-                                }
+                                disposable.Dispose();
                             }
                         }
-                    }
 
-                    frame.BackStack.Clear();
+                        frame.BackStack.RemoveAt(i);
+                    }
                 }
 
                 if (args.Parameters is not null)
                 {
-                    if (args.Parameters.TryGetValue("Transition", out object? transition))
+                    if (args.Parameters.TryGetValue("Transition", 
+                        out object? transition))
                     {
                         switch ($"{transition}")
                         {
@@ -149,7 +151,8 @@ public class FrameHandler :
                         }
                     }
 
-                    if (args.Parameters.TryGetValue("IsBackStackEnabled", out object? isBackStackEnabled))
+                    if (args.Parameters.TryGetValue("IsBackStackEnabled", 
+                        out object? isBackStackEnabled))
                     {
                         if (isBackStackEnabled is bool value)
                         {
@@ -157,24 +160,49 @@ public class FrameHandler :
                         }
                     }
 
-                    if (args.Parameters.TryGetValue("ClearBackStack", out object? clearBackStack))
+                    if (args.Parameters.TryGetValue("ClearBackStack", 
+                        out object? clearBackStack))
                     {
-                        if (clearBackStack is bool value)
+                        if (clearBackStack is bool clearBool)
                         {
-                            if (value)
+                            if (clearBool)
                             {
-                                postNavigateActions.Add(() => CleanUp());
+                                postNavigateActions.Add(() => CleanUp(1, frame.BackStack.Count));
                             }
                         }
+
+                        if (clearBackStack is string clearString)
+                        {
+                            if (clearString.StartsWith('[') && clearString.EndsWith(']') && 
+                                clearString.Contains('-'))
+                            {
+                                string range = clearString.Trim('[', ']');
+                                string[] parts = range.Split('-');
+
+                                if (parts.Length == 2 && int.TryParse(parts[0], out int start) &&
+                                    int.TryParse(parts[1], out int end))
+                                {
+                                    postNavigateActions.Add(() => CleanUp(start, end));
+                                }
+                                else
+                                {
+                                    postNavigateActions.Add(() => CleanUp(1, frame.BackStack.Count));
+                                }
+                            }
+                            else
+                            {
+                                postNavigateActions.Add(() => CleanUp(1, frame.BackStack.Count));
+                            }
+                        } 
                     }
-                }
-                foreach (Action postAction in postNavigateActions)
-                {
-                    postAction.Invoke();
                 }
 
                 frame.NavigateFromObject(control, navigationOptions);
 
+                foreach (Action postAction in postNavigateActions)
+                {
+                    postAction.Invoke();
+                }
             }
         }
 

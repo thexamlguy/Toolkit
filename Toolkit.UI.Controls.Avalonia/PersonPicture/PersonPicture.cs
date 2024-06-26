@@ -42,7 +42,7 @@ public class PersonPicture : TemplatedControl
     private TextBlock? badgeNumberTextBlock;
     private Ellipse? badgingBackgroundEllipse;
     private Ellipse? badgingEllipse;
-    private PersonPictureColourGenerator colourGenerator = new(hue: 210, saturation: 0.8f, lightness: 0.6f);
+    private PersonPictureColourGenerator colourGenerator = new();
     private string? displayNameInitials;
     private TextBlock? initialsTextBlock;
 
@@ -339,7 +339,7 @@ public class PersonPicture : TemplatedControl
 
         if (DisplayName is { Length: > 0 })
         {
-            Color rgb = colourGenerator.Create(DisplayName);
+            Color rgb = colourGenerator.GenerateColour(DisplayName);
             SetValue(BackgroundProperty, new SolidColorBrush(Color.FromArgb(rgb.A, rgb.R, rgb.G, rgb.B)));
         }
 
