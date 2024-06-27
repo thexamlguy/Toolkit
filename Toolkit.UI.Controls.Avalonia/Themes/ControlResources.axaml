@@ -5,6 +5,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <MergeResourceInclude Source="../CarouselView/CarouselView.axaml" />
                 <MergeResourceInclude Source="../PersonPicture/PersonPicture.axaml" />
+                <MergeResourceInclude Source="../SettingsExpander/SettingsExpander.axaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Styles.Resources>

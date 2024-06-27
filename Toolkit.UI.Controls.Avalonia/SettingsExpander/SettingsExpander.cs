@@ -1,6 +1,4 @@
-﻿using Avalonia;
-
-namespace Toolkit.UI.Controls.Avalonia;
+﻿namespace Toolkit.UI.Controls.Avalonia;
 
 public class SettingsExpander : FluentAvalonia.UI.Controls.SettingsExpander
 {

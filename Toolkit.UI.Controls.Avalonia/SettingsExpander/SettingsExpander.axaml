@@ -1,0 +1,93 @@
+﻿<ResourceDictionary
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Toolkit.UI.Controls.Avalonia"
+    xmlns:ui="using:FluentAvalonia.UI.Controls">
+    <ControlTheme x:Key="SettingsExpanderExpanderStyle" TargetType="Expander">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="MinWidth" Value="0" />
+        <Setter Property="MinHeight" Value="{DynamicResource SettingsExpanderMinHeight}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ExpanderContentBorderBrush}" />
+        <Setter Property="BorderThickness" Value="{DynamicResource ExpanderContentDownBorderThickness}" />
+        <Setter Property="CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <StackPanel>
+                    <controls:SettingsExpanderToggleButton
+                        Name="ToggleButton"
+                        MinHeight="{TemplateBinding MinHeight}"
+                        Content="{TemplateBinding Header}"
+                        IsChecked="{TemplateBinding IsExpanded,
+                                                    Mode=TwoWay}"
+                        IsEnabled="{TemplateBinding IsEnabled}"
+                        Theme="{StaticResource SettingsExpanderToggleButtonStyle}" />
+
+                    <Border
+                        Name="ExpanderContent"
+                        Background="{TemplateBinding Background}"
+                        BackgroundSizing="InnerBorderEdge"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius,
+                                                       Converter={StaticResource BottomCornerRadiusFilterConverter}}"
+                        IsVisible="False">
+                        <ContentPresenter
+                            Name="PART_ContentPresenter"
+                            Margin="{TemplateBinding Padding}"
+                            HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                            Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            IsVisible="{TemplateBinding IsExpanded}" />
+                    </Border>
+                </StackPanel>
+            </ControlTemplate>
+        </Setter>
+        <Style Selector="^:expanded /template/ Border#ExpanderContent">
+            <Setter Property="IsVisible" Value="True" />
+        </Style>
+    </ControlTheme>
+    <ControlTheme x:Key="{x:Type ui:SettingsExpander}" TargetType="ui:SettingsExpander">
+        <Setter Property="Background" Value="{DynamicResource ExpanderBackground}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ExpanderHeaderBorderBrush}" />
+        <Setter Property="BorderThickness" Value="{DynamicResource ExpanderHeaderBorderThickness}" />
+        <Setter Property="Padding" Value="{DynamicResource SettingsExpanderPadding}" />
+        <Setter Property="CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
+        <Setter Property="MinHeight" Value="{DynamicResource SettingsExpanderMinHeight}" />
+        <Setter Property="ItemsPanel">
+            <ItemsPanelTemplate>
+                <StackPanel Spacing="1" />
+            </ItemsPanelTemplate>
+        </Setter>
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Expander
+                    Name="Expander"
+                    IsExpanded="{TemplateBinding IsExpanded,
+                                                 Mode=TwoWay}"
+                    Theme="{StaticResource SettingsExpanderExpanderStyle}">
+                    <Expander.Header>
+                        <ui:SettingsExpanderItem
+                            Name="ContentHost"
+                            Padding="{DynamicResource SettingsExpanderPadding}"
+                            ActionIconSource="{TemplateBinding ActionIconSource}"
+                            Background="Transparent"
+                            Content="{TemplateBinding Header}"
+                            ContentTemplate="{TemplateBinding HeaderTemplate}"
+                            Description="{TemplateBinding Description}"
+                            Footer="{TemplateBinding Footer}"
+                            FooterTemplate="{TemplateBinding FooterTemplate}"
+                            IconSource="{TemplateBinding IconSource}"
+                            IsClickEnabled="{TemplateBinding IsClickEnabled}" />
+                    </Expander.Header>
+
+                    <ItemsPresenter ItemsPanel="{TemplateBinding ItemsPanel}" />
+                </Expander>
+            </ControlTemplate>
+        </Setter>
+
+        <Style Selector="^:empty /template/ ItemsPresenter#ItemsHost">
+            <Setter Property="IsVisible" Value="False" />
+        </Style>
+    </ControlTheme>
+</ResourceDictionary>
