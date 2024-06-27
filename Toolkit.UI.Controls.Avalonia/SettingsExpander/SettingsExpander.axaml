@@ -3,6 +3,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="using:Toolkit.UI.Controls.Avalonia"
     xmlns:ui="using:FluentAvalonia.UI.Controls">
+    <Thickness x:Key="SettingsExpanderItemBottomFooterMargin">0 4 0 0</Thickness>
     <ControlTheme x:Key="SettingsExpanderExpanderStyle" TargetType="Expander">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="MinWidth" Value="0" />
