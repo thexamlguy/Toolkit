@@ -123,7 +123,7 @@ public static class IHostBuilderExtension
                     IFileInfo? fileInfo = null;
                     if (provider.GetService<IHostEnvironment>() is IHostEnvironment hostEnvironment)
                     {
-                        IFileProvider fileProvider = hostEnvironment.ContentRootFileProvider;
+                        Microsoft.Extensions.FileProviders.IFileProvider fileProvider = hostEnvironment.ContentRootFileProvider;
                         fileInfo = fileProvider.GetFileInfo(path);
                     }
 

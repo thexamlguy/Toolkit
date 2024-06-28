@@ -1,4 +1,5 @@
-﻿namespace Toolkit.Foundation;
+﻿
+namespace Toolkit.Foundation;
 
 public record Activated
 {

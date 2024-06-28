@@ -124,6 +124,11 @@ public static class IServiceCollectionExtensions
 
     public static IServiceCollection AddAvalonia(this IServiceCollection services)
     {
+        services.AddTransient<ITopLevelProvider, TopLevelProvider>();
+        services.AddTransient<IFileProvider, FileProvider>();
+        services.AddTransient<IImageProvider,  ImageProvider>();
+        services.AddTransient<IImageResizer, ImageResizer>();
+
         services.AddTransient<IDispatcher, AvaloniaDispatcher>();
 
         services.AddTransient<IContentTemplate, ContentTemplate>();
