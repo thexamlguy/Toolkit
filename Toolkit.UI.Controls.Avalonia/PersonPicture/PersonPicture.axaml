@@ -55,6 +55,7 @@
                         x:Name="PersonPictureEllipse"
                         Width="{TemplateBinding Width}"
                         Height="{TemplateBinding Height}"
+                        Fill="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=TemplateSettings.ActualImageBrush}"
                         FlowDirection="LeftToRight" />
                     <Grid
                         x:Name="BadgeGrid"

@@ -157,6 +157,7 @@ public class PersonPicture : TemplatedControl
 
         if (change.Property == ProfilePictureProperty)
         {
+            UpdateIfReady();
         }
     }
 
