@@ -2,5 +2,5 @@
 
 public interface IInitialization
 {
-    Task Initialize();
+    void Initialize();
 }

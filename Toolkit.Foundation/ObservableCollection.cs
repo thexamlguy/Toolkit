@@ -157,8 +157,7 @@ public partial class ObservableCollection<TItem> :
     }
 
     public TItem Add<T>(params object?[] parameters)
-            where T :
-        TItem
+        where T : TItem
     {
         T? item = Factory.Create<T>(args =>
         {
@@ -416,19 +415,17 @@ public partial class ObservableCollection<TItem> :
         IsCompatibleObject(value) ?
         IndexOf((TItem)value!) : -1;
 
-    public virtual Task Initialize()
+    public virtual void Initialize()
     {
         if (IsInitialized)
         {
-            return Task.CompletedTask;
+            return;
         }
 
         IsInitialized = true;
 
         Subscriber.Subscribe(this);
         Synchronize();
-
-        return Task.CompletedTask;
     }
 
     public TItem Insert<T>(int index = 0,

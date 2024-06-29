@@ -6,14 +6,15 @@ public class AppService(IEnumerable<IInitialization> initializers,
     IPublisher publisher) :
     IHostedService
 {
-    public async Task StartAsync(CancellationToken cancellationToken)
+    public Task StartAsync(CancellationToken cancellationToken)
     {
         foreach (IInitialization initializer in initializers)
         {
-            await initializer.Initialize();
+            initializer.Initialize();
         }
 
         publisher.Publish<StartedEventArgs>();
+        return Task.CompletedTask;
     }
 
     public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;

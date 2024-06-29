@@ -56,17 +56,15 @@ public partial class Observable(IServiceProvider provider,
         Disposer.Dispose(this);
     }
 
-    public virtual Task Initialize()
+    public virtual void Initialize()
     {
         if (IsInitialized)
         {
-            return Task.CompletedTask;
+            return;
         }
 
         IsInitialized = true;
-
         Subscriber.Subscribe(this);
-        return Task.CompletedTask;
     }
 
     [ObservableProperty]

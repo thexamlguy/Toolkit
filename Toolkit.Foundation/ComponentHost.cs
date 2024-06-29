@@ -14,7 +14,8 @@ public class ComponentHost(IServiceProvider services,
     {
     }
 
-    public TConfiguration? GetConfiguration<TConfiguration>() where TConfiguration : ComponentConfiguration
+    public TConfiguration? GetConfiguration<TConfiguration>()
+        where TConfiguration : ComponentConfiguration
     {
         return Services.GetService<TConfiguration>();
     }
@@ -23,7 +24,7 @@ public class ComponentHost(IServiceProvider services,
     {
         foreach (IInitialization initializer in initializers)
         {
-            await initializer.Initialize();
+            initializer.Initialize();
         }
 
         foreach (IHostedService service in hostedServices)

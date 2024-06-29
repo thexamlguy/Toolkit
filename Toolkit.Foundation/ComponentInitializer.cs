@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace Toolkit.Foundation;
 
@@ -9,7 +10,7 @@ public class ComponentInitializer(IEnumerable<IComponent> components,
     IServiceProvider provider) :
     IInitialization
 {
-    public async Task Initialize()
+    public void Initialize()
     {
         foreach (IComponent component in components)
         {
@@ -45,7 +46,7 @@ public class ComponentInitializer(IEnumerable<IComponent> components,
                 provider.GetRequiredService<IServiceProvider>()));
 
             hosts.Add(host);
-            await host.StartAsync();
+            host.Start();
         }
     }
 }

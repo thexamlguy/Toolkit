@@ -9,7 +9,7 @@ public class ConfigurationInitializer<TConfiguration>(IConfigurationReader<TConf
     where TConfiguration :
     class
 {
-    public Task Initialize()
+    public void Initialize()
     {
         if (!reader.TryRead(out TConfiguration? configuration))
         {
@@ -21,6 +21,5 @@ public class ConfigurationInitializer<TConfiguration>(IConfigurationReader<TConf
         }
 
         publisher.PublishUI(new ActivatedEventArgs<TConfiguration>(configuration));
-        return Task.CompletedTask;
     }
 }

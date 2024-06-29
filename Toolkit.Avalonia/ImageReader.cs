@@ -6,7 +6,7 @@ namespace Toolkit.Avalonia;
 public class ImageReader(IImageResizer imageResizer) : 
     IImageReader
 {
-    public async Task<IImageDescriptor> Get(Stream stream, 
+    public IImageDescriptor Get(Stream stream, 
         int width, 
         int height, 
         bool maintainAspectRatio)
