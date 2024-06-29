@@ -2,9 +2,9 @@
 
 public class Request
 {
-    public static RequestEventArgs<TValue> As<TValue>(TValue value) =>
-        new(value);
+    public static RequestEventArgs<TSender> As<TSender>(TSender sender) =>
+        new(sender);
 
-    public static RequestEventArgs<TValue> As<TValue>() where TValue : new() =>
-        new(new TValue());
+    public static RequestEventArgs<TSender> As<TSender>() where TSender : new() =>
+        new(new TSender());
 }

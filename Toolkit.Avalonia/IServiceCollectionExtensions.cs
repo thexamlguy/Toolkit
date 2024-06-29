@@ -126,7 +126,9 @@ public static class IServiceCollectionExtensions
     {
         services.AddTransient<ITopLevelProvider, TopLevelProvider>();
         services.AddTransient<IFileProvider, FileProvider>();
-        services.AddTransient<IImageProvider,  ImageProvider>();
+
+        services.AddTransient<IImageReader,  ImageReader>();
+        services.AddTransient<IImageWriter, ImageWriter>();
         services.AddTransient<IImageResizer, ImageResizer>();
 
         services.AddTransient<IDispatcher, AvaloniaDispatcher>();
@@ -149,6 +151,10 @@ public static class IServiceCollectionExtensions
         services.AddTransient((Func<IServiceProvider, IProxyServiceCollection<IComponentBuilder>>)(provider =>
             new ProxyServiceCollection<IComponentBuilder>(services =>
             {
+                services.AddTransient<IImageReader, ImageReader>();
+                services.AddTransient<IImageWriter, ImageWriter>();
+                services.AddTransient<IImageResizer, ImageResizer>();
+
                 services.AddSingleton(provider.GetRequiredService<IDispatcher>());
                 services.AddTransient<IContentTemplate, ContentTemplate>();
 

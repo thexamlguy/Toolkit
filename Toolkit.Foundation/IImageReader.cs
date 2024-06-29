@@ -1,8 +1,8 @@
 ﻿namespace Toolkit.Foundation;
 
-public interface IImageProvider
+public interface IImageReader
 {
-    Task<IImageDescriptor> Get(string filePath, 
+    Task<IImageDescriptor> Get(Stream stream, 
         int width, 
         int height, 
         bool maintainAspectRatio = false);
