@@ -9,23 +9,7 @@ public class ComponentBuilder :
 {
     private readonly IHostBuilder hostBuilder;
 
-    private ContentRootConfiguration rootConfiguration = new();
-
-    public void SetRootConfiguration(Action<ContentRootConfiguration> configurationDelegate)
-    {
-        ContentRootConfiguration rootConfiguration = new();
-        configurationDelegate.Invoke(rootConfiguration);
-
-        this.rootConfiguration = rootConfiguration;
-    }
-
-    public void SetAppConfiguration(Action<ContentRootConfiguration> rootConfigurationDelegate)
-    {
-        ContentRootConfiguration rootConfiguration = new();
-        rootConfigurationDelegate.Invoke(rootConfiguration);
-
-        this.rootConfiguration = rootConfiguration;
-    }
+    private ComponentContentConfiguration configuration = new();
 
     private ComponentBuilder()
     {
@@ -61,8 +45,7 @@ public class ComponentBuilder :
             });
     }
 
-    public static IComponentBuilder Create() =>
-        new ComponentBuilder();
+    public static IComponentBuilder Create() => new ComponentBuilder();
 
     public IComponentBuilder AddConfiguration<TConfiguration>(Action<TConfiguration> configurationDelegate)
         where TConfiguration : ComponentConfiguration, new()
@@ -104,13 +87,21 @@ public class ComponentBuilder :
 
     public IComponentHost Build()
     {
-        hostBuilder.UseContentRoot(rootConfiguration.ContentRoot, true)
+        hostBuilder.UseContentRoot(configuration.ContentRoot, true)
             .ConfigureAppConfiguration(config =>
             {
-                config.AddJsonFile(rootConfiguration.JsonFileName, true, true);
+                config.AddJsonFile(configuration.JsonFileName, true, true);
             });
 
         IHost host = hostBuilder.Build();
         return host.Services.GetRequiredService<IComponentHost>();
+    }
+
+    public void SetComponentConfiguration(Action<ComponentContentConfiguration> configurationDelegate)
+    {
+        ComponentContentConfiguration configuration = new();
+        configurationDelegate.Invoke(configuration);
+
+        this.configuration = configuration;
     }
 }

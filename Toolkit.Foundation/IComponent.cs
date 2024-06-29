@@ -2,5 +2,5 @@
 
 public interface IComponent
 {
-    IComponentBuilder Create();
+    IComponentBuilder Configure(string key);
 }

@@ -14,7 +14,9 @@ public interface IComponentBuilder
     IComponentBuilder AddConfiguration<TConfiguration>(string section)
         where TConfiguration : ComponentConfiguration, new();
 
+    IComponentBuilder AddServices(Action<IServiceCollection> configureDelegate);
+
     IComponentHost Build();
 
-    IComponentBuilder AddServices(Action<IServiceCollection> configureDelegate);
+    void SetComponentConfiguration(Action<ComponentContentConfiguration> configurationDelegate);
 }

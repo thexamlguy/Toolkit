@@ -1,6 +1,6 @@
 ﻿namespace Toolkit.Foundation;
 
-public record ContentRootConfiguration
+public record ComponentContentConfiguration
 {
     public string ContentRoot { get; set; } = "Local";
 

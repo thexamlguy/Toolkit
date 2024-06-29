@@ -7,16 +7,16 @@ public class ComponentFactory(IServiceProvider provider,
     IComponentScopeCollection scopes) :
     IComponentFactory
 {
-    public IComponentHost? Create<TComponent, TConfiguration>(string name,
+    public IComponentHost? Create<TComponent, TConfiguration>(string key,
         TConfiguration? configuration = null,
         Action<IServiceCollection>? servicesDelegate = null)
         where TComponent : IComponent
-        where TConfiguration : ComponentConfiguration, new()
+        where TConfiguration :
+        ComponentConfiguration, new()
     {
         if (provider.GetRequiredService<TComponent>() is TComponent component)
         {
-            IComponentBuilder builder = component.Create();
-
+            IComponentBuilder builder = component.Configure(key);
             builder.AddServices(services =>
             {
                 services.AddTransient(_ =>
@@ -38,7 +38,7 @@ public class ComponentFactory(IServiceProvider provider,
                     provider.GetRequiredService<IComponentScopeProvider>());
 
                 services.AddRange(proxy.Services);
-                services.AddSingleton(new NamedComponent(name));
+                services.AddSingleton(new NamedComponent(key));
 
                 if (servicesDelegate is not null)
                 {
@@ -46,10 +46,10 @@ public class ComponentFactory(IServiceProvider provider,
                 }
             });
 
-            builder.AddConfiguration(name, configuration);
+            builder.AddConfiguration(key, configuration);
             IComponentHost host = builder.Build();
 
-            scopes.Add(new ComponentScopeDescriptor(name,
+            scopes.Add(new ComponentScopeDescriptor(key,
                  host.Services.GetRequiredService<IServiceProvider>()));
 
             return host;

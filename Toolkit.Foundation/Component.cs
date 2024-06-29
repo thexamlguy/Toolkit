@@ -2,17 +2,16 @@
 
 namespace Toolkit.Foundation;
 
+
 public class Component :
     IComponent
 {
     private readonly IComponentBuilder builder;
 
-    protected Component(IComponentBuilder builder)
-    {
+    protected Component(IComponentBuilder builder) => 
         this.builder = builder;
-    }
 
-    public static TComponent? Register<TComponent>(IServiceProvider provider,
+    public static TComponent? Create<TComponent>(IServiceProvider provider,
         Action<IComponentBuilder> builderDelegate)
         where TComponent : class, IComponent
     {
@@ -23,8 +22,13 @@ public class Component :
 
             return factory.Create<TComponent>(builder);
         }
+
         return default;
     }
 
-    public virtual IComponentBuilder Create() => builder;
+    public IComponentBuilder Configure(string name) =>
+        Configuring(name, builder);
+
+    public virtual IComponentBuilder Configuring(string name,
+        IComponentBuilder builder) => builder;
 }

@@ -13,7 +13,7 @@ public class ComponentInitializer(IEnumerable<IComponent> components,
     {
         foreach (IComponent component in components)
         {
-            IComponentBuilder builder = component.Create();
+            IComponentBuilder builder = component.Configure("");
             builder.AddServices(services =>
             {
                 services.AddTransient(_ =>
