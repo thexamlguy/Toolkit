@@ -4,7 +4,6 @@ using Toolkit.Foundation;
 
 namespace Toolkit.Avalonia;
 
-
 public class FileProvider(ITopLevelProvider topLevelProvider) :
     IFileProvider
 {

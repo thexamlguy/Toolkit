@@ -151,6 +151,9 @@ public static class IServiceCollectionExtensions
         services.AddTransient((Func<IServiceProvider, IProxyServiceCollection<IComponentBuilder>>)(provider =>
             new ProxyServiceCollection<IComponentBuilder>(services =>
             {
+                services.AddTransient<ITopLevelProvider, TopLevelProvider>();
+                services.AddTransient<IFileProvider, FileProvider>();
+
                 services.AddTransient<IImageReader, ImageReader>();
                 services.AddTransient<IImageWriter, ImageWriter>();
                 services.AddTransient<IImageResizer, ImageResizer>();

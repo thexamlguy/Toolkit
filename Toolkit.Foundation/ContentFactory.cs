@@ -1,21 +1,12 @@
 ﻿namespace Toolkit.Foundation;
 
-public class ContentFactory(IMediator mediator,
-    IServiceProvider provider,
+public class ContentFactory(IServiceProvider provider,
     IServiceFactory factory) : IContentFactory
 {
-    public async Task<object?> CreateAsync(IContentTemplateDescriptor descriptor, 
+    public Task<object?> CreateAsync(IContentTemplateDescriptor descriptor, 
         object[] parameters)
     {
-        Type createEventType = typeof(CreateEventArgs<>).MakeGenericType(descriptor.ContentType);
-
-        object? content = null;
-        if (Activator.CreateInstance(createEventType, [null, parameters]) is object createEvent)
-        {
-            content = await mediator.Handle(descriptor.ContentType, createEvent, descriptor.Key);
-        }
-
-        content ??= parameters is { Length: > 0 }
+        object? content = parameters is { Length: > 0 }
                 ? factory.Create(descriptor.ContentType, args =>
                 {
                     if (args is IInitialization initialization)
@@ -31,6 +22,6 @@ public class ContentFactory(IMediator mediator,
                     }
                 }, descriptor.Key);
 
-        return content;
+        return Task.FromResult<object?>(content);
     }
 }
