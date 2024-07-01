@@ -21,7 +21,7 @@ public class ContentControlHandler :
                     {
                         if (content is IActivated activated)
                         {
-                            await activated.Activated();
+                            await activated.OnActivated();
                         }
                     }
 
@@ -35,7 +35,7 @@ public class ContentControlHandler :
                     {
                         if (content is IDeactivated deactivated)
                         {
-                            await deactivated.Deactivated();
+                            await deactivated.OnDeactivated();
                         }
 
                         if (content is IDisposable disposable)

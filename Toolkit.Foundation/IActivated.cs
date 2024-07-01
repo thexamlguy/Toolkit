@@ -2,5 +2,5 @@
 
 public interface IActivated
 {
-    Task Activated();
+    Task OnActivated();
 }

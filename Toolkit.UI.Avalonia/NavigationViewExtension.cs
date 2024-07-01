@@ -34,7 +34,7 @@ public class NavigationViewExtension
                         sender.RaiseEvent(new ItemInvokedEventArgs { RoutedEvent = ItemInvokedEvent });
                     }
                 }
-       
+
                 navigationView.ItemInvoked += OnItemInvoked;
                 return true;
             }

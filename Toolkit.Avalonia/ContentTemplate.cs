@@ -29,7 +29,7 @@ public class ContentTemplate :
                             {
                                 if (content is IActivated activated)
                                 {
-                                    await activated.Activated();
+                                    await activated.OnActivated();
                                 }
                             }
                         }
@@ -40,7 +40,7 @@ public class ContentTemplate :
                             {
                                 if (content is IActivated activated)
                                 {
-                                    await activated.Activated();
+                                    await activated.OnActivated();
                                 }
                             }
                         }
@@ -52,7 +52,7 @@ public class ContentTemplate :
                             {
                                 if (content is IDeactivated deactivated)
                                 {
-                                    await deactivated.Deactivated();
+                                    await deactivated.OnDeactivated();
                                 }
                             }
                         }

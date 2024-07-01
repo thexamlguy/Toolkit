@@ -81,7 +81,7 @@ public class ContentDialogHandler(IDispatcher dispatcher) :
                         {
                             if (content is IDeactivating deactivating)
                             {
-                                await deactivating.Deactivating();
+                                await deactivating.OnDeactivating();
                             }
                        }
                     }
@@ -96,7 +96,7 @@ public class ContentDialogHandler(IDispatcher dispatcher) :
                 {
                     if (content is IActivated activated)
                     {
-                        await activated.Activated();
+                        await activated.OnActivated();
                     }
                 }
             }
@@ -109,7 +109,7 @@ public class ContentDialogHandler(IDispatcher dispatcher) :
                 {
                     if (content is IDeactivated deactivated)
                     {
-                        await deactivated.Deactivated();
+                        await deactivated.OnDeactivated();
                     }
                 }
             }

@@ -127,7 +127,7 @@ public partial class ObservableCollection<TItem> :
 
     object? IList.this[int index]
     {
-        get => collection[index];
+        get => index >= 0 ? collection[index] : null;
         set
         {
             TItem? item = default;
@@ -144,7 +144,7 @@ public partial class ObservableCollection<TItem> :
         }
     }
 
-    public virtual Task Activated()
+    public virtual Task OnActivated()
     {
         IsActivated = true;
         while (pendingEvents.Count > 0)
@@ -251,13 +251,13 @@ public partial class ObservableCollection<TItem> :
     void ICollection.CopyTo(Array array, int index) =>
         collection.CopyTo((TItem[])array, index);
 
-    public virtual Task Deactivated()
+    public virtual Task OnDeactivated()
     {
         IsActivated = false;
         return Task.CompletedTask;
     }
 
-    public virtual Task Deactivating() =>
+    public virtual Task OnDeactivating() =>
         Task.CompletedTask;
 
     public virtual void Dispose()
@@ -642,11 +642,15 @@ public partial class ObservableCollection<TItem> :
             }
         }
     }
+
     partial void OnSelectedItemChanged(TItem? oldValue, TItem? newValue)
     {
         if (oldValue is ISelectable oldSelection)
         {
-            oldSelection.IsSelected = false;
+            if (oldSelection.IsSelected)
+            {
+                oldSelection.IsSelected = false;
+            }
         }
 
         if (newValue is ISelectable newSelection)

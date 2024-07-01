@@ -25,6 +25,9 @@ public partial class Observable(IServiceProvider provider,
     private readonly Dictionary<string, object> trackedProperties = [];
 
     [ObservableProperty]
+    private bool isActivated;
+
+    [ObservableProperty]
     private bool isActive;
 
     [ObservableProperty]
@@ -42,6 +45,12 @@ public partial class Observable(IServiceProvider provider,
 
     public ISubscriber Subscriber { get; } = subscriber;
 
+    public virtual Task OnActivated()
+    {
+        IsActivated = true;
+        return Task.CompletedTask;
+    }
+
     public void Commit()
     {
         foreach (object trackedProperty in trackedProperties.Values)
@@ -49,6 +58,15 @@ public partial class Observable(IServiceProvider provider,
             ((dynamic)trackedProperty).Commit();
         }
     }
+
+    public virtual Task OnDeactivated()
+    {
+        IsActivated = false;
+        return Task.CompletedTask;
+    }
+
+    public virtual Task OnDeactivating() =>
+        Task.CompletedTask;
 
     public virtual void Dispose()
     {
@@ -66,25 +84,6 @@ public partial class Observable(IServiceProvider provider,
         IsInitialized = true;
         Subscriber.Subscribe(this);
     }
-
-    [ObservableProperty]
-    private bool isActivated;
-
-    public virtual Task Activated()
-    {
-        IsActivated = true;
-        return Task.CompletedTask;
-    }
-
-
-    public virtual Task Deactivated()
-    {
-        IsActivated = false;
-        return Task.CompletedTask;
-    }
-
-    public virtual Task Deactivating() =>
-        Task.CompletedTask;
 
     public void Revert()
     {
