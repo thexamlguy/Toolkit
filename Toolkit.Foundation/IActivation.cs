@@ -1,3 +1,3 @@
 ﻿namespace Toolkit.Foundation;
 
-public interface ISynchronize;
+public interface IActivation;

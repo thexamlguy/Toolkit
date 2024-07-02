@@ -266,7 +266,7 @@ public partial class ObservableCollection<TItem> :
         Disposer.Dispose(this);
     }
 
-    public void Fetch(Func<SynchronizeExpression> aggregateDelegate,
+    public void Activate(Func<ActivationBuilder> aggregateDelegate, 
         bool reset = false)
     {
         if (reset)
@@ -274,8 +274,8 @@ public partial class ObservableCollection<TItem> :
             Clear();
         }
 
-        SynchronizeExpression expression = aggregateDelegate.Invoke();
-        Publisher.PublishUI(expression.Value, expression.Key);
+        ActivationBuilder expression = aggregateDelegate.Invoke();
+        Publisher.Publish(expression.Value, expression.Key);
     }
 
     public IEnumerator<TItem> GetEnumerator() =>
@@ -415,6 +415,11 @@ public partial class ObservableCollection<TItem> :
         IsCompatibleObject(value) ?
         IndexOf((TItem)value!) : -1;
 
+    public virtual void OnInitialize()
+    {
+
+    }
+
     public virtual void Initialize()
     {
         if (IsInitialized)
@@ -423,9 +428,10 @@ public partial class ObservableCollection<TItem> :
         }
 
         IsInitialized = true;
-
         Subscriber.Subscribe(this);
-        Synchronize();
+        OnInitialize();
+
+        Activate();
     }
 
     public TItem Insert<T>(int index = 0,
@@ -570,15 +576,15 @@ public partial class ObservableCollection<TItem> :
         }
     }
 
-    public void Synchronize(bool reset = false)
+    public void Activate(bool reset = false)
     {
         if (reset)
         {
             Clear();
         }
 
-        SynchronizeExpression expression = BuildAggregateExpression();
-        Publisher.PublishUI(expression.Value, expression.Key);
+        ActivationBuilder builder = ActivationBuilder();
+        Publisher.PublishUI(builder.Value, builder.Key);
     }
 
     public void Track<T>(string propertyName, Func<T> getter, Action<T> setter)
@@ -590,8 +596,8 @@ public partial class ObservableCollection<TItem> :
         }
     }
 
-    protected virtual SynchronizeExpression BuildAggregateExpression() =>
-        new(new SynchronizeEventArgs<TItem>());
+    protected virtual ActivationBuilder ActivationBuilder() =>
+        new(new ActivationEventArgs<TItem>());
 
     protected virtual void ClearItems() =>
         collection.Clear();

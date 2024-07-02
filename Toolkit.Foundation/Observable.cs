@@ -74,6 +74,11 @@ public partial class Observable(IServiceProvider provider,
         Disposer.Dispose(this);
     }
 
+    public virtual void OnInitialize()
+    {
+
+    }
+
     public virtual void Initialize()
     {
         if (IsInitialized)
@@ -83,6 +88,7 @@ public partial class Observable(IServiceProvider provider,
 
         IsInitialized = true;
         Subscriber.Subscribe(this);
+        OnInitialize();
     }
 
     public void Revert()
