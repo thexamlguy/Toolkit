@@ -31,12 +31,10 @@ public class ImageResizer :
                 int cropY = (resized.Height - targetHeight) / 2;
 
                 cropped = new SKBitmap(targetWidth, targetHeight);
-                using (SKCanvas croppedCanvas = new(cropped))
-                {
-                    SKRect srcRect = new(cropX, cropY, cropX + targetWidth, cropY + targetHeight);
-                    SKRect destRect = new(0, 0, targetWidth, targetHeight);
-                    croppedCanvas.DrawBitmap(resized, srcRect, destRect);
-                }
+                using SKCanvas croppedCanvas = new(cropped);
+                SKRect originalRect = new(cropX, cropY, cropX + targetWidth, cropY + targetHeight);
+                SKRect targetRect = new(0, 0, targetWidth, targetHeight);
+                croppedCanvas.DrawBitmap(resized, originalRect, targetRect);
             }
 
             using SKImage image = SKImage.FromBitmap(cropped);
