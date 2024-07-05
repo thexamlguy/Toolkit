@@ -74,14 +74,7 @@ public class ConfigurationSource<TConfiguration>(IConfigurationFile<TConfigurati
                 string currentKey = segments[i];
                 if (currentNode[currentKey] is null)
                 {
-                    if (int.TryParse(segments[i + 1], out int _))
-                    {
-                        currentNode[currentKey] = new JsonArray();
-                    }
-                    else
-                    {
-                        currentNode[currentKey] = new JsonObject();
-                    }
+                    currentNode[currentKey] = new JsonObject();
                 }
 
                 currentNode = currentNode[currentKey];

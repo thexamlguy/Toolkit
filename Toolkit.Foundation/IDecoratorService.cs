@@ -2,7 +2,7 @@
 
 public interface IDecoratorService<T>
 {
-    T? Service { get; }
+    T? Value { get; }
 
-    void Set(T service);
+    void Set(T? value);
 }

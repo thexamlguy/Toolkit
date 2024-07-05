@@ -51,7 +51,6 @@ public class ComponentBuilder :
         where TConfiguration : ComponentConfiguration, new()
     {
         TConfiguration configuration = new();
-
         if (configurationDelegate is not null)
         {
             configurationDelegate(configuration);
