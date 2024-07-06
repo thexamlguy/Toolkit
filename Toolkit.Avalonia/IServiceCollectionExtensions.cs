@@ -127,6 +127,8 @@ public static class IServiceCollectionExtensions
         services.AddTransient<ITopLevelProvider, TopLevelProvider>();
         services.AddTransient<IFileProvider, FileProvider>();
 
+        services.AddTransient<IClipboardWriter, ClipboardWriter>();
+
         services.AddTransient<IImageReader,  ImageReader>();
         services.AddTransient<IImageWriter, ImageWriter>();
         services.AddTransient<IImageResizer, ImageResizer>();
@@ -153,6 +155,8 @@ public static class IServiceCollectionExtensions
             {
                 services.AddTransient<ITopLevelProvider, TopLevelProvider>();
                 services.AddTransient<IFileProvider, FileProvider>();
+
+                services.AddTransient<IClipboardWriter, ClipboardWriter>();
 
                 services.AddTransient<IImageReader, ImageReader>();
                 services.AddTransient<IImageWriter, ImageWriter>();
