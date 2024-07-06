@@ -168,7 +168,6 @@ public partial class ObservableCollection<TItem> :
         }, parameters);
 
         Add(item);
-
         return item;
     }
 
@@ -401,7 +400,6 @@ public partial class ObservableCollection<TItem> :
             pendingEvents.Enqueue(args);
         }
 
-
         return Task.CompletedTask;
     }
 
@@ -529,9 +527,10 @@ public partial class ObservableCollection<TItem> :
         Disposer.Dispose(item);
         Disposer.Remove(this, item);
 
+        TItem? oldSelection = SelectedItem;
         RemoveItem(index);
 
-        if (item.Equals(SelectedItem))
+        if (item.Equals(oldSelection))
         {
             int newIndex = Math.Min(index, Count - 1);
             TItem? selectedItem = newIndex >= 0 ? this[newIndex] : default;
@@ -653,10 +652,7 @@ public partial class ObservableCollection<TItem> :
     {
         if (oldValue is ISelectable oldSelection)
         {
-            if (oldSelection.IsSelected)
-            {
-                oldSelection.IsSelected = false;
-            }
+            oldSelection.IsSelected = false;
         }
 
         if (newValue is ISelectable newSelection)
