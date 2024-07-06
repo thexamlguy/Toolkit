@@ -3,14 +3,14 @@ using Avalonia.Controls.Templates;
 
 namespace Toolkit.UI.Controls.Avalonia;
 
-public class SettingsExpander :
-    FluentAvalonia.UI.Controls.SettingsExpander
+public class SettingsExpanderItem :
+    FluentAvalonia.UI.Controls.SettingsExpanderItem
 {
     public static readonly StyledProperty<object> ActionProperty =
-        AvaloniaProperty.Register<SettingsExpander, object>(nameof(Action));
+        AvaloniaProperty.Register<SettingsExpanderItem, object>(nameof(Action));
 
     public static readonly StyledProperty<IDataTemplate> ActionTemplateProperty =
-        AvaloniaProperty.Register<SettingsExpander, IDataTemplate>(nameof(ActionTemplate));
+        AvaloniaProperty.Register<SettingsExpanderItem, IDataTemplate>(nameof(ActionTemplate));
 
     public object Action
     {
@@ -25,5 +25,5 @@ public class SettingsExpander :
     }
 
     protected override Type StyleKeyOverride =>
-        typeof(SettingsExpander);
+        typeof(SettingsExpanderItem);
 }
