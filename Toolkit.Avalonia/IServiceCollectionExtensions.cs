@@ -138,6 +138,8 @@ public static class IServiceCollectionExtensions
         services.AddTransient<IContentTemplate, ContentTemplate>();
         services.AddTransient<INavigationRegion, NavigationRegion>();
 
+        services.AddHandler<WriteClipboardHandler>();
+
         services.AddHandler<ClassicDesktopStyleApplicationHandler>(nameof(IClassicDesktopStyleApplicationLifetime));
         services.AddHandler<SingleViewApplicationHandler>(nameof(ISingleViewApplicationLifetime));
         services.AddHandler<ContentControlHandler>(nameof(ContentControl));
@@ -166,6 +168,8 @@ public static class IServiceCollectionExtensions
                 services.AddTransient<IContentTemplate, ContentTemplate>();
 
                 services.AddTransient<INavigationRegion, NavigationRegion>();
+
+                services.AddHandler<WriteClipboardHandler>();
 
                 services.AddHandler<ContentControlHandler>(nameof(ContentControl));
                 services.AddHandler<FrameHandler>(nameof(Frame));
