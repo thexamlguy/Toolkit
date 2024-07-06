@@ -70,6 +70,7 @@
                         <controls:SettingsExpanderItem
                             Name="ContentHost"
                             Padding="{DynamicResource SettingsExpanderPadding}"
+                            Action="{TemplateBinding Action}"
                             ActionIconSource="{TemplateBinding ActionIconSource}"
                             ActionTemplate="{TemplateBinding ActionTemplate}"
                             Background="Transparent"
@@ -152,7 +153,6 @@
                             Grid.Column="2"
                             Content="{TemplateBinding Action}"
                             ContentTemplate="{TemplateBinding ActionTemplate}" />
-                        <Button Grid.Column="2">dsfdsfsdfs</Button>
                         <Viewbox
                             Name="ActionIconHost"
                             Grid.Column="3"
