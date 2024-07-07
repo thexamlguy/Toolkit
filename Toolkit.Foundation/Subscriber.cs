@@ -8,106 +8,88 @@ public class Subscriber(SubscriptionCollection subscriptions,
 {
     public void Subscribe(object subscriber)
     {
-        Type handlerType = subscriber.GetType();
-
         IDictionary<Type, List<object>> subscribers = GetSubscriptionKeys(subscriber);
-        foreach (Type interfaceType in GetHandlerInterfaces(handlerType))
+
+        foreach (Type handlerType in GetHandlerInterfaces(subscriber.GetType()))
         {
-            if (interfaceType.GetGenericArguments().FirstOrDefault() is Type argumentType)
+            if (handlerType.Name == typeof(INotificationHandler<>).Name &&
+                handlerType.GetGenericArguments() is { Length: 1 } notificationHandlerArguments)
             {
-                subscribers.TryGetValue(argumentType, out List<object>? keys);
-                if (keys is not null)
-                {
-                    foreach (object key in keys)
-                    {
-                        string subscriptionKey = $"{(key is not null ? $"{key}:" : "")}{argumentType}";
-                        subscriptions.AddOrUpdate(subscriptionKey, _ => new List<WeakReference> { new(subscriber) }, (_, collection) =>
-                        {
-                            collection.Add(new WeakReference(subscriber));
-                            return collection;
-                        });
+                Type notificationType = notificationHandlerArguments[0];
+                AddSubscriptions(subscriber, subscribers, notificationType);
+            }
 
-                        disposer.Add(subscriber, Disposable.Create(() => RemoveSubscriber(subscriber, subscriptionKey)));
-                    }
-                }
-                else
-                {
-                    string subscriptionKey = $"{argumentType}";
-                    subscriptions.AddOrUpdate(subscriptionKey, _ => new List<WeakReference> { new(subscriber) }, (_, collection) =>
-                    {
-                        collection.Add(new WeakReference(subscriber));
-                        return collection;
-                    });
-
-                    disposer.Add(subscriber, Disposable.Create(() => RemoveSubscriber(subscriber, subscriptionKey)));
-                }
+            if (handlerType.Name == typeof(IHandler<,>).Name &&
+                handlerType.GetGenericArguments() is { Length: 2 } handlerArguments)
+            {
+                Type requestType = handlerArguments[0];
+                Type responseType = handlerArguments[1];
+                Type wrapperType = typeof(HandlerWrapper<,>).MakeGenericType(requestType, responseType);
+                AddSubscriptions(subscriber, subscribers, wrapperType);
             }
         }
     }
 
     public void Unsubscribe(object subscriber)
     {
-        Type handlerType = subscriber.GetType();
         IDictionary<Type, List<object>> subscribers = GetSubscriptionKeys(subscriber);
-        foreach (Type interfaceType in GetHandlerInterfaces(handlerType))
+
+        foreach (Type handlerType in GetHandlerInterfaces(subscriber.GetType()))
         {
-            if (interfaceType.GetGenericArguments().FirstOrDefault() is Type argumentType)
+            if (handlerType.Name == typeof(INotificationHandler<>).Name &&
+                handlerType.GetGenericArguments() is { Length: 1 } notificationHandlerArguments)
             {
-                subscribers.TryGetValue(argumentType, out List<object>? keys);
-                if (keys is not null)
-                {
-                    foreach (object key in keys)
-                    {
-                        string subscriptionKey = $"{(key is not null ? $"{key}:" : "")}{argumentType}";
-                        if (subscriptions.TryGetValue(subscriptionKey, out List<WeakReference>? existing))
-                        {
-                            for (int i = existing.Count - 1; i >= 0; i--)
-                            {
-                                if (!existing[i].IsAlive || existing[i].Target == subscriber)
-                                {
-                                    existing.RemoveAt(i);
-                                }
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    string subscriptionKey = $"{argumentType}";
-                    if (subscriptions.TryGetValue(subscriptionKey, out List<WeakReference>? existing))
-                    {
-                        for (int i = existing.Count - 1; i >= 0; i--)
-                        {
-                            if (!existing[i].IsAlive || existing[i].Target == subscriber)
-                            {
-                                existing.RemoveAt(i);
-                            }
-                        }
-                    }
-                }
+                Type notificationType = notificationHandlerArguments[0];
+                RemoveSubscriptions(subscriber, subscribers, notificationType);
+            }
+
+            if (handlerType.Name == typeof(IHandler<,>).Name &&
+                handlerType.GetGenericArguments() is { Length: 2 } handlerArguments)
+            {
+                Type requestType = handlerArguments[0];
+                Type responseType = handlerArguments[1];
+                Type wrapperType = typeof(HandlerWrapper<,>).MakeGenericType(requestType, responseType);
+                RemoveSubscriptions(subscriber, subscribers, wrapperType);
             }
         }
     }
 
-    private void RemoveSubscriber(object subscriber,
-        string key)
+    private void AddOrUpdateSubscription(object subscriber, string preferredKey)
     {
-        if (subscriptions.TryGetValue(key, out List<WeakReference>? subscribers))
+        subscriptions.AddOrUpdate(preferredKey, _ => new List<WeakReference> { new(subscriber) }, (_, collection) =>
         {
-            for (int i = subscribers.Count - 1; i >= 0; i--)
-            {
-                if (subscribers[i].Target == subscriber)
-                {
-                    subscribers.RemoveAt(i);
-                }
-            }
+            collection.Add(new WeakReference(subscriber));
+            return collection;
+        });
 
-            if (subscribers.Count == 0)
+        disposer.Add(subscriber, Disposable.Create(() => RemoveSubscription(subscriber, preferredKey)));
+    }
+
+    private void AddSubscriptions(object subscriber, IDictionary<Type, List<object>> subscribers, Type handlerType)
+    {
+        if (subscribers.TryGetValue(handlerType, out List<object>? keys))
+        {
+            foreach (object key in keys)
             {
-                subscriptions.TryRemove(key, out _);
+                string preferredKey = $"{(key is not null ? $"{key}:" : "")}{handlerType}";
+                AddOrUpdateSubscription(subscriber, preferredKey);
             }
         }
+        else
+        {
+            string preferredKey = $"{handlerType}";
+            AddOrUpdateSubscription(subscriber, preferredKey);
+        }
     }
+
+    private IEnumerable<Type> GetHandlerInterfaces(Type handlerType) =>
+        handlerType.GetInterfaces().Where(interfaceType =>
+        {
+            Type? definition = interfaceType.IsGenericType ? interfaceType.GetGenericTypeDefinition() : null;
+            return definition == typeof(INotificationHandler<>) ||
+                   definition == typeof(IHandler<>) ||
+                   definition == typeof(IHandler<,>);
+        });
 
     private IDictionary<Type, List<object>> GetSubscriptionKeys(object subscriber)
     {
@@ -133,12 +115,40 @@ public class Subscriber(SubscriptionCollection subscriptions,
         return keys;
     }
 
-    private IEnumerable<Type> GetHandlerInterfaces(Type handlerType) =>
-        handlerType.GetInterfaces().Where(interfaceType =>
+    private void RemoveSubscription(object subscriber,
+        string key)
+    {
+        if (subscriptions.TryGetValue(key, out List<WeakReference>? subscribers))
         {
-            Type? definition = interfaceType.IsGenericType ? interfaceType.GetGenericTypeDefinition() : null;
-            return definition == typeof(INotificationHandler<>) ||
-                   definition == typeof(IHandler<>) ||
-                   definition == typeof(IHandler<,>);
-        });
+            for (int i = subscribers.Count - 1; i >= 0; i--)
+            {
+                if (subscribers[i].Target == subscriber)
+                {
+                    subscribers.RemoveAt(i);
+                }
+            }
+
+            if (subscribers.Count == 0)
+            {
+                subscriptions.TryRemove(key, out _);
+            }
+        }
+    }
+
+    private void RemoveSubscriptions(object subscriber, IDictionary<Type, List<object>> subscribers, Type handlerType)
+    {
+        if (subscribers.TryGetValue(handlerType, out List<object>? keys))
+        {
+            foreach (object key in keys)
+            {
+                string subscriptionKey = $"{(key is not null ? $"{key}:" : "")}{handlerType}";
+                RemoveSubscription(subscriber, subscriptionKey);
+            }
+        }
+        else
+        {
+            string subscriptionKey = $"{handlerType}";
+            RemoveSubscription(subscriber, subscriptionKey);
+        }
+    }
 }

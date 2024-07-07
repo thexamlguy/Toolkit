@@ -41,43 +41,43 @@ public static class IServiceCollectionExtensions
         string? key = null)
         where THandler : IHandler
     {
-        if (typeof(THandler).GetInterfaces() is Type[] contracts)
+        if (typeof(THandler).GetInterfaces() is Type[] handlerTypes)
         {
-            foreach (Type contract in contracts)
+            foreach (Type handlerType in handlerTypes)
             {
-                if (contract.Name == typeof(INotificationHandler<>).Name &&
-                    contract.GetGenericArguments() is { Length: 1 } notificationHandlerArguments)
+                if (handlerType.Name == typeof(INotificationHandler<>).Name &&
+                    handlerType.GetGenericArguments() is { Length: 1 } notificationHandlerArguments)
                 {
                     Type notificationType = notificationHandlerArguments[0];
                     Type wrapperType = typeof(NotificationHandlerWrapper<>).MakeGenericType(notificationType);
 
-                    string actualKey = $"{(key is not null ? $"{key}:" : "")}{notificationType}";
+                    string preferredKey = $"{(key is not null ? $"{key}:" : "")}{notificationType}";
 
                     services.Add(new ServiceDescriptor(typeof(INotificationHandler<>)
-                        .MakeGenericType(notificationType), actualKey, typeof(THandler), lifetime));
+                        .MakeGenericType(notificationType), preferredKey, typeof(THandler), lifetime));
 
-                    services.Add(new ServiceDescriptor(wrapperType, actualKey, (provider, registeredKey) =>
+                    services.Add(new ServiceDescriptor(wrapperType, preferredKey, (provider, registeredKey) =>
                             provider.GetService<IServiceFactory>()?.Create(wrapperType,
                                 provider.GetRequiredKeyedService(typeof(INotificationHandler<>).MakeGenericType(notificationType), registeredKey),
                                 provider.GetServices(typeof(IPipelineBehaviour<>)
                                     .MakeGenericType(notificationType)))!, lifetime));
                 }
 
-                if (contract.Name == typeof(IHandler<,>).Name &&
-                    contract.GetGenericArguments() is { Length: 2 } handlerArguments)
+                if (handlerType.Name == typeof(IHandler<,>).Name &&
+                    handlerType.GetGenericArguments() is { Length: 2 } handlerArguments)
                 {
                     Type requestType = handlerArguments[0];
                     Type responseType = handlerArguments[1];
 
                     Type wrapperType = typeof(HandlerWrapper<,>).MakeGenericType(requestType, responseType);
-                    string actualKey = $"{(key is not null ? $"{key}:" : "")}{wrapperType}";
+                    string preferredKey = $"{(key is not null ? $"{key}:" : "")}{wrapperType}";
 
-                    services.Add(new ServiceDescriptor(typeof(THandler), actualKey,
+                    services.Add(new ServiceDescriptor(typeof(THandler), preferredKey,
                         typeof(THandler), lifetime));
 
-                    services.Add(new ServiceDescriptor(wrapperType, actualKey, (provider, actualKey) =>
+                    services.Add(new ServiceDescriptor(wrapperType, preferredKey, (provider, actualKey) =>
                         provider.GetService<IServiceFactory>()?.Create(wrapperType,
-                                provider.GetRequiredKeyedService<THandler>(actualKey),
+                                provider.GetRequiredKeyedService<THandler>(preferredKey),
                                 provider.GetServices(typeof(IPipelineBehaviour<,>)
                                     .MakeGenericType(requestType, responseType)))!, lifetime));
                 }
