@@ -1,0 +1,29 @@
+<ResourceDictionary
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Toolkit.UI.Controls.Avalonia">
+    <ControlTheme x:Key="{x:Type controls:OverflowListBox}" TargetType="controls:OverflowListBox">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid Margin="{TemplateBinding Margin}" ColumnDefinitions="*,Auto">
+                    <ListBox
+                        x:Name="PrimaryListBox"
+                        Grid.Column="0"
+                        ItemTemplate="{TemplateBinding ItemTemplate}"
+                        ItemsPanel="{TemplateBinding ItemsPanel}"
+                        SelectedItem="{TemplateBinding SelectedItem}" />
+                    <Button Grid.Column="1">
+                        <Button.Flyout>
+                            <Flyout>
+                                <ListBox
+                                    x:Name="SecondaryListBox"
+                                    ItemTemplate="{TemplateBinding ItemTemplate}"
+                                    SelectedItem="{TemplateBinding SelectedItem}" />
+                            </Flyout>
+                        </Button.Flyout>
+                    </Button>
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </ControlTheme>
+</ResourceDictionary>
