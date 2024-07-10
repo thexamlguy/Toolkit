@@ -2,7 +2,7 @@
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="using:Toolkit.UI.Controls.Avalonia">
-    <ControlTheme x:Key="{x:Type controls:OverflowListBox}" TargetType="controls:OverflowListBox">
+    <ControlTheme x:Key="{x:Type controls:Overflow}" TargetType="controls:Overflow">
         <Setter Property="Template">
             <ControlTemplate>
                 <Grid Margin="{TemplateBinding Margin}" ColumnDefinitions="*,Auto">
@@ -11,14 +11,14 @@
                         Grid.Column="0"
                         ItemTemplate="{TemplateBinding ItemTemplate}"
                         ItemsPanel="{TemplateBinding ItemsPanel}"
-                        SelectedItem="{TemplateBinding SelectedItem}" />
-                    <Button Grid.Column="1">
+                        SelectedItem="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=TemplateSettings.PrimarySelection, Mode=TwoWay}" />
+                    <Button Grid.Column="1" Focusable="False">
                         <Button.Flyout>
                             <Flyout>
                                 <ListBox
                                     x:Name="SecondaryListBox"
                                     ItemTemplate="{TemplateBinding ItemTemplate}"
-                                    SelectedItem="{TemplateBinding SelectedItem}" />
+                                    SelectedItem="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=TemplateSettings.SecondarySelection, Mode=TwoWay}" />
                             </Flyout>
                         </Button.Flyout>
                     </Button>

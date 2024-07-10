@@ -2,35 +2,65 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Templates;
-using Avalonia.Data;
 using Avalonia.Metadata;
 using Avalonia.Threading;
+using FluentAvalonia.Core;
 using System.Collections;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 
 namespace Toolkit.UI.Controls.Avalonia;
 
-public class OverflowListBox : 
+public class Overflow : 
     TemplatedControl
 {
     public static readonly StyledProperty<ITemplate<Panel?>> ItemsPanelProperty =
-        AvaloniaProperty.Register<OverflowListBox, ITemplate<Panel?>>(nameof(ItemsPanel), new FuncTemplate<Panel?>(() => new StackPanel()));
+        AvaloniaProperty.Register<Overflow, ITemplate<Panel?>>(nameof(ItemsPanel), new FuncTemplate<Panel?>(() => new StackPanel()));
 
     public static readonly StyledProperty<IEnumerable?> ItemsSourceProperty =
-        AvaloniaProperty.Register<OverflowListBox, IEnumerable?>(nameof(ItemsSource));
+        AvaloniaProperty.Register<Overflow, IEnumerable?>(nameof(ItemsSource));
 
     public static readonly StyledProperty<IDataTemplate?> ItemTemplateProperty =
-        AvaloniaProperty.Register<OverflowListBox, IDataTemplate?>(nameof(ItemTemplate));
+        AvaloniaProperty.Register<Overflow, IDataTemplate?>(nameof(ItemTemplate));
 
     public static readonly StyledProperty<object?> SelectedItemProperty =
-        AvaloniaProperty.Register<OverflowListBox, object?>(nameof(SelectedItem), BindingMode.TwoWay);
+        AvaloniaProperty.Register<Overflow, object?>(nameof(SelectedItem));
 
-    private readonly ObservableCollection<object> primaryCollection = new();
-    private readonly ObservableCollection<object> secondaryCollection = new();
+    private static readonly StyledProperty<OverflowTemplateSettings> TemplateSettingsProperty =
+        AvaloniaProperty.Register<Overflow, OverflowTemplateSettings>(nameof(TemplateSettings));
+
+    private readonly ObservableCollection<object> primaryCollection = [];
+
+    private readonly ObservableCollection<object> secondaryCollection = [];
 
     private ListBox? primaryListBox;
+
     private ListBox? secondaryListBox;
+
+    public Overflow()
+    {
+        SetValue(TemplateSettingsProperty, new OverflowTemplateSettings());
+
+        TemplateSettings.GetPropertyChangedObservable(OverflowTemplateSettings.PrimarySelectionProperty)
+            .AddClassHandler<OverflowTemplateSettings>(OnPrimarySelectionPropertyChanged);
+
+        TemplateSettings.GetPropertyChangedObservable(OverflowTemplateSettings.SecondarySelectionProperty)
+            .AddClassHandler<OverflowTemplateSettings>(OnSecondarySelectionPropertyChanged);
+    }
+
+    private void OnPrimarySelectionPropertyChanged(OverflowTemplateSettings sender,
+        AvaloniaPropertyChangedEventArgs args)
+    {
+        object? selection = args.GetNewValue<object>();
+        SetValue(SelectedItemProperty, selection);
+    }
+
+    private void OnSecondarySelectionPropertyChanged(OverflowTemplateSettings sender,
+        AvaloniaPropertyChangedEventArgs args)
+    {
+        object? selection = args.GetNewValue<object>();
+        SetValue(SelectedItemProperty, selection);
+    }
 
     public ITemplate<Panel?> ItemsPanel
     {
@@ -57,15 +87,26 @@ public class OverflowListBox :
         set => SetValue(SelectedItemProperty, value);
     }
 
+    public OverflowTemplateSettings TemplateSettings
+    {
+        get => GetValue(TemplateSettingsProperty);
+        set => SetValue(TemplateSettingsProperty, value);
+    }
     protected override void OnApplyTemplate(TemplateAppliedEventArgs args)
     {
         base.OnApplyTemplate(args);
 
         primaryListBox = args.NameScope.Get<ListBox>("PrimaryListBox");
-        primaryListBox?.SetValue(ItemsControl.ItemsSourceProperty, primaryCollection);
+        if (primaryListBox is not null)
+        {
+            primaryListBox.SetValue(ItemsControl.ItemsSourceProperty, primaryCollection);
+        }
 
         secondaryListBox = args.NameScope.Get<ListBox>("SecondaryListBox");
-        secondaryListBox?.SetValue(ItemsControl.ItemsSourceProperty, secondaryCollection);
+        if (secondaryListBox is not null)
+        {
+            secondaryListBox.SetValue(ItemsControl.ItemsSourceProperty, secondaryCollection);
+        }
 
         InitializeCollections();
         UpdateOverflow();
@@ -74,6 +115,12 @@ public class OverflowListBox :
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs args)
     {
         base.OnPropertyChanged(args);
+
+        if (args.Property == SelectedItemProperty)
+        {
+            UpdateSelectedItem();
+        }
+
         if (args.Property == ItemsSourceProperty)
         {
             if (args.OldValue is IEnumerable oldCollection && oldCollection is INotifyCollectionChanged oldNotifyCollectionChanged)
@@ -105,7 +152,8 @@ public class OverflowListBox :
         }
     }
 
-    private void OnSourceCollectionChanged(object? sender, NotifyCollectionChangedEventArgs args)
+    private void OnSourceCollectionChanged(object? sender,
+        NotifyCollectionChangedEventArgs args)
     {
         switch (args.Action)
         {
@@ -205,7 +253,7 @@ public class OverflowListBox :
             double accumulatedWidth = 0;
             double itemSpacing = 6;
 
-            List<(object item, int originalIndex)> itemsToMoveToSecondary = new();
+            List<object> itemsToMoveToSecondary = [];
 
             for (int i = 0; i < primaryCollection.Count; i++)
             {
@@ -217,7 +265,7 @@ public class OverflowListBox :
 
                     if (accumulatedWidth + itemWidth + (itemsToMoveToSecondary.Count * itemSpacing) > controlWidth)
                     {
-                        itemsToMoveToSecondary.Add((item, i));
+                        itemsToMoveToSecondary.Add(item);
                     }
                     else
                     {
@@ -226,14 +274,41 @@ public class OverflowListBox :
                 }
             }
 
-            foreach (var (item, originalIndex) in itemsToMoveToSecondary.OrderByDescending(x => x.originalIndex))
+            foreach (object item in itemsToMoveToSecondary)
             {
                 primaryCollection.Remove(item);
-                int insertIndexInSecondary = originalIndex - primaryCollection.Count;
+
+                int insertIndexInSecondary = secondaryCollection.Count;
+                if (ItemsSource.Contains(item))
+                {
+                    int indexInItemsSource = ItemsSource.IndexOf(item);
+                    insertIndexInSecondary = Math.Min(indexInItemsSource, secondaryCollection.Count);
+                }
+
                 secondaryCollection.Insert(insertIndexInSecondary, item);
             }
         });
     }
 
+    private void UpdateSelectedItem()
+    {
+        if (SelectedItem is not null)
+        {
+            if (primaryCollection.Contains(SelectedItem))
+            {
+                TemplateSettings.SetValue(OverflowTemplateSettings.PrimarySelectionProperty, SelectedItem);
+            }
+
+            if (secondaryCollection.Contains(SelectedItem))
+            {
+                TemplateSettings.SetValue(OverflowTemplateSettings.SecondarySelectionProperty, SelectedItem);
+            }
+        }
+        else
+        {
+            TemplateSettings.SetValue(OverflowTemplateSettings.PrimarySelectionProperty, null);
+            TemplateSettings.SetValue(OverflowTemplateSettings.SecondarySelectionProperty, null);
+        }
+    }
 }
 

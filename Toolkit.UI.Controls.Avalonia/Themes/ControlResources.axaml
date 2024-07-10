@@ -6,7 +6,7 @@
                 <MergeResourceInclude Source="../CarouselView/CarouselView.axaml" />
                 <MergeResourceInclude Source="../PersonPicture/PersonPicture.axaml" />
                 <MergeResourceInclude Source="../SettingsExpander/SettingsExpander.axaml" />
-                <MergeResourceInclude Source="../OverflowListBox/OverflowListBox.axaml" />
+                <MergeResourceInclude Source="../Overflow/Overflow.axaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Styles.Resources>
