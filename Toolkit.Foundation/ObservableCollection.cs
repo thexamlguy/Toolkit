@@ -153,6 +153,7 @@ public partial class ObservableCollection<TItem> :
 
         if (source is INotifyCollectionChanged observableSource)
         {
+            observableSource.CollectionChanged -= SourceCollectionChanged;
             observableSource.CollectionChanged += SourceCollectionChanged;
         }
     }
@@ -272,7 +273,6 @@ public partial class ObservableCollection<TItem> :
     public void Clear(bool disposeItems = false)
     {
         isClearing = true;
-
         if (disposeItems)
         {
             foreach (TItem item in this.ToList())
