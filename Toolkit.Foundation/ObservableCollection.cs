@@ -750,7 +750,7 @@ public partial class ObservableCollection<TItem> :
                     oldSelection.IsSelected = false;
                 }
 
-                SelectedItem = item;
+                dispatcher.Invoke(() => SelectedItem = item);
             }
         }
     }
