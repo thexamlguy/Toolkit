@@ -127,7 +127,7 @@ public partial class ObservableCollection<TItem> :
 
     object? IList.this[int index]
     {
-        get => index >= 0 ? collection[index] : null;
+        get => index >= 0 && collection.Count > 0 ? collection[index] : null;
         set
         {
             TItem? item = default;
@@ -141,6 +141,59 @@ public partial class ObservableCollection<TItem> :
             }
 
             this[index] = item!;
+        }
+    }
+
+    public void SetSource(IList<TItem> source)
+    {
+        foreach (TItem item in source)
+        {
+            Add(item);
+        }
+
+        if (source is INotifyCollectionChanged observableSource)
+        {
+            observableSource.CollectionChanged += SourceCollectionChanged;
+        }
+    }
+
+    private void SourceCollectionChanged(object? sender, 
+        NotifyCollectionChangedEventArgs args)
+    {
+        switch (args.Action)
+        {
+            case NotifyCollectionChangedAction.Add:
+                if (args.NewItems is not null)
+                {
+                    foreach (TItem newItem in args.NewItems)
+                    {
+                        Add(newItem);
+                    }
+                }
+                break;
+            case NotifyCollectionChangedAction.Remove:
+                if (args.OldItems is not null)
+                {
+                    foreach (TItem oldItem in args.OldItems)
+                    {
+                        if (this.FirstOrDefault(x => x.Equals(oldItem)) is TItem removedItem)
+                        {
+                            Remove(removedItem);
+                        }
+                    }
+                }
+                break;
+            case NotifyCollectionChangedAction.Reset:
+
+                Clear();
+                if (sender is IEnumerable<TItem> collection)
+                {
+                    foreach (TItem item in collection)
+                    {
+                        Add(item);
+                    }
+                }
+                break;
         }
     }
 
@@ -210,16 +263,33 @@ public partial class ObservableCollection<TItem> :
         }
     }
 
-    public void Clear(Action<ObservableCollection<TItem>> factory)
+    public void Reset(Action<ObservableCollection<TItem>> factory, bool disposeItems = true)
     {
-        Clear();
+        Clear(disposeItems);
         factory.Invoke(this);
+    }
+
+    public void Clear(bool disposeItems = false)
+    {
+        isClearing = true;
+
+        if (disposeItems)
+        {
+            foreach (TItem item in this.ToList())
+            {
+                Disposer.Dispose(item);
+                Disposer.Remove(this, item);
+            }
+
+        }
+
+        ClearItems();
+        isClearing = false;
     }
 
     public void Clear()
     {
         isClearing = true;
-
         foreach (TItem item in this.ToList())
         {
             Disposer.Dispose(item);
