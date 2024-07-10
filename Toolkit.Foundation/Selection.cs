@@ -2,9 +2,9 @@
 
 public record Selection
 {
-    public static SelectionEventArgs<TValue> As<TValue>(TValue value) =>
-        new(value);
+    public static SelectionEventArgs<TSender?> As<TSender>(TSender? sender) =>
+        new(sender);
 
-    public static SelectionEventArgs<TValue> As<TValue>() where TValue : new() =>
-        new(new TValue());
+    public static SelectionEventArgs<TSender?> As<TSender>() where TSender : new() =>
+        new(new TSender());
 }

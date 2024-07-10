@@ -659,6 +659,14 @@ public partial class ObservableCollection<TItem> :
         {
             newSelection.IsSelected = true;
         }
+
+        Publisher.Publish(Selection.As(SelectedItem));
+        OnSelectedItemChanged();
+    }
+    
+    protected virtual void OnSelectedItemChanged()
+    {
+
     }
 
     private void UpdateSelection(TItem item)
@@ -672,7 +680,7 @@ public partial class ObservableCollection<TItem> :
                     oldSelection.IsSelected = false;
                 }
 
-                dispatcher.Invoke(() => SelectedItem = item);
+                SelectedItem = item;
             }
         }
     }
