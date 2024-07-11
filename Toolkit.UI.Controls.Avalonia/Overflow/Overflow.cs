@@ -48,20 +48,6 @@ public class Overflow :
             .AddClassHandler<OverflowTemplateSettings>(OnSecondarySelectionPropertyChanged);
     }
 
-    private void OnPrimarySelectionPropertyChanged(OverflowTemplateSettings sender,
-        AvaloniaPropertyChangedEventArgs args)
-    {
-        object? selection = args.GetNewValue<object>();
-        SetValue(SelectedItemProperty, selection);
-    }
-
-    private void OnSecondarySelectionPropertyChanged(OverflowTemplateSettings sender,
-        AvaloniaPropertyChangedEventArgs args)
-    {
-        object? selection = args.GetNewValue<object>();
-        SetValue(SelectedItemProperty, selection);
-    }
-
     public ITemplate<Panel?> ItemsPanel
     {
         get => GetValue(ItemsPanelProperty);
@@ -92,6 +78,7 @@ public class Overflow :
         get => GetValue(TemplateSettingsProperty);
         set => SetValue(TemplateSettingsProperty, value);
     }
+
     protected override void OnApplyTemplate(TemplateAppliedEventArgs args)
     {
         base.OnApplyTemplate(args);
@@ -152,6 +139,19 @@ public class Overflow :
         }
     }
 
+    private void OnPrimarySelectionPropertyChanged(OverflowTemplateSettings sender,
+        AvaloniaPropertyChangedEventArgs args)
+    {
+        object? selection = args.GetNewValue<object>();
+        SetValue(SelectedItemProperty, selection);
+    }
+
+    private void OnSecondarySelectionPropertyChanged(OverflowTemplateSettings sender,
+        AvaloniaPropertyChangedEventArgs args)
+    {
+        object? selection = args.GetNewValue<object>();
+        SetValue(SelectedItemProperty, selection);
+    }
     private void OnSourceCollectionChanged(object? sender,
         NotifyCollectionChangedEventArgs args)
     {
@@ -249,7 +249,7 @@ public class Overflow :
                 return;
             }
 
-            double controlWidth = primaryListBox?.DesiredSize.Width ?? 0;
+            double controlWidth = 240;
             double accumulatedWidth = 0;
             double itemSpacing = 6;
 
