@@ -287,6 +287,8 @@ public class Overflow :
 
                 secondaryCollection.Insert(insertIndexInSecondary, item);
             }
+
+            PseudoClasses.Set(":overflow", secondaryCollection is { Count: > 0 });
         });
     }
 

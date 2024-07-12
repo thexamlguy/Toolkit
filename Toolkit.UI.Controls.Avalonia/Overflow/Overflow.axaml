@@ -129,10 +129,13 @@
                         </ListBox.ItemsPanel>
                     </ListBox>
                     <Grid
+                        x:Name="Spacer"
                         Grid.Column="1"
                         Width="{StaticResource OverflowItemSpacing}"
-                        Height="{StaticResource OverflowItemSpacing}" />
+                        Height="{StaticResource OverflowItemSpacing}"
+                        IsVisible="False" />
                     <Button
+                        x:Name="OverflowButton"
                         Grid.Column="2"
                         MinWidth="{StaticResource OverflowItemSize}"
                         MinHeight="{StaticResource OverflowItemSize}"
@@ -140,7 +143,8 @@
                         HorizontalContentAlignment="Center"
                         VerticalContentAlignment="Center"
                         CornerRadius="{StaticResource OverflowItemCornerRadius}"
-                        Focusable="False">
+                        Focusable="False"
+                        IsVisible="False">
                         <Viewbox Width="14" Height="14">
                             <PathIcon
                                 HorizontalAlignment="Center"
@@ -166,5 +170,11 @@
                 </StackPanel>
             </ControlTemplate>
         </Setter>
+        <Style Selector="^:overflow /template/ Button#OverflowButton">
+            <Setter Property="IsVisible" Value="True" />
+        </Style>
+        <Style Selector="^:overflow /template/ Grid#Spacer">
+            <Setter Property="IsVisible" Value="True" />
+        </Style>
     </ControlTheme>
 </ResourceDictionary>
