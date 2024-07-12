@@ -138,6 +138,10 @@ public class FrameHandler :
                     {
                         switch ($"{transition}")
                         {
+                            case "Suppress":
+                                navigationOptions.TransitionInfoOverride =
+                                    new SuppressNavigationTransitionInfo();
+                                break;
                             case "FromLeft":
                             case "FromRight":
                             case "FromTop":

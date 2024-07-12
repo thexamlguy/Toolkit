@@ -1,4 +1,6 @@
 ﻿using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Templates;
 
 namespace Toolkit.UI.Controls.Avalonia;
@@ -12,6 +14,9 @@ public class SettingsExpander :
     public static readonly StyledProperty<IDataTemplate> ActionTemplateProperty =
         AvaloniaProperty.Register<SettingsExpander, IDataTemplate>(nameof(ActionTemplate));
 
+    public static readonly StyledProperty<bool> IsToggleableProperty =
+        AvaloniaProperty.Register<SettingsExpander, bool>(nameof(IsToggleable));
+
     public object Action
     {
         get => GetValue(ActionProperty);
@@ -23,6 +28,13 @@ public class SettingsExpander :
         get => GetValue(ActionTemplateProperty);
         set => SetValue(ActionTemplateProperty, value);
     }
+
+    public bool IsToggleable
+    {
+        get => GetValue(IsToggleableProperty);
+        set => SetValue(IsToggleableProperty, value);
+    }
+
 
     protected override Type StyleKeyOverride =>
         typeof(SettingsExpander);

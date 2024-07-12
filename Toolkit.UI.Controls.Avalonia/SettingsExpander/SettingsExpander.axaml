@@ -4,6 +4,75 @@
     xmlns:controls="using:Toolkit.UI.Controls.Avalonia"
     xmlns:ui="using:FluentAvalonia.UI.Controls">
     <Thickness x:Key="SettingsExpanderItemBottomFooterMargin">0 4 0 0</Thickness>
+    <ControlTheme x:Key="SettingsExpanderToggleButtonStyle" TargetType="controls:SettingsExpanderToggleButton">
+        <Setter Property="Background" Value="{DynamicResource ExpanderHeaderBackground}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ExpanderHeaderBorderBrush}" />
+        <Setter Property="BorderThickness" Value="{DynamicResource ExpanderHeaderBorderThickness}" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
+        <Setter Property="BackgroundSizing" Value="InnerBorderEdge" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border
+                    Name="Root"
+                    Padding="{TemplateBinding Padding}"
+                    Background="{TemplateBinding Background}"
+                    BackgroundSizing="{TemplateBinding BackgroundSizing}"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    CornerRadius="{TemplateBinding CornerRadius}">
+                    <Border.Transitions>
+                        <Transitions>
+                            <BrushTransition Property="Background" Duration="00:00:00.083" />
+                            <BrushTransition Property="BorderBrush" Duration="00:00:00.083" />
+                        </Transitions>
+                    </Border.Transitions>
+                    <Grid ColumnDefinitions="*,Auto">
+                        <ContentPresenter Content="{TemplateBinding Content}" />
+                        <ui:SymbolIcon
+                            Name="ExpandCollapseChevron"
+                            Grid.Column="1"
+                            Margin="{DynamicResource SettingsExpanderExpandCollapseChevronMargin}"
+                            FontSize="18"
+                            Foreground="{DynamicResource ExpanderChevronForeground}"
+                            IsVisible="{TemplateBinding IsToggleable}"
+                            RenderTransform="none"
+                            Symbol="ChevronDown" />
+                    </Grid>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+
+        <Style Selector="^:allowClick">
+            <Style Selector="^:pointerover /template/ Border#Root">
+                <Setter Property="Background" Value="{DynamicResource ControlFillColorSecondaryBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource ControlStrokeColorDefaultBrush}" />
+            </Style>
+            <Style Selector="^:pressed /template/ Border#Root">
+                <Setter Property="Background" Value="{DynamicResource ControlFillColorTertiaryBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource ControlStrokeColorDefaultBrush}" />
+                <Setter Property="TextElement.Foreground" Value="{DynamicResource TextFillColorSecondaryBrush}" />
+            </Style>
+        </Style>
+
+        <Style Selector="^:disabled /template/ Border#Root">
+            <Setter Property="Background" Value="{DynamicResource ControlFillColorDisabledBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource ControlStrokeColorDefaultBrush}" />
+            <Setter Property="TextElement.Foreground" Value="{DynamicResource TextFillColorDisabledBrush}" />
+        </Style>
+
+        <Style Selector="^:checked">
+            <Style Selector="^ /template/ ui|SymbolIcon#ExpandCollapseChevron">
+                <Setter Property="RenderTransform" Value="rotate(180deg)" />
+            </Style>
+            <Style Selector="^:not(:empty) /template/ Border#Root">
+                <Setter Property="CornerRadius" Value="{Binding Source={StaticResource ControlCornerRadius}, Converter={StaticResource TopCornerRadiusFilterConverter}}" />
+            </Style>
+        </Style>
+    </ControlTheme>
+
     <ControlTheme x:Key="SettingsExpanderExpanderStyle" TargetType="Expander">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="MinWidth" Value="0" />
@@ -21,6 +90,7 @@
                         IsChecked="{TemplateBinding IsExpanded,
                                                     Mode=TwoWay}"
                         IsEnabled="{TemplateBinding IsEnabled}"
+                        IsToggleable="{TemplateBinding Tag}"
                         Theme="{StaticResource SettingsExpanderToggleButtonStyle}" />
                     <Border
                         Name="ExpanderContent"
@@ -65,6 +135,7 @@
                     Name="Expander"
                     IsExpanded="{TemplateBinding IsExpanded,
                                                  Mode=TwoWay}"
+                    Tag="{TemplateBinding IsToggleable}"
                     Theme="{StaticResource SettingsExpanderExpanderStyle}">
                     <Expander.Header>
                         <controls:SettingsExpanderItem
