@@ -144,11 +144,20 @@ public partial class ObservableCollection<TItem> :
         }
     }
 
-    public void SetSource(IList<TItem> source)
+    private Func<TItem> defaultSelectionFactory;
+
+    public void SetSource(IList<TItem> source, 
+        Func<TItem>? defaultSelectionFactory)
     {
         foreach (TItem item in source)
         {
             Add(item);
+        }
+
+        if (defaultSelectionFactory is not null)
+        {
+            this.defaultSelectionFactory = defaultSelectionFactory;
+            SelectedItem = defaultSelectionFactory.Invoke();
         }
 
         if (source is INotifyCollectionChanged observableSource)
@@ -192,6 +201,11 @@ public partial class ObservableCollection<TItem> :
                     foreach (TItem item in collection)
                     {
                         Add(item);
+                    }
+
+                    if (defaultSelectionFactory is not null)
+                    {
+                        SelectedItem = defaultSelectionFactory.Invoke();
                     }
                 }
                 break;
@@ -266,6 +280,8 @@ public partial class ObservableCollection<TItem> :
 
     public void Reset(Action<ObservableCollection<TItem>> factory, bool disposeItems = true)
     {
+        SelectedItem = default;
+
         Clear(disposeItems);
         factory.Invoke(this);
     }
