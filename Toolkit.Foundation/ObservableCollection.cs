@@ -144,7 +144,7 @@ public partial class ObservableCollection<TItem> :
         }
     }
 
-    private Func<TItem> defaultSelectionFactory;
+    private Func<TItem>? defaultSelectionFactory;
 
     public void SetSource(IList<TItem> source, 
         Func<TItem>? defaultSelectionFactory)
@@ -780,7 +780,6 @@ public partial class ObservableCollection<TValue, TViewModel>(IServiceProvider p
     IDisposer disposer,
     TValue value) : ObservableCollection<TViewModel>(provider, factory, mediator, publisher, subscriber, disposer)
     where TViewModel : notnull, IDisposable
-    where TValue : notnull
 {
     [ObservableProperty]
     private TValue value = value;
@@ -797,7 +796,6 @@ public partial class ObservableCollection<TViewModel, TKey, TValue> :
     ObservableCollection<TViewModel>
     where TViewModel : notnull, IDisposable
     where TKey : notnull
-    where TValue : notnull
    {
     [ObservableProperty]
     private TKey key;

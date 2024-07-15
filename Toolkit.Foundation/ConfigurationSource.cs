@@ -20,6 +20,7 @@ public class ConfigurationSource<TConfiguration>(IConfigurationFile<TConfigurati
         return new JsonSerializerOptions
         {
             WriteIndented = true,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
             Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
             Converters =
             {

@@ -138,7 +138,6 @@ public partial class Observable<TValue> :
 public partial class Observable<TKey, TValue> :
     Observable
     where TKey : notnull
-    where TValue : notnull
 {
     [ObservableProperty]
     private TKey key;
