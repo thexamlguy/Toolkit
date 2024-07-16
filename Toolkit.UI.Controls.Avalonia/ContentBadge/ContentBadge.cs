@@ -5,7 +5,6 @@ using Avalonia.Media;
 using Path = Avalonia.Controls.Shapes.Path;
 
 namespace Toolkit.UI.Controls.Avalonia;
-
 public class ContentBadge : 
     ContentControl
 {
@@ -15,7 +14,16 @@ public class ContentBadge :
     public static readonly StyledProperty<double> BadgeSizeProperty =
         AvaloniaProperty.Register<ContentBadge, double>(nameof(BadgeSize), 14);
 
+    public static readonly StyledProperty<ContentBadgePlacement> BadgePlacementProperty =
+         AvaloniaProperty.Register<ContentBadge, ContentBadgePlacement>(nameof(BadgePlacement), ContentBadgePlacement.BottomRight);
+
     private ContentControl? badgeContent;
+
+    public ContentBadgePlacement BadgePlacement
+    {
+        get => GetValue(BadgePlacementProperty);
+        set => SetValue(BadgePlacementProperty, value);
+    }
 
     public string? BadgePath
     {
@@ -44,15 +52,36 @@ public class ContentBadge :
 
             double adjustedStrokeWidth = Math.Min(scaleX, scaleY) * 8;
 
-            Geometry knockoutGeometry = geometry.GetWidenedGeometry(new Pen(new SolidColorBrush(Colors.Transparent), adjustedStrokeWidth);
+            Geometry knockoutGeometry = geometry.GetWidenedGeometry(new Pen(new SolidColorBrush(Colors.Transparent), adjustedStrokeWidth));
 
             TransformGroup transformGroup = new();
             transformGroup.Children.Add(new ScaleTransform(scaleX, scaleY));
 
             double scaledWidth = knockoutGeometry.Bounds.Width * scaleX;
             double scaledHeight = knockoutGeometry.Bounds.Height * scaleY;
-            double offsetX = backgroundWidth - scaledWidth;
-            double offsetY = backgroundHeight - scaledHeight;
+
+            double offsetX = 0;
+            double offsetY = 0;
+
+            switch (BadgePlacement)
+            {
+                case ContentBadgePlacement.TopLeft:
+                    offsetX = 0;
+                    offsetY = 0;
+                    break;
+                case ContentBadgePlacement.TopRight:
+                    offsetX = backgroundWidth - scaledWidth;
+                    offsetY = 0;
+                    break;
+                case ContentBadgePlacement.BottomLeft:
+                    offsetX = 0;
+                    offsetY = backgroundHeight - scaledHeight;
+                    break;
+                case ContentBadgePlacement.BottomRight:
+                    offsetX = backgroundWidth - scaledWidth;
+                    offsetY = backgroundHeight - scaledHeight;
+                    break;
+            }
 
             transformGroup.Children.Add(new TranslateTransform(offsetX, offsetY));
             knockoutGeometry.Transform = transformGroup;
