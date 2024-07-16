@@ -84,16 +84,10 @@ public class Overflow :
         base.OnApplyTemplate(args);
 
         primaryListBox = args.NameScope.Get<ListBox>("PrimaryListBox");
-        if (primaryListBox is not null)
-        {
-            primaryListBox.SetValue(ItemsControl.ItemsSourceProperty, primaryCollection);
-        }
+        primaryListBox?.SetValue(ItemsControl.ItemsSourceProperty, primaryCollection);
 
         secondaryListBox = args.NameScope.Get<ListBox>("SecondaryListBox");
-        if (secondaryListBox is not null)
-        {
-            secondaryListBox.SetValue(ItemsControl.ItemsSourceProperty, secondaryCollection);
-        }
+        secondaryListBox?.SetValue(ItemsControl.ItemsSourceProperty, secondaryCollection);
 
         InitializeCollections();
         UpdateOverflow();
