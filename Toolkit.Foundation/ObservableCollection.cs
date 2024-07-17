@@ -721,7 +721,7 @@ public partial class ObservableCollection<TItem> :
         CollectionChanged?.Invoke(this, args);
     }
 
-    private partial void OnIsActivatedChanged(bool value)
+    partial void OnIsActivatedChanged(bool value)
     {
         if (value)
         {
@@ -733,7 +733,7 @@ public partial class ObservableCollection<TItem> :
         }
     }
 
-    private partial void OnSelectedItemChanged(TItem? oldValue, TItem? newValue)
+    partial void OnSelectedItemChanged(TItem? oldValue, TItem? newValue)
     {
         if (oldValue is ISelectable oldSelection)
         {
@@ -786,7 +786,7 @@ public partial class ObservableCollection<TValue, TViewModel>(IServiceProvider p
     {
     }
 
-    private partial void OnValueChanged(TValue value) => OnValueChanged();
+    partial void OnValueChanged(TValue value) => OnValueChanged();
 }
 
 public partial class ObservableCollection<TViewModel, TKey, TValue> :
@@ -831,7 +831,7 @@ public partial class ObservableCollection<TViewModel, TKey, TValue> :
     {
     }
 
-    private partial void OnValueChanged(TValue value) => OnValueChanged();
+    partial void OnValueChanged(TValue value) => OnValueChanged();
 }
 
 public class ObservableCollection :

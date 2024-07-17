@@ -130,7 +130,7 @@ public partial class Observable<TValue> :
     {
     }
 
-    private partial void OnValueChanged(TValue? value) => OnValueChanged();
+    partial void OnValueChanged(TValue? value) => OnValueChanged();
 }
 
 public partial class Observable<TKey, TValue> :
@@ -160,5 +160,5 @@ public partial class Observable<TKey, TValue> :
     {
     }
 
-    private partial void OnValueChanged(TValue? value) => OnValueChanged();
+    partial void OnValueChanged(TValue? value) => OnValueChanged();
 }
