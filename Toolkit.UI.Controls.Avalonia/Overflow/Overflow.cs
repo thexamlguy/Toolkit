@@ -29,13 +29,14 @@ public class Overflow :
     private static readonly StyledProperty<OverflowTemplateSettings> TemplateSettingsProperty =
         AvaloniaProperty.Register<Overflow, OverflowTemplateSettings>(nameof(TemplateSettings));
 
+
     private readonly ObservableCollection<object> primaryCollection = [];
 
     private readonly ObservableCollection<object> secondaryCollection = [];
 
-    private ListBox? primaryListBox;
+    private OverflowList? primaryListBox;
 
-    private ListBox? secondaryListBox;
+    private OverflowList? secondaryListBox;
 
     public Overflow()
     {
@@ -59,7 +60,6 @@ public class Overflow :
         get => GetValue(ItemsSourceProperty);
         set => SetValue(ItemsSourceProperty, value);
     }
-
     [InheritDataTypeFromItems(nameof(ItemsSource))]
     public IDataTemplate? ItemTemplate
     {
@@ -83,10 +83,10 @@ public class Overflow :
     {
         base.OnApplyTemplate(args);
 
-        primaryListBox = args.NameScope.Get<ListBox>("PrimaryListBox");
+        primaryListBox = args.NameScope.Get<OverflowList>("PrimaryListBox");
         primaryListBox?.SetValue(ItemsControl.ItemsSourceProperty, primaryCollection);
 
-        secondaryListBox = args.NameScope.Get<ListBox>("SecondaryListBox");
+        secondaryListBox = args.NameScope.Get<OverflowList>("SecondaryListBox");
         secondaryListBox?.SetValue(ItemsControl.ItemsSourceProperty, secondaryCollection);
 
         InitializeCollections();

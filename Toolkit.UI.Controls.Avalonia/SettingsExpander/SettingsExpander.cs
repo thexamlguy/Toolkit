@@ -1,6 +1,4 @@
 ﻿using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Templates;
 
 namespace Toolkit.UI.Controls.Avalonia;

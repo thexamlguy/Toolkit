@@ -13,7 +13,44 @@
     <x:Double x:Key="OverflowItemSpacing">6</x:Double>
     <x:Double x:Key="OverflowItemSize">40</x:Double>
     <CornerRadius x:Key="OverflowItemCornerRadius">40</CornerRadius>
-    <ControlTheme x:Key="OverflowItemStyle" TargetType="ListBoxItem">
+    <ControlTheme x:Key="{x:Type OverflowList}" TargetType="OverflowList">
+        <Setter Property="Foreground" Value="{DynamicResource ListBoxForeground}" />
+        <Setter Property="Background" Value="{DynamicResource ListBoxBackground}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ListBoxBorder}" />
+        <Setter Property="BorderThickness" Value="{DynamicResource ListBoxBorderThemeThickness}" />
+        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+        <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+        <Setter Property="ScrollViewer.IsScrollChainingEnabled" Value="True" />
+        <Setter Property="ScrollViewer.IsScrollInertiaEnabled" Value="True" />
+        <Setter Property="FontSize" Value="{DynamicResource ControlContentThemeFontSize}" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border
+                    Name="border"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}">
+                    <ScrollViewer
+                        Name="PART_ScrollViewer"
+                        AllowAutoHide="{TemplateBinding (ScrollViewer.AllowAutoHide)}"
+                        Background="{TemplateBinding Background}"
+                        BringIntoViewOnFocusChange="{TemplateBinding (ScrollViewer.BringIntoViewOnFocusChange)}"
+                        HorizontalScrollBarVisibility="{TemplateBinding (ScrollViewer.HorizontalScrollBarVisibility)}"
+                        HorizontalSnapPointsType="{TemplateBinding (ScrollViewer.HorizontalSnapPointsType)}"
+                        IsDeferredScrollingEnabled="{TemplateBinding (ScrollViewer.IsDeferredScrollingEnabled)}"
+                        IsScrollChainingEnabled="{TemplateBinding (ScrollViewer.IsScrollChainingEnabled)}"
+                        IsScrollInertiaEnabled="{TemplateBinding (ScrollViewer.IsScrollInertiaEnabled)}"
+                        VerticalScrollBarVisibility="{TemplateBinding (ScrollViewer.VerticalScrollBarVisibility)}"
+                        VerticalSnapPointsType="{TemplateBinding (ScrollViewer.VerticalSnapPointsType)}">
+                        <ItemsPresenter
+                            Name="PART_ItemsPresenter"
+                            Margin="{TemplateBinding Padding}"
+                            ItemsPanel="{TemplateBinding ItemsPanel}" />
+                    </ScrollViewer>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </ControlTheme>
+    <ControlTheme x:Key="{x:Type controls:OverflowItem}" TargetType="controls:OverflowItem">
         <Setter Property="FontFamily" Value="{DynamicResource ContentControlThemeFontFamily}" />
         <Setter Property="FontSize" Value="{DynamicResource ControlContentThemeFontSize}" />
         <Setter Property="Background" Value="{DynamicResource ListViewItemBackground}" />
@@ -34,21 +71,28 @@
                         BorderBrush="{TemplateBinding BorderBrush}"
                         BorderThickness="{TemplateBinding BorderThickness}"
                         CornerRadius="{TemplateBinding CornerRadius}">
-                        <Grid>
-                            <ContentPresenter
-                                Name="PART_ContentPresenter"
-                                HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
-                                Content="{TemplateBinding Content}"
-                                ContentTemplate="{TemplateBinding ContentTemplate}" />
-                            <Border
-                                Name="SelectionIndicator"
-                                BorderBrush="{DynamicResource AccentFillColorDefaultBrush}"
-                                BorderThickness="3"
-                                CornerRadius="{TemplateBinding CornerRadius}"
-                                IsVisible="False"
-                                UseLayoutRounding="False" />
-                        </Grid>
+                        <controls:ContentBadge
+                            BadgePath="{TemplateBinding BadgePath}"
+                            BadgePlacement="{TemplateBinding BadgePlacement}"
+                            BadgeSize="{TemplateBinding BadgeSize}"
+                            Foreground="Red"
+                            IsBadgeVisible="{TemplateBinding IsBadgeVisible}">
+                            <Grid>
+                                <ContentPresenter
+                                    Name="PART_ContentPresenter"
+                                    HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                    VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                    Content="{TemplateBinding Content}"
+                                   />
+                                <Border
+                                    Name="SelectionIndicator"
+                                    BorderBrush="{DynamicResource AccentFillColorDefaultBrush}"
+                                    BorderThickness="3"
+                                    CornerRadius="{TemplateBinding CornerRadius}"
+                                    IsVisible="False"
+                                    UseLayoutRounding="False" />
+                            </Grid>
+                        </controls:ContentBadge>
                     </Border>
                 </Panel>
             </ControlTemplate>
@@ -116,18 +160,17 @@
         <Setter Property="Template">
             <ControlTemplate>
                 <StackPanel Margin="{TemplateBinding Margin}">
-                    <ListBox
+                    <controls:OverflowList
                         x:Name="PrimaryListBox"
                         Grid.Column="0"
-                        ItemContainerTheme="{StaticResource OverflowItemStyle}"
                         ItemTemplate="{TemplateBinding ItemTemplate}"
                         SelectedItem="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=TemplateSettings.PrimarySelection, Mode=TwoWay}">
-                        <ListBox.ItemsPanel>
+                        <controls:OverflowList.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource OverflowItemSpacing}" />
                             </ItemsPanelTemplate>
-                        </ListBox.ItemsPanel>
-                    </ListBox>
+                        </controls:OverflowList.ItemsPanel>
+                    </controls:OverflowList>
                     <Grid
                         x:Name="Spacer"
                         Grid.Column="1"
@@ -153,17 +196,16 @@
                         </Viewbox>
                         <Button.Flyout>
                             <Flyout>
-                                <ListBox
+                                <controls:OverflowList
                                     x:Name="SecondaryListBox"
-                                    ItemContainerTheme="{StaticResource OverflowItemStyle}"
                                     ItemTemplate="{TemplateBinding ItemTemplate}"
                                     SelectedItem="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=TemplateSettings.SecondarySelection, Mode=TwoWay}">
-                                    <ListBox.ItemsPanel>
+                                    <controls:OverflowList.ItemsPanel>
                                         <ItemsPanelTemplate>
                                             <StackPanel Orientation="Horizontal" Spacing="{StaticResource OverflowItemSpacing}" />
                                         </ItemsPanelTemplate>
-                                    </ListBox.ItemsPanel>
-                                </ListBox>
+                                    </controls:OverflowList.ItemsPanel>
+                                </controls:OverflowList>
                             </Flyout>
                         </Button.Flyout>
                     </Button>
