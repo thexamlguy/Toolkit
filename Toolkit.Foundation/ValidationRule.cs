@@ -5,7 +5,7 @@ public class ValidationRule
     private readonly Func<bool>? syncValidation;
     private readonly Func<Task<bool>>? asyncValidation;
 
-    public ValidationRule(Func<bool> validation, 
+    public ValidationRule(Func<bool> validation,
         string message)
     {
         syncValidation = validation;

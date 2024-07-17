@@ -11,7 +11,7 @@ using System.Collections.Specialized;
 
 namespace Toolkit.UI.Controls.Avalonia;
 
-public class Overflow : 
+public class Overflow :
     TemplatedControl
 {
     public static readonly StyledProperty<ITemplate<Panel?>> ItemsPanelProperty =
@@ -28,7 +28,6 @@ public class Overflow :
 
     private static readonly StyledProperty<OverflowTemplateSettings> TemplateSettingsProperty =
         AvaloniaProperty.Register<Overflow, OverflowTemplateSettings>(nameof(TemplateSettings));
-
 
     private readonly ObservableCollection<object> primaryCollection = [];
 
@@ -60,6 +59,7 @@ public class Overflow :
         get => GetValue(ItemsSourceProperty);
         set => SetValue(ItemsSourceProperty, value);
     }
+
     [InheritDataTypeFromItems(nameof(ItemsSource))]
     public IDataTemplate? ItemTemplate
     {
@@ -146,6 +146,7 @@ public class Overflow :
         object? selection = args.GetNewValue<object>();
         SetValue(SelectedItemProperty, selection);
     }
+
     private void OnSourceCollectionChanged(object? sender,
         NotifyCollectionChangedEventArgs args)
     {
@@ -307,4 +308,3 @@ public class Overflow :
         }
     }
 }
-

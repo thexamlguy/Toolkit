@@ -5,7 +5,8 @@ using Avalonia.Media;
 using Path = Avalonia.Controls.Shapes.Path;
 
 namespace Toolkit.UI.Controls.Avalonia;
-public class ContentBadge : 
+
+public class ContentBadge :
     ContentControl
 {
     public static readonly StyledProperty<string> BadgePathProperty =
@@ -95,14 +96,17 @@ public class ContentBadge :
                         offsetX = 0;
                         offsetY = 0;
                         break;
+
                     case ContentBadgePlacement.TopRight:
                         offsetX = backgroundWidth - scaledWidth;
                         offsetY = 0;
                         break;
+
                     case ContentBadgePlacement.BottomLeft:
                         offsetX = 0;
                         offsetY = backgroundHeight - scaledHeight;
                         break;
+
                     case ContentBadgePlacement.BottomRight:
                         offsetX = backgroundWidth - scaledWidth;
                         offsetY = backgroundHeight - scaledHeight;
@@ -155,4 +159,3 @@ public class ContentBadge :
         UpdateBadge();
     }
 }
-

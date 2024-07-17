@@ -133,7 +133,7 @@ public class FrameHandler :
 
                 if (args.Parameters is not null)
                 {
-                    if (args.Parameters.TryGetValue("Transition", 
+                    if (args.Parameters.TryGetValue("Transition",
                         out object? transition))
                     {
                         switch ($"{transition}")
@@ -142,6 +142,7 @@ public class FrameHandler :
                                 navigationOptions.TransitionInfoOverride =
                                     new SuppressNavigationTransitionInfo();
                                 break;
+
                             case "FromLeft":
                             case "FromRight":
                             case "FromTop":
@@ -155,7 +156,7 @@ public class FrameHandler :
                         }
                     }
 
-                    if (args.Parameters.TryGetValue("IsBackStackEnabled", 
+                    if (args.Parameters.TryGetValue("IsBackStackEnabled",
                         out object? isBackStackEnabled))
                     {
                         if (isBackStackEnabled is bool value)
@@ -164,7 +165,7 @@ public class FrameHandler :
                         }
                     }
 
-                    if (args.Parameters.TryGetValue("ClearBackStack", 
+                    if (args.Parameters.TryGetValue("ClearBackStack",
                         out object? clearBackStack))
                     {
                         if (clearBackStack is bool clearBool)
@@ -177,7 +178,7 @@ public class FrameHandler :
 
                         if (clearBackStack is string clearString)
                         {
-                            if (clearString.StartsWith('[') && clearString.EndsWith(']') && 
+                            if (clearString.StartsWith('[') && clearString.EndsWith(']') &&
                                 clearString.Contains('-'))
                             {
                                 string range = clearString.Trim('[', ']');
@@ -197,7 +198,7 @@ public class FrameHandler :
                             {
                                 postNavigateActions.Add(() => CleanUp(1, frame.BackStack.Count));
                             }
-                        } 
+                        }
                     }
                 }
 

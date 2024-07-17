@@ -96,7 +96,7 @@ public static class IHostBuilderExtension
                     sections.Add(section);
                 }
             }
- 
+
             foreach (string section in sections)
             {
                 if (context.Properties.TryGetValue(section, out object? value))
@@ -112,7 +112,7 @@ public static class IHostBuilderExtension
                             configurations.Add(typeof(TConfiguration));
                         }
                     }
-                }    
+                }
                 else
                 {
                     context.Properties.Add(section, new List<Type> { typeof(TConfiguration) });

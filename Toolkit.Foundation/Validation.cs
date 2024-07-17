@@ -9,15 +9,16 @@ public class Validation(IValidatorCollection validators) :
     private readonly ValidationErrorCollection errors = [];
 
     public event PropertyChangedEventHandler? PropertyChanged;
-    public IReadOnlyDictionary<string, string> Errors => 
+
+    public IReadOnlyDictionary<string, string> Errors =>
         errors.AsReadOnly();
 
-    public bool HasErrors => 
+    public bool HasErrors =>
         Errors.Count > 0;
 
     internal IValidatorCollection Validators { get; } = validators;
 
-    public void Add<TProperty>(Expression<Func<TProperty>> property, 
+    public void Add<TProperty>(Expression<Func<TProperty>> property,
         ValidationRule[] rules,
         ValidationTrigger trigger = ValidationTrigger.Deferred)
     {
@@ -36,8 +37,7 @@ public class Validation(IValidatorCollection validators) :
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
-
-    public async Task<bool> Validate<TProperty>(Expression<Func<TProperty>> property, 
+    public async Task<bool> Validate<TProperty>(Expression<Func<TProperty>> property,
         ValidationRule[] rules)
     {
         string? name = GetPropertyName(property);
@@ -109,11 +109,13 @@ public class Validation(IValidatorCollection validators) :
             OnPropertyChanged(nameof(Errors), null, null);
         }
     }
+
     private void Clear()
     {
         errors.Clear();
         OnPropertyChanged(nameof(Errors), null, null);
     }
+
     private string GetPropertyName<T>(Expression<Func<T>> expression)
     {
         return expression.Body switch

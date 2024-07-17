@@ -2,8 +2,8 @@
 
 public interface IImageReader
 {
-    IImageDescriptor Get(Stream stream, 
-        int width, 
-        int height, 
+    IImageDescriptor Get(Stream stream,
+        int width,
+        int height,
         bool maintainAspectRatio = false);
 }

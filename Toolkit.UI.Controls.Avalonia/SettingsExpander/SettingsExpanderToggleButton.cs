@@ -4,7 +4,7 @@ using Avalonia.Input;
 
 namespace Toolkit.UI.Controls.Avalonia;
 
-public class SettingsExpanderToggleButton : 
+public class SettingsExpanderToggleButton :
     ToggleButton
 {
     public static readonly StyledProperty<bool> IsToggleableProperty =

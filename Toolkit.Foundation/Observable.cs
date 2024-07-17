@@ -76,7 +76,6 @@ public partial class Observable(IServiceProvider provider,
 
     public virtual void OnInitialize()
     {
-
     }
 
     public virtual void Initialize()
@@ -129,10 +128,9 @@ public partial class Observable<TValue> :
 
     protected virtual void OnValueChanged()
     {
-
     }
 
-    partial void OnValueChanged(TValue? value) => OnValueChanged();
+    private partial void OnValueChanged(TValue? value) => OnValueChanged();
 }
 
 public partial class Observable<TKey, TValue> :
@@ -148,8 +146,8 @@ public partial class Observable<TKey, TValue> :
     public Observable(IServiceProvider provider,
         IServiceFactory factory,
         IMediator mediator,
-        IPublisher publisher, 
-        ISubscriber subscriber, 
+        IPublisher publisher,
+        ISubscriber subscriber,
         IDisposer disposer,
         TKey key,
         TValue? value = default) : base(provider, factory, mediator, publisher, subscriber, disposer)
@@ -160,8 +158,7 @@ public partial class Observable<TKey, TValue> :
 
     protected virtual void OnValueChanged()
     {
-
     }
 
-    partial void OnValueChanged(TValue? value) => OnValueChanged();
+    private partial void OnValueChanged(TValue? value) => OnValueChanged();
 }

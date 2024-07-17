@@ -1,5 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Collections;
+﻿using System.Collections;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Toolkit.Foundation;
 
@@ -10,15 +10,15 @@ public class ValidatorCollection :
 
     public int Count => binders.Count;
 
-    public void Add(string key, Validator binder) => 
+    public void Add(string key, Validator binder) =>
         binders.Add(key, binder);
 
-    public IEnumerator<Validator> GetEnumerator() => 
+    public IEnumerator<Validator> GetEnumerator() =>
         binders.Select(x => x.Value).GetEnumerator();
 
-    public bool TryGet(string key, [MaybeNull] out Validator? value) => 
+    public bool TryGet(string key, [MaybeNull] out Validator? value) =>
         binders.TryGetValue(key, out value);
 
-    IEnumerator IEnumerable.GetEnumerator() => 
+    IEnumerator IEnumerable.GetEnumerator() =>
         binders.Select(x => x.Value).GetEnumerator();
 }

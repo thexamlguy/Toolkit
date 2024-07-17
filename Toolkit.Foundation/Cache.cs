@@ -193,6 +193,7 @@ public class Cache<TKey, TValue>(IComparer<TKey> comparer) :
         value = default;
         return false;
     }
+
     private class KeyValuePairComparer<TK, TV>(IComparer<TK> comparer) :
                                 IComparer<KeyValuePair<TK, TV>>
     {

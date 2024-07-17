@@ -4,7 +4,7 @@ using Toolkit.UI.Controls.Avalonia;
 
 namespace Toolkit.Avalonia;
 
-public class ContentDialogHandler(IDispatcher dispatcher) :
+public class ContentDialogHandler :
     INotificationHandler<NavigateEventArgs<ContentDialog>>
 {
     public async Task Handle(NavigateEventArgs<ContentDialog> args)
@@ -83,7 +83,7 @@ public class ContentDialogHandler(IDispatcher dispatcher) :
                             {
                                 await deactivating.OnDeactivating();
                             }
-                       }
+                        }
                     }
                 }
             }

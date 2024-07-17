@@ -146,7 +146,7 @@ public partial class ObservableCollection<TItem> :
 
     private Func<TItem>? defaultSelectionFactory;
 
-    public void SetSource(IList<TItem> source, 
+    public void SetSource(IList<TItem> source,
         Func<TItem>? defaultSelectionFactory)
     {
         foreach (TItem item in source)
@@ -167,7 +167,7 @@ public partial class ObservableCollection<TItem> :
         }
     }
 
-    private void SourceCollectionChanged(object? sender, 
+    private void SourceCollectionChanged(object? sender,
         NotifyCollectionChangedEventArgs args)
     {
         switch (args.Action)
@@ -181,6 +181,7 @@ public partial class ObservableCollection<TItem> :
                     }
                 }
                 break;
+
             case NotifyCollectionChangedAction.Remove:
                 if (args.OldItems is not null)
                 {
@@ -193,6 +194,7 @@ public partial class ObservableCollection<TItem> :
                     }
                 }
                 break;
+
             case NotifyCollectionChangedAction.Reset:
 
                 Clear();
@@ -263,7 +265,6 @@ public partial class ObservableCollection<TItem> :
         }
         catch (InvalidCastException)
         {
-
         }
 
         Add(item!);
@@ -296,7 +297,6 @@ public partial class ObservableCollection<TItem> :
                 Disposer.Dispose(item);
                 Disposer.Remove(this, item);
             }
-
         }
 
         ClearItems();
@@ -351,7 +351,7 @@ public partial class ObservableCollection<TItem> :
         Disposer.Dispose(this);
     }
 
-    public void Activate(Func<ActivationBuilder> aggregateDelegate, 
+    public void Activate(Func<ActivationBuilder> aggregateDelegate,
         bool reset = false)
     {
         if (reset)
@@ -501,7 +501,6 @@ public partial class ObservableCollection<TItem> :
 
     public virtual void OnInitialize()
     {
-
     }
 
     public virtual void Initialize()
@@ -722,7 +721,7 @@ public partial class ObservableCollection<TItem> :
         CollectionChanged?.Invoke(this, args);
     }
 
-    partial void OnIsActivatedChanged(bool value)
+    private partial void OnIsActivatedChanged(bool value)
     {
         if (value)
         {
@@ -734,7 +733,7 @@ public partial class ObservableCollection<TItem> :
         }
     }
 
-    partial void OnSelectedItemChanged(TItem? oldValue, TItem? newValue)
+    private partial void OnSelectedItemChanged(TItem? oldValue, TItem? newValue)
     {
         if (oldValue is ISelectable oldSelection)
         {
@@ -749,10 +748,9 @@ public partial class ObservableCollection<TItem> :
         Publisher.Publish(Selection.As(SelectedItem));
         OnSelectedItemChanged();
     }
-    
+
     protected virtual void OnSelectedItemChanged()
     {
-
     }
 
     private void UpdateSelection(TItem item)
@@ -776,7 +774,7 @@ public partial class ObservableCollection<TValue, TViewModel>(IServiceProvider p
     IServiceFactory factory,
     IMediator mediator,
     IPublisher publisher,
-    ISubscriber subscriber, 
+    ISubscriber subscriber,
     IDisposer disposer,
     TValue value) : ObservableCollection<TViewModel>(provider, factory, mediator, publisher, subscriber, disposer)
     where TViewModel : notnull, IDisposable
@@ -786,25 +784,24 @@ public partial class ObservableCollection<TValue, TViewModel>(IServiceProvider p
 
     protected virtual void OnValueChanged()
     {
-
     }
 
-    partial void OnValueChanged(TValue value) => OnValueChanged();
+    private partial void OnValueChanged(TValue value) => OnValueChanged();
 }
 
-public partial class ObservableCollection<TViewModel, TKey, TValue> : 
+public partial class ObservableCollection<TViewModel, TKey, TValue> :
     ObservableCollection<TViewModel>
     where TViewModel : notnull, IDisposable
     where TKey : notnull
-   {
+{
     [ObservableProperty]
     private TKey key;
 
     [ObservableProperty]
     private TValue value;
 
-    public ObservableCollection(IServiceProvider provider, 
-        IServiceFactory factory, 
+    public ObservableCollection(IServiceProvider provider,
+        IServiceFactory factory,
         IMediator mediator,
         IPublisher publisher,
         ISubscriber subscriber,
@@ -820,8 +817,8 @@ public partial class ObservableCollection<TViewModel, TKey, TValue> :
         IServiceFactory factory,
         IMediator mediator,
         IPublisher publisher,
-        ISubscriber subscriber, 
-        IDisposer disposer, 
+        ISubscriber subscriber,
+        IDisposer disposer,
         IEnumerable<TViewModel> items,
         TKey key,
         TValue value) : base(provider, factory, mediator, publisher, subscriber, disposer, items)
@@ -832,13 +829,12 @@ public partial class ObservableCollection<TViewModel, TKey, TValue> :
 
     protected virtual void OnValueChanged()
     {
-
     }
 
-    partial void OnValueChanged(TValue value) => OnValueChanged();
+    private partial void OnValueChanged(TValue value) => OnValueChanged();
 }
 
-public class ObservableCollection : 
+public class ObservableCollection :
     ObservableCollection<IDisposable>
 {
     public ObservableCollection(IServiceProvider provider,

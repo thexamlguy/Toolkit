@@ -2,13 +2,12 @@
 
 namespace Toolkit.Foundation;
 
-
 public class Component :
     IComponent
 {
     private readonly IComponentBuilder builder;
 
-    protected Component(IComponentBuilder builder) => 
+    protected Component(IComponentBuilder builder) =>
         this.builder = builder;
 
     public static TComponent? Create<TComponent>(IServiceProvider provider,

@@ -8,7 +8,7 @@ public class BooleanToPasswordCharConverter :
     MarkupExtension,
     IValueConverter
 {
-    public override object ProvideValue(IServiceProvider serviceProvider) => 
+    public override object ProvideValue(IServiceProvider serviceProvider) =>
         this;
 
     public char PasswordChar { get; set; }
@@ -16,6 +16,6 @@ public class BooleanToPasswordCharConverter :
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture) =>
         value is bool boolValue ? boolValue ? '\0' : PasswordChar : (object)PasswordChar;
 
-    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) => 
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) =>
         throw new NotImplementedException();
 }

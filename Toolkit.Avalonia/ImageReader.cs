@@ -3,12 +3,12 @@ using Toolkit.Foundation;
 
 namespace Toolkit.Avalonia;
 
-public class ImageReader(IImageResizer imageResizer) : 
+public class ImageReader(IImageResizer imageResizer) :
     IImageReader
 {
-    public IImageDescriptor Get(Stream stream, 
-        int width, 
-        int height, 
+    public IImageDescriptor Get(Stream stream,
+        int width,
+        int height,
         bool maintainAspectRatio)
     {
         Bitmap resizedImage = imageResizer.Resize(stream, width, height, maintainAspectRatio);

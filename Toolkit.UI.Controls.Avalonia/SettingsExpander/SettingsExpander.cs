@@ -33,7 +33,6 @@ public class SettingsExpander :
         set => SetValue(IsToggleableProperty, value);
     }
 
-
     protected override Type StyleKeyOverride =>
         typeof(SettingsExpander);
 }

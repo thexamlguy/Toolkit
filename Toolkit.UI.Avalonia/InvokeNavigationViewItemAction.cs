@@ -10,6 +10,8 @@ public class InvokeNavigationViewItemAction :
     AvaloniaObject,
     IAction
 {
+    private int currentIndex;
+
     public static readonly StyledProperty<int> SelectedIndexProperty =
         AvaloniaProperty.Register<InvokeNavigationViewItemAction, int>(nameof(SelectedIndex), 0);
 
@@ -30,6 +32,11 @@ public class InvokeNavigationViewItemAction :
 
     public object? Execute(object? sender, object? parameter)
     {
+        //if (SelectedIndex == currentIndex)
+        //{
+        //    return false;
+        //}
+
         if ((Target ?? sender) is NavigationViewItem navigationViewItem)
         {
             Dispatcher.UIThread.Post(() =>
@@ -53,6 +60,7 @@ public class InvokeNavigationViewItemAction :
                     if (collection is { Count: > 0 })
                     {
                         navigationView.SetValue(NavigationView.SelectedItemProperty, collection[SelectedIndex]);
+                        currentIndex = SelectedIndex;
                     }
                     else
                     {
@@ -64,5 +72,4 @@ public class InvokeNavigationViewItemAction :
 
         return true;
     }
-
 }

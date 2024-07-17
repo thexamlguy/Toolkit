@@ -7,4 +7,3 @@ public enum ContentBadgePlacement
     BottomLeft,
     BottomRight
 }
-

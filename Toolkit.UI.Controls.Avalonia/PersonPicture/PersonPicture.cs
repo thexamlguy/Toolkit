@@ -7,7 +7,6 @@ using Avalonia.Media.Imaging;
 
 namespace Toolkit.UI.Controls.Avalonia;
 
-
 public class PersonPicture : TemplatedControl
 {
     public static readonly StyledProperty<string> BadgeGlyphProperty =

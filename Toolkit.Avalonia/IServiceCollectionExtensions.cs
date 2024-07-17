@@ -129,7 +129,7 @@ public static class IServiceCollectionExtensions
 
         services.AddTransient<IClipboardWriter, ClipboardWriter>();
 
-        services.AddTransient<IImageReader,  ImageReader>();
+        services.AddTransient<IImageReader, ImageReader>();
         services.AddTransient<IImageWriter, ImageWriter>();
         services.AddTransient<IImageResizer, ImageResizer>();
 

@@ -2,6 +2,7 @@
 using Avalonia.Metadata;
 
 namespace Toolkit.UI.Avalonia;
+
 public class ConditionalExpression :
     AvaloniaObject,
     ICondition

@@ -23,7 +23,7 @@ public class FileProvider(ITopLevelProvider topLevelProvider) :
                 }
             });
 
-            return storageFiles.Select(file => file.Path.LocalPath).ToList();  
+            return storageFiles.Select(file => file.Path.LocalPath).ToList();
         }
 
         return Array.Empty<string>();

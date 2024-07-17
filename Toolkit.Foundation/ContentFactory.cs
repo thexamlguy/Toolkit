@@ -3,7 +3,7 @@
 public class ContentFactory(IServiceProvider provider,
     IServiceFactory factory) : IContentFactory
 {
-    public Task<object?> CreateAsync(IContentTemplateDescriptor descriptor, 
+    public Task<object?> CreateAsync(IContentTemplateDescriptor descriptor,
         object[] parameters)
     {
         object? content = parameters is { Length: > 0 }

@@ -1,5 +1,5 @@
-﻿using System.Collections.Specialized;
-using System.Collections;
+﻿using System.Collections;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 
@@ -61,10 +61,10 @@ public class ValidationErrorCollection :
         }
     }
 
-    object? IDictionary.this[object key] 
-    { 
+    object? IDictionary.this[object key]
+    {
         get => ((IDictionary)items)[key];
-        set => ((IDictionary)items)[key] = value; 
+        set => ((IDictionary)items)[key] = value;
     }
 
     public void Add(string key, string value)
@@ -73,7 +73,7 @@ public class ValidationErrorCollection :
         NotifyAdd(key, value);
     }
 
-    void ICollection<KeyValuePair<string, string>>.Add(KeyValuePair<string, string> item) => 
+    void ICollection<KeyValuePair<string, string>>.Add(KeyValuePair<string, string> item) =>
         Add(item.Key, item.Value);
 
     void IDictionary.Add(object key, object? value) =>
@@ -93,24 +93,24 @@ public class ValidationErrorCollection :
     bool ICollection<KeyValuePair<string, string>>.Contains(KeyValuePair<string, string> item) =>
         items.Contains(item);
 
-    bool IDictionary.Contains(object key) => 
+    bool IDictionary.Contains(object key) =>
         ((IDictionary)items).Contains(key);
 
     public bool ContainsKey(string key) => items.ContainsKey(key);
 
-    public void CopyTo(KeyValuePair<string, string>[] array, int arrayIndex) => 
+    public void CopyTo(KeyValuePair<string, string>[] array, int arrayIndex) =>
         ((IDictionary<string, string>)items).CopyTo(array, arrayIndex);
 
-    void ICollection.CopyTo(Array array, int index) => 
+    void ICollection.CopyTo(Array array, int index) =>
         ((ICollection)items).CopyTo(array, index);
 
-    public IEnumerator<KeyValuePair<string, string>> GetEnumerator() => 
+    public IEnumerator<KeyValuePair<string, string>> GetEnumerator() =>
         items.GetEnumerator();
 
-    IEnumerator IEnumerable.GetEnumerator() => 
+    IEnumerator IEnumerable.GetEnumerator() =>
         items.GetEnumerator();
 
-    IDictionaryEnumerator IDictionary.GetEnumerator() => 
+    IDictionaryEnumerator IDictionary.GetEnumerator() =>
         ((IDictionary)items).GetEnumerator();
 
     public bool Remove(string key)
@@ -131,10 +131,10 @@ public class ValidationErrorCollection :
         }
     }
 
-    public bool Contains(string key) => 
+    public bool Contains(string key) =>
         items.ContainsKey(key);
 
-    bool ICollection<KeyValuePair<string, string>>.Remove(KeyValuePair<string, string> item) => 
+    bool ICollection<KeyValuePair<string, string>>.Remove(KeyValuePair<string, string> item) =>
         Remove(item.Key);
 
     void IDictionary.Remove(object key) => Remove((string)key);
@@ -146,7 +146,7 @@ public class ValidationErrorCollection :
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Count)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs($"Item[{key}]"));
 
-        CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, 
+        CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add,
             new[] { new KeyValuePair<string, string>(key, value) }, -1));
     }
 }

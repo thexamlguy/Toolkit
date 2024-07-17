@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
 namespace Toolkit.Foundation;
+
 public static class IServiceCollectionExtensions
 {
     public static IServiceCollection AddCache<TKey, TValue>(this IServiceCollection services)
@@ -37,7 +38,7 @@ public static class IServiceCollectionExtensions
     }
 
     public static IServiceCollection AddHandler<THandler>(this IServiceCollection services,
-        ServiceLifetime lifetime = ServiceLifetime.Transient, 
+        ServiceLifetime lifetime = ServiceLifetime.Transient,
         string? key = null)
         where THandler : IHandler
     {

@@ -1,4 +1,4 @@
 ﻿namespace Toolkit.Foundation;
 
-public record CreateEventArgs<TSender>(TSender? Sender = default, 
+public record CreateEventArgs<TSender>(TSender? Sender = default,
     params object[] Parameters);

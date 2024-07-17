@@ -30,7 +30,7 @@ public class Mediator(IHandlerProvider handlerProvider,
         return default;
     }
 
-    public async Task<object?> Handle(Type responseType, 
+    public async Task<object?> Handle(Type responseType,
         object message,
         object? key = null,
         CancellationToken cancellationToken = default)
@@ -57,7 +57,7 @@ public class Mediator(IHandlerProvider handlerProvider,
         return default;
     }
 
-    public async Task<List<object?>> HandleMany(Type responseType, 
+    public async Task<List<object?>> HandleMany(Type responseType,
         object message,
         object? key = null,
         CancellationToken cancellationToken = default)
@@ -97,7 +97,7 @@ public class Mediator(IHandlerProvider handlerProvider,
         List<object?> handlers = GetHandlers(message, handlerType, key);
         foreach (object? handler in handlers)
         {
-            MethodInfo? handleMethod = handler?.GetType().GetMethod("Handle", 
+            MethodInfo? handleMethod = handler?.GetType().GetMethod("Handle",
                 [messageType, typeof(CancellationToken)]);
 
             if (handleMethod is not null)
@@ -127,7 +127,7 @@ public class Mediator(IHandlerProvider handlerProvider,
         }
     }
 
-    private List<object?> GetHandlers(object message, 
+    private List<object?> GetHandlers(object message,
         Type handlerWrapperType,
         object? key)
     {
@@ -151,7 +151,7 @@ public class Mediator(IHandlerProvider handlerProvider,
             }
         }
 
-        IEnumerable<object?> keyedServices = key is not null ? provider.GetKeyedServices(handlerWrapperType, key) : 
+        IEnumerable<object?> keyedServices = key is not null ? provider.GetKeyedServices(handlerWrapperType, key) :
             provider.GetServices(handlerWrapperType);
         AddHandlers(keyedServices);
 
@@ -160,5 +160,4 @@ public class Mediator(IHandlerProvider handlerProvider,
 
         return handlers.SelectMany(entry => entry.Value).ToList();
     }
-
 }

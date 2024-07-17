@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 
 namespace Toolkit.Foundation;
 
-public interface IValidation : 
+public interface IValidation :
     INotifyPropertyChanged
 {
     IReadOnlyDictionary<string, string> Errors { get; }

@@ -10,7 +10,7 @@ public class NavigateBackHandler(IComponentScopeProvider provider) :
         if (provider.Get(args.Scope ?? "Root")
             is ComponentScopeDescriptor descriptor)
         {
-            if (descriptor?.Services?.GetService<INavigation>() is 
+            if (descriptor?.Services?.GetService<INavigation>() is
                 INavigation navigationScope)
             {
                 navigationScope.Back(args.Context);

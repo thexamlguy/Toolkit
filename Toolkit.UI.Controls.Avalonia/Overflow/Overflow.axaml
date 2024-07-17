@@ -75,15 +75,14 @@
                             BadgePath="{TemplateBinding BadgePath}"
                             BadgePlacement="{TemplateBinding BadgePlacement}"
                             BadgeSize="{TemplateBinding BadgeSize}"
-                            Foreground="Red"
+                            Foreground="{TemplateBinding BadgeBrush}"
                             IsBadgeVisible="{TemplateBinding IsBadgeVisible}">
                             <Grid>
                                 <ContentPresenter
                                     Name="PART_ContentPresenter"
                                     HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
                                     VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
-                                    Content="{TemplateBinding Content}"
-                                   />
+                                    Content="{TemplateBinding Content}" />
                                 <Border
                                     Name="SelectionIndicator"
                                     BorderBrush="{DynamicResource AccentFillColorDefaultBrush}"
