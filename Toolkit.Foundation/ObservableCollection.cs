@@ -351,7 +351,7 @@ public partial class ObservableCollection<TItem> :
         Disposer.Dispose(this);
     }
 
-    public void Activate(Func<ActivationBuilder> aggregateDelegate,
+    public void Activate(Func<ActivationBuilder> activateDelegate,
         bool reset = false)
     {
         if (reset)
@@ -359,8 +359,8 @@ public partial class ObservableCollection<TItem> :
             Clear();
         }
 
-        ActivationBuilder expression = aggregateDelegate.Invoke();
-        Publisher.Publish(expression.Value, expression.Key);
+        ActivationBuilder builder = activateDelegate.Invoke();
+        Publisher.Publish(builder.Value, builder.Key);
     }
 
     public IEnumerator<TItem> GetEnumerator() =>
