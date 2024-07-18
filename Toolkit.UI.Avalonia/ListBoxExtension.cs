@@ -39,11 +39,6 @@ public class ListBoxExtension
                     }
                 }
 
-                if (sender.DataContext == listBox.SelectedItem)
-                {
-                    sender.RaiseEvent(new ItemInvokedEventArgs { RoutedEvent = ItemInvokedEvent });
-                }
-
                 listBox.SelectionChanged += OnItemInvoked;
                 return true;
             }

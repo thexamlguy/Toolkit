@@ -14,6 +14,9 @@ namespace Toolkit.UI.Controls.Avalonia;
 public class Overflow :
     TemplatedControl
 {
+    public static readonly StyledProperty<IItemContainerTemplateSelector?> ItemContainerTemplateSelectorProperty =
+        AvaloniaProperty.Register<Overflow, IItemContainerTemplateSelector?>(nameof(ItemContainerTemplateSelector));
+
     public static readonly StyledProperty<ITemplate<Panel?>> ItemsPanelProperty =
         AvaloniaProperty.Register<Overflow, ITemplate<Panel?>>(nameof(ItemsPanel), new FuncTemplate<Panel?>(() => new StackPanel()));
 
@@ -46,6 +49,12 @@ public class Overflow :
 
         TemplateSettings.GetPropertyChangedObservable(OverflowTemplateSettings.SecondarySelectionProperty)
             .AddClassHandler<OverflowTemplateSettings>(OnSecondarySelectionPropertyChanged);
+    }
+
+    public IItemContainerTemplateSelector? ItemContainerTemplateSelector
+    {
+        get => GetValue(ItemContainerTemplateSelectorProperty);
+        set => SetValue(ItemContainerTemplateSelectorProperty, value);
     }
 
     public ITemplate<Panel?> ItemsPanel

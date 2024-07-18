@@ -162,6 +162,7 @@
                     <controls:OverflowList
                         x:Name="PrimaryListBox"
                         Grid.Column="0"
+                        ItemContainerTemplateSelector="{TemplateBinding ItemContainerTemplateSelector}"
                         ItemTemplate="{TemplateBinding ItemTemplate}"
                         SelectedItem="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=TemplateSettings.PrimarySelection, Mode=TwoWay}">
                         <controls:OverflowList.ItemsPanel>
@@ -197,6 +198,7 @@
                             <Flyout>
                                 <controls:OverflowList
                                     x:Name="SecondaryListBox"
+                                    ItemContainerTemplateSelector="{TemplateBinding ItemContainerTemplateSelector}"
                                     ItemTemplate="{TemplateBinding ItemTemplate}"
                                     SelectedItem="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=TemplateSettings.SecondarySelection, Mode=TwoWay}">
                                     <controls:OverflowList.ItemsPanel>
