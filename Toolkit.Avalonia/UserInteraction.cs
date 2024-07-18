@@ -5,7 +5,6 @@ using Toolkit.Foundation;
 
 namespace Toolkit.Avalonia;
 
-
 public class UserInteraction(ITopLevelProvider topLevelProvider) : 
     IUserInteraction
 {
