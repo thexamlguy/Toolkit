@@ -12,22 +12,13 @@ public class UserInteraction(ITopLevelProvider topLevelProvider) :
     public event EventHandler<UserInteractedEventArgs>? UserInteracted;
 
     private void OnPointerMoved(object? sender,
-        PointerEventArgs args)
-    {
-        UserInteracted?.Invoke(this, new UserInteractedEventArgs());
-    }
+        PointerEventArgs args) => UserInteracted?.Invoke(this, new UserInteractedEventArgs());
 
-    private void OnKeyDown(object? sender, 
-        KeyEventArgs args)
-    {
-        UserInteracted?.Invoke(this, new UserInteractedEventArgs());
-    }
+    private void OnKeyDown(object? sender,
+        KeyEventArgs args) => UserInteracted?.Invoke(this, new UserInteractedEventArgs());
 
     private void OnKeyUp(object? sender,
-        KeyEventArgs args)
-    {
-        UserInteracted?.Invoke(this, new UserInteractedEventArgs());
-    }
+        KeyEventArgs args) => UserInteracted?.Invoke(this, new UserInteractedEventArgs());
 
     public void Stop()
     {
