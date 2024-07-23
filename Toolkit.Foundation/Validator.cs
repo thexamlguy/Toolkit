@@ -11,7 +11,7 @@ public class Validator(string propertyName,
     {
         foreach (ValidationRule rule in rules)
         {
-            if (!await rule.ValidateAsync())
+            if (!await rule.Validate())
             {
                 return (false, rule.Message);
             }

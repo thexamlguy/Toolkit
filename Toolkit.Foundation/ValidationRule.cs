@@ -31,7 +31,7 @@ public class ValidationRule
         Message = "";
     }
 
-    public async Task<bool> ValidateAsync()
+    public async Task<bool> Validate()
     {
         if (syncValidation is not null)
         {
