@@ -25,6 +25,7 @@ public class Subscriber(SubscriptionCollection subscriptions,
                 Type requestType = handlerArguments[0];
                 Type responseType = handlerArguments[1];
                 Type wrapperType = typeof(HandlerWrapper<,>).MakeGenericType(requestType, responseType);
+
                 AddSubscriptions(subscriber, subscribers, wrapperType);
             }
         }
@@ -49,12 +50,14 @@ public class Subscriber(SubscriptionCollection subscriptions,
                 Type requestType = handlerArguments[0];
                 Type responseType = handlerArguments[1];
                 Type wrapperType = typeof(HandlerWrapper<,>).MakeGenericType(requestType, responseType);
+
                 RemoveSubscriptions(subscriber, subscribers, wrapperType);
             }
         }
     }
 
-    private void AddOrUpdateSubscription(object subscriber, string preferredKey)
+    private void AddOrUpdateSubscription(object subscriber, 
+        string preferredKey)
     {
         subscriptions.AddOrUpdate(preferredKey, _ => new List<WeakReference> { new(subscriber) }, (_, collection) =>
         {
@@ -62,10 +65,16 @@ public class Subscriber(SubscriptionCollection subscriptions,
             return collection;
         });
 
-        disposer.Add(subscriber, Disposable.Create(() => RemoveSubscription(subscriber, preferredKey)));
+        disposer.Add(subscriber, Disposable.Create(() => { 
+            
+            RemoveSubscription(subscriber, preferredKey);
+        
+        }));
     }
 
-    private void AddSubscriptions(object subscriber, IDictionary<Type, List<object>> subscribers, Type handlerType)
+    private void AddSubscriptions(object subscriber, 
+        IDictionary<Type, List<object>> subscribers, 
+        Type handlerType)
     {
         if (subscribers.TryGetValue(handlerType, out List<object>? keys))
         {
@@ -135,7 +144,9 @@ public class Subscriber(SubscriptionCollection subscriptions,
         }
     }
 
-    private void RemoveSubscriptions(object subscriber, IDictionary<Type, List<object>> subscribers, Type handlerType)
+    private void RemoveSubscriptions(object subscriber,
+        IDictionary<Type, List<object>> subscribers, 
+        Type handlerType)
     {
         if (subscribers.TryGetValue(handlerType, out List<object>? keys))
         {

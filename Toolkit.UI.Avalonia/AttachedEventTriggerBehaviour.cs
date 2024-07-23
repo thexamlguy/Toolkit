@@ -21,13 +21,26 @@ public class AttachedEventTriggerBehaviour : Trigger
         {
             if (AssociatedObject is Interactive interactive)
             {
-                interactive.AddHandler(RoutedEvent, (object sender, RoutedEventArgs args) =>
-                {
-                    Interaction.ExecuteActions(AssociatedObject, Actions, null);
-                });
+                interactive.AddHandler(RoutedEvent, Handle);
             }
         }
 
         base.OnAttached();
     }
+
+    protected override void OnDetaching()
+    {
+        if (RoutedEvent is not null)
+        {
+            if (AssociatedObject is Interactive interactive)
+            {
+                interactive.RemoveHandler(RoutedEvent, Handle);
+            }
+        }
+
+        base.OnDetaching();
+    }
+
+    private void Handle(object sender, RoutedEventArgs args) => 
+        Interaction.ExecuteActions(AssociatedObject, Actions, null);
 }

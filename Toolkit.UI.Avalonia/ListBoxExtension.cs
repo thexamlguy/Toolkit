@@ -39,7 +39,20 @@ public class ListBoxExtension
                     }
                 }
 
+                if (sender.DataContext == listBox.SelectedItem)
+                {
+                    sender.RaiseEvent(new ItemInvokedEventArgs { RoutedEvent = ItemInvokedEvent });
+                }
+
+                void HandleUnloaded(object? _, RoutedEventArgs __)
+                {
+                    listBox.SelectionChanged -= OnItemInvoked;
+                    listBox.Unloaded -= HandleUnloaded;
+                }
+
                 listBox.SelectionChanged += OnItemInvoked;
+                listBox.Unloaded += HandleUnloaded;
+
                 return true;
             }
 
@@ -48,13 +61,12 @@ public class ListBoxExtension
 
         if (!TrySetupListBox())
         {
-            void OnAttachedToVisualTree(object? _, VisualTreeAttachmentEventArgs __)
+            void HandleLoaded(object? _, RoutedEventArgs __)
             {
-                sender.AttachedToVisualTree -= OnAttachedToVisualTree;
                 TrySetupListBox();
             }
 
-            sender.AttachedToVisualTree += OnAttachedToVisualTree;
+            sender.Loaded += HandleLoaded;
         }
     }
 
