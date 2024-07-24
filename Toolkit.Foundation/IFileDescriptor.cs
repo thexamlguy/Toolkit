@@ -6,5 +6,5 @@ public interface IFileDescriptor
 
     string Path { get; }
 
-    int Size { get; }
+    long Size { get; }
 }
