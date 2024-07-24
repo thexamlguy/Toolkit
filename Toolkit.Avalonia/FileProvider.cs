@@ -18,7 +18,7 @@ public class FileProvider(ITopLevelProvider topLevelProvider) :
                 {
                     new(filter.Name)
                     {
-                        Patterns = filter.Extensions.Select(x => $"*.{x}").ToList()
+                        Patterns = filter.Extensions is { Count: > 0 } ? filter.Extensions.Select(x => $"*.{x}").ToList() : ["*.*"]
                     }
                 }
             });

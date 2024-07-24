@@ -2,9 +2,9 @@
 
 public interface IImageDescriptor
 {
-    public object Image { get; }
+    object Image { get; }
 
-    public int Width { get; }
+    int Width { get; }
 
-    public int Height { get; }
+    int Height { get; }
 }
