@@ -28,8 +28,14 @@ public class ImageResizer :
             using SKBitmap resized = new(newWidth, newHeight);
             using SKCanvas canvas = new(resized);
 
+            using SKPaint paint = new()
+            {
+                FilterQuality = SKFilterQuality.High,
+                IsAntialias = true
+            };
+
             canvas.Clear(SKColors.Transparent);
-            canvas.DrawBitmap(sKBitmap, new SKRect(0, 0, newWidth, newHeight));
+            canvas.DrawBitmap(sKBitmap, new SKRect(0, 0, newWidth, newHeight), paint);
 
             SKBitmap cropped;
             if (maintainAspectRatio)
