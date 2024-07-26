@@ -3,7 +3,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="using:Toolkit.UI.Controls.Avalonia"
     xmlns:ui="using:FluentAvalonia.UI.Controls">
-    <Thickness x:Key="SettingsExpanderItemBottomFooterMargin">0 4 0 0</Thickness>
+    <Thickness x:Key="SettingsExpanderItemBottomFooterMargin">0,0,0,0</Thickness>
     <ControlTheme x:Key="SettingsExpanderToggleButtonStyle" TargetType="controls:SettingsExpanderToggleButton">
         <Setter Property="Background" Value="{DynamicResource ExpanderHeaderBackground}" />
         <Setter Property="BorderBrush" Value="{DynamicResource ExpanderHeaderBorderBrush}" />
@@ -117,6 +117,7 @@
             <Setter Property="IsVisible" Value="True" />
         </Style>
     </ControlTheme>
+
     <ControlTheme x:Key="{x:Type controls:SettingsExpander}" TargetType="controls:SettingsExpander">
         <Setter Property="Background" Value="{DynamicResource ExpanderBackground}" />
         <Setter Property="BorderBrush" Value="{DynamicResource ExpanderHeaderBorderBrush}" />
@@ -135,7 +136,7 @@
                     Name="Expander"
                     IsExpanded="{TemplateBinding IsExpanded,
                                                  Mode=TwoWay}"
-                    Tag="{TemplateBinding IsToggleable}"
+                    Tag="{TemplateBinding IsExpandable}"
                     Theme="{StaticResource SettingsExpanderExpanderStyle}">
                     <Expander.Header>
                         <controls:SettingsExpanderItem
@@ -150,7 +151,9 @@
                             Description="{TemplateBinding Description}"
                             Footer="{TemplateBinding Footer}"
                             FooterTemplate="{TemplateBinding FooterTemplate}"
+                            Icon="{TemplateBinding Icon}"
                             IconSource="{TemplateBinding IconSource}"
+                            IconTemplate="{TemplateBinding IconTemplate}"
                             IsClickEnabled="{TemplateBinding IsClickEnabled}" />
                     </Expander.Header>
                     <ItemsPresenter ItemsPanel="{TemplateBinding ItemsPanel}" />
@@ -161,6 +164,7 @@
             <Setter Property="IsVisible" Value="False" />
         </Style>
     </ControlTheme>
+
     <ControlTheme x:Key="{x:Type controls:SettingsExpanderItem}" TargetType="controls:SettingsExpanderItem">
         <Setter Property="Background" Value="{DynamicResource ExpanderHeaderBackground}" />
         <Setter Property="Padding" Value="{DynamicResource SettingsExpanderItemPadding}" />
@@ -181,47 +185,66 @@
                             <BrushTransition Property="BorderBrush" Duration="00:00:00.083" />
                         </Transitions>
                     </Border.Transitions>
-                    <Grid ColumnDefinitions="*,Auto,Auto,Auto" RowDefinitions="*,Auto">
+                    <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+                        <ContentPresenter
+                            Name="IconPresenter"
+                            Grid.Column="0"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch"
+                            Content="{TemplateBinding Icon}"
+                            ContentTemplate="{TemplateBinding IconTemplate}" />
                         <Viewbox
                             Name="IconHost"
+                            Grid.Column="0"
                             Width="{DynamicResource SettingsExpanderItemIconSize}"
                             Height="{DynamicResource SettingsExpanderItemIconSize}"
                             HorizontalAlignment="Left"
                             VerticalAlignment="Center"
                             IsVisible="False">
-                            <ContentPresenter Name="IconPresenter" Content="{Binding TemplateSettings.Icon, RelativeSource={RelativeSource TemplatedParent}}" />
+                            <ContentPresenter Content="{Binding TemplateSettings.Icon, RelativeSource={RelativeSource TemplatedParent}}" />
                         </Viewbox>
-                        <StackPanel
-                            Name="HeaderRegion"
-                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                            VerticalAlignment="Center">
-                            <ContentPresenter
-                                Name="ContentPresenter"
-                                Content="{TemplateBinding Content}"
-                                ContentTemplate="{TemplateBinding ContentTemplate}"
-                                IsVisible="False" />
-                            <TextBlock
-                                Name="DescriptionText"
-                                Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                IsVisible="False"
-                                Text="{TemplateBinding Description}"
-                                TextWrapping="Wrap"
-                                Theme="{StaticResource CaptionTextBlockStyle}" />
-                        </StackPanel>
-                        <ContentPresenter
-                            Name="FooterPresenter"
-                            Grid.Row="0"
+
+                        <Grid
                             Grid.Column="1"
-                            Grid.ColumnSpan="1"
-                            Margin="{DynamicResource SettingsExpanderItemFooterMargin}"
-                            HorizontalAlignment="Right"
                             VerticalAlignment="Center"
-                            Content="{TemplateBinding Footer}"
-                            ContentTemplate="{TemplateBinding FooterTemplate}"
-                            IsVisible="False" />
+                            RowDefinitions="Auto,Auto">
+                            <StackPanel
+                                Name="HeaderRegion"
+                                Grid.Row="0"
+                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                VerticalAlignment="Center">
+                                <ContentPresenter
+                                    Name="ContentPresenter"
+                                    Content="{TemplateBinding Content}"
+                                    ContentTemplate="{TemplateBinding ContentTemplate}"
+                                    IsVisible="False" />
+                                <TextBlock
+                                    Name="DescriptionText"
+                                    Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                    IsVisible="False"
+                                    Text="{TemplateBinding Description}"
+                                    TextWrapping="Wrap"
+                                    Theme="{StaticResource CaptionTextBlockStyle}" />
+                            </StackPanel>
+                            <ContentPresenter
+                                Name="FooterPresenter"
+                                Grid.Row="0"
+                                Grid.Column="2"
+                                Grid.ColumnSpan="1"
+                                Margin="{DynamicResource SettingsExpanderItemFooterMargin}"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Center"
+                                Content="{TemplateBinding Footer}"
+                                ContentTemplate="{TemplateBinding FooterTemplate}"
+                                IsVisible="False" />
+
+                        </Grid>
+
                         <ContentPresenter
                             Name="ActionPresenter"
                             Grid.Column="2"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch"
                             Content="{TemplateBinding Action}"
                             ContentTemplate="{TemplateBinding ActionTemplate}" />
                         <Viewbox
@@ -229,6 +252,8 @@
                             Grid.Column="3"
                             Width="{DynamicResource SettingsExpanderItemActionIconSize}"
                             Height="{DynamicResource SettingsExpanderItemActionIconSize}"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch"
                             IsVisible="False">
                             <ContentPresenter Name="ExpandChevronActionIconContainer" Content="{Binding TemplateSettings.ActionIcon, RelativeSource={RelativeSource TemplatedParent}}" />
                         </Viewbox>
@@ -249,13 +274,23 @@
             <Setter Property="IsVisible" Value="True" />
         </Style>
 
-        <Style Selector="^:footerBottom /template/ ContentPresenter#FooterPresenter">
-            <Setter Property="Grid.Row" Value="1" />
-            <Setter Property="Grid.Column" Value="0" />
-            <Setter Property="Grid.ColumnSpan" Value="3" />
-            <Setter Property="HorizontalAlignment" Value="Left" />
-            <Setter Property="VerticalAlignment" Value="Top" />
-            <Setter Property="Margin" Value="{DynamicResource SettingsExpanderItemBottomFooterMargin}" />
+        <Style Selector="^:footerBottom">
+            <Style Selector="^ /template/ ContentPresenter#FooterPresenter">
+                <Setter Property="Grid.Row" Value="1" />
+                <Setter Property="Grid.Column" Value="1" />
+                <Setter Property="Grid.ColumnSpan" Value="3" />
+                <Setter Property="HorizontalAlignment" Value="Left" />
+                <Setter Property="VerticalAlignment" Value="Top" />
+                <Setter Property="Margin" Value="{DynamicResource SettingsExpanderItemBottomFooterMargin}" />
+            </Style>
+            <Style Selector="^ /template/ ContentPresenter#ActionPresenter">
+                <Setter Property="Grid.Row" Value="0" />
+                <Setter Property="Grid.RowSpan" Value="2" />
+            </Style>
+            <Style Selector="^ /template/ ContentPresenter#IconPresenter">
+                <Setter Property="Grid.Row" Value="0" />
+                <Setter Property="Grid.RowSpan" Value="2" />
+            </Style>
         </Style>
 
         <Style Selector="^:actionIcon /template/ Viewbox#ActionIconHost">
@@ -265,22 +300,18 @@
         <Style Selector="^:content /template/ ContentPresenter#ContentPresenter">
             <Setter Property="IsVisible" Value="True" />
         </Style>
+
         <Style Selector="^:description /template/ TextBlock#DescriptionText">
             <Setter Property="IsVisible" Value="True" />
         </Style>
+
         <Style Selector="^:icon">
-            <Style Selector="^ /template/ Viewbox#IconHost">
+
+            <Style Selector="^ /template/ ContentPresenter#IconPresenter">
                 <Setter Property="IsVisible" Value="True" />
             </Style>
-            <Style Selector="^ /template/ StackPanel#HeaderRegion">
-                <Setter Property="Margin" Value="{DynamicResource SettingsExpanderItemContentMargin}" />
-            </Style>
         </Style>
-        <Style Selector="^:iconPlaceholder">
-            <Style Selector="^ /template/ StackPanel#HeaderRegion">
-                <Setter Property="Margin" Value="{DynamicResource SettingsExpanderItemContentMargin}" />
-            </Style>
-        </Style>
+        <Style Selector="^:iconPlaceholder" />
 
         <Style Selector="^:allowClick">
             <Style Selector="^:pointerover /template/ Border#Root">

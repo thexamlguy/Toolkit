@@ -12,8 +12,14 @@ public class SettingsExpander :
     public static readonly StyledProperty<IDataTemplate> ActionTemplateProperty =
         AvaloniaProperty.Register<SettingsExpander, IDataTemplate>(nameof(ActionTemplate));
 
-    public static readonly StyledProperty<bool> IsToggleableProperty =
-        AvaloniaProperty.Register<SettingsExpander, bool>(nameof(IsToggleable));
+    public static readonly StyledProperty<object> IconProperty =
+        AvaloniaProperty.Register<SettingsExpander, object>(nameof(Icon));
+
+    public static readonly StyledProperty<IDataTemplate> IconTemplateProperty =
+        AvaloniaProperty.Register<SettingsExpander, IDataTemplate>(nameof(IconTemplate));
+
+    public static readonly StyledProperty<bool> IsExpandableProperty =
+        AvaloniaProperty.Register<SettingsExpander, bool>(nameof(IsExpandable));
 
     public object Action
     {
@@ -27,10 +33,22 @@ public class SettingsExpander :
         set => SetValue(ActionTemplateProperty, value);
     }
 
-    public bool IsToggleable
+    public object Icon
     {
-        get => GetValue(IsToggleableProperty);
-        set => SetValue(IsToggleableProperty, value);
+        get => GetValue(IconProperty);
+        set => SetValue(IconProperty, value);
+    }
+
+    public IDataTemplate IconTemplate
+    {
+        get => GetValue(IconTemplateProperty);
+        set => SetValue(IconTemplateProperty, value);
+    }
+
+    public bool IsExpandable
+    {
+        get => GetValue(IsExpandableProperty);
+        set => SetValue(IsExpandableProperty, value);
     }
 
     protected override Type StyleKeyOverride =>
