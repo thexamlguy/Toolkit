@@ -14,8 +14,10 @@ public interface IValidation :
         ValidationRule[] rules,
         ValidationTrigger trigger = ValidationTrigger.Deferred);
 
+    void Clear();
+
     Task<bool> Validate<TProperty>(Expression<Func<TProperty>> property,
-        ValidationRule[] rules);
+            ValidationRule[] rules);
 
     Task<bool> Validate();
 

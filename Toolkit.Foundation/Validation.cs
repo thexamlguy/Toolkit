@@ -31,8 +31,14 @@ public class Validation(IValidatorCollection validators) :
         }
     }
 
+    public void Clear()
+    {
+        errors.Clear();
+        OnPropertyChanged(nameof(Errors), null, null);
+    }
+
     public virtual void OnPropertyChanged(string propertyName,
-        object? before, object? after)
+            object? before, object? after)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
@@ -83,6 +89,7 @@ public class Validation(IValidatorCollection validators) :
     public async Task<bool> Validate()
     {
         Clear();
+
         foreach (Validator? validator in Validators)
         {
             if (validator.PropertyName is string name)
@@ -109,13 +116,6 @@ public class Validation(IValidatorCollection validators) :
             OnPropertyChanged(nameof(Errors), null, null);
         }
     }
-
-    private void Clear()
-    {
-        errors.Clear();
-        OnPropertyChanged(nameof(Errors), null, null);
-    }
-
     private string GetPropertyName<T>(Expression<Func<T>> expression)
     {
         return expression.Body switch
