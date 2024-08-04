@@ -3,7 +3,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="using:Toolkit.UI.Controls.Avalonia"
     xmlns:ui="using:FluentAvalonia.UI.Controls">
-    <Thickness x:Key="SettingsExpanderItemBottomFooterMargin">0,0,0,0</Thickness>
+    <Thickness x:Key="SettingsExpanderItemBottomFooterMargin">0,4,0,0</Thickness>
     <ControlTheme x:Key="SettingsExpanderToggleButtonStyle" TargetType="controls:SettingsExpanderToggleButton">
         <Setter Property="Background" Value="{DynamicResource ExpanderHeaderBackground}" />
         <Setter Property="BorderBrush" Value="{DynamicResource ExpanderHeaderBorderBrush}" />
@@ -203,14 +203,15 @@
                             IsVisible="False">
                             <ContentPresenter Content="{Binding TemplateSettings.Icon, RelativeSource={RelativeSource TemplatedParent}}" />
                         </Viewbox>
-
                         <Grid
                             Grid.Column="1"
                             VerticalAlignment="Center"
+                            ColumnDefinitions="*,Auto"
                             RowDefinitions="Auto,Auto">
                             <StackPanel
                                 Name="HeaderRegion"
                                 Grid.Row="0"
+                                Grid.Column="0"
                                 HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                 VerticalAlignment="Center">
                                 <ContentPresenter
@@ -229,17 +230,14 @@
                             <ContentPresenter
                                 Name="FooterPresenter"
                                 Grid.Row="0"
-                                Grid.Column="2"
-                                Grid.ColumnSpan="1"
+                                Grid.Column="1"
                                 Margin="{DynamicResource SettingsExpanderItemFooterMargin}"
                                 HorizontalAlignment="Right"
                                 VerticalAlignment="Center"
                                 Content="{TemplateBinding Footer}"
                                 ContentTemplate="{TemplateBinding FooterTemplate}"
                                 IsVisible="False" />
-
                         </Grid>
-
                         <ContentPresenter
                             Name="ActionPresenter"
                             Grid.Column="2"
@@ -270,6 +268,10 @@
             <Setter Property="CornerRadius" Value="{Binding Source={StaticResource ControlCornerRadius}, Converter={StaticResource BottomCornerRadiusFilterConverter}}" />
         </Style>
 
+        <Style Selector="^:footer /template/ StackPanel#HeaderRegion">
+            <Setter Property="Grid.RowSpan" Value="1" />
+        </Style>
+
         <Style Selector="^:footer /template/ ContentPresenter#FooterPresenter">
             <Setter Property="IsVisible" Value="True" />
         </Style>
@@ -277,19 +279,10 @@
         <Style Selector="^:footerBottom">
             <Style Selector="^ /template/ ContentPresenter#FooterPresenter">
                 <Setter Property="Grid.Row" Value="1" />
-                <Setter Property="Grid.Column" Value="1" />
-                <Setter Property="Grid.ColumnSpan" Value="3" />
-                <Setter Property="HorizontalAlignment" Value="Left" />
+                <Setter Property="Grid.Column" Value="0" />
+                <Setter Property="HorizontalAlignment" Value="Stretch" />
                 <Setter Property="VerticalAlignment" Value="Top" />
                 <Setter Property="Margin" Value="{DynamicResource SettingsExpanderItemBottomFooterMargin}" />
-            </Style>
-            <Style Selector="^ /template/ ContentPresenter#ActionPresenter">
-                <Setter Property="Grid.Row" Value="0" />
-                <Setter Property="Grid.RowSpan" Value="2" />
-            </Style>
-            <Style Selector="^ /template/ ContentPresenter#IconPresenter">
-                <Setter Property="Grid.Row" Value="0" />
-                <Setter Property="Grid.RowSpan" Value="2" />
             </Style>
         </Style>
 
@@ -306,7 +299,6 @@
         </Style>
 
         <Style Selector="^:icon">
-
             <Style Selector="^ /template/ ContentPresenter#IconPresenter">
                 <Setter Property="IsVisible" Value="True" />
             </Style>
