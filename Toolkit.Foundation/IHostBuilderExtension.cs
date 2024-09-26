@@ -184,4 +184,17 @@ public static class IHostBuilderExtension
 
         return builder;
     }
+
+    public static IHostBuilder UseContentRoot(this IHostBuilder hostBuilder,
+                                        string contentRoot,
+        bool createDirectory)
+    {
+        if (createDirectory)
+        {
+            Directory.CreateDirectory(contentRoot);
+        }
+
+        hostBuilder.UseContentRoot(contentRoot);
+        return hostBuilder;
+    }
 }
