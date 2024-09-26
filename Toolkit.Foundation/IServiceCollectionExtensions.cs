@@ -114,37 +114,46 @@ public static class IServiceCollectionExtensions
         ServiceLifetime serviceLifetime = ServiceLifetime.Transient,
         params object[]? parameters)
     {
+        return AddTemplate<TViewModel, TViewModel, TView>(services, key, serviceLifetime, parameters);
+    }
+    
+    public static IServiceCollection AddTemplate<TViewModel, TViewModelImplementation, TView>(this IServiceCollection services,
+        object? key = null,
+        ServiceLifetime serviceLifetime = ServiceLifetime.Transient,
+        params object[]? parameters)
+    {
         Type viewModelType = typeof(TViewModel);
+        Type viewModelImplementationType = typeof(TViewModelImplementation);
         Type viewType = typeof(TView);
 
-        key ??= viewModelType.Name.Replace("ViewModel", "");
+        key ??= viewModelImplementationType.Name.Replace("ViewModel", "");
 
         if (parameters is { Length: 0 })
         {
-            services.Add(new ServiceDescriptor(viewModelType, viewModelType, serviceLifetime));
+            services.Add(new ServiceDescriptor(viewModelType, viewModelImplementationType, serviceLifetime));
         }
         else
         {
-            services.Add(new ServiceDescriptor(viewModelType, provider =>
-                provider.GetRequiredService<IServiceFactory>().Create<TViewModel>(parameters)!, serviceLifetime));
+            services.Add(new ServiceDescriptor(viewModelImplementationType, provider =>
+                provider.GetRequiredService<IServiceFactory>().Create<TViewModelImplementation>(parameters)!, serviceLifetime));
         }
 
         services.Add(new ServiceDescriptor(viewType, viewType, serviceLifetime));
 
         if (parameters is { Length: 0 })
         {
-            services.Add(new ServiceDescriptor(viewModelType, key, viewModelType, serviceLifetime));
+            services.Add(new ServiceDescriptor(viewModelType, key, viewModelImplementationType, serviceLifetime));
         }
         else
         {
-            services.Add(new ServiceDescriptor(viewModelType, key, (provider, key) =>
-                provider.GetRequiredService<IServiceFactory>().Create<TViewModel>(parameters)!, serviceLifetime));
+            services.Add(new ServiceDescriptor(viewModelImplementationType, key, (provider, key) =>
+                provider.GetRequiredService<IServiceFactory>().Create<TViewModelImplementation>(parameters)!, serviceLifetime));
         }
 
         services.Add(new ServiceDescriptor(viewType, key, viewType, serviceLifetime));
 
         services.AddKeyedTransient<IContentTemplateDescriptor>(key, (provider, _) =>
-            new ContentTemplateDescriptor(key, viewModelType, viewType, parameters));
+            new ContentTemplateDescriptor(key, viewModelImplementationType, viewType, parameters));
 
         return services;
     }
