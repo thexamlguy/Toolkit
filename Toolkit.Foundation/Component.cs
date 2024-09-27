@@ -10,19 +10,16 @@ public class Component :
     protected Component(IComponentBuilder builder) =>
         this.builder = builder;
 
-    public static TComponent? Create<TComponent>(IServiceProvider provider,
+    public static TComponent Create<TComponent>(IServiceProvider provider,
         Action<IComponentBuilder> builderDelegate)
         where TComponent : class, IComponent
     {
-        if (provider.GetRequiredService<IServiceFactory>() is IServiceFactory factory)
-        {
-            IComponentBuilder builder = ComponentBuilder.Create();
-            builderDelegate(builder);
+        IServiceFactory factory = provider.GetRequiredService<IServiceFactory>();
 
-            return factory.Create<TComponent>(builder);
-        }
+        IComponentBuilder builder = ComponentBuilder.Create();
+        builderDelegate(builder);
 
-        return default;
+        return factory.Create<TComponent>(builder);
     }
 
     public IComponentBuilder Configure(string name) =>

@@ -18,5 +18,5 @@ public interface IComponentBuilder
 
     IComponentHost Build();
 
-    void SetComponentConfiguration(Action<ComponentContentConfiguration> configurationDelegate);
+    void SetContentConfiguration(Action<ComponentContentConfiguration> configurationDelegate);
 }

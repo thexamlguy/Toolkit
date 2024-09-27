@@ -96,10 +96,10 @@ public class ComponentBuilder :
         return host.Services.GetRequiredService<IComponentHost>();
     }
 
-    public void SetComponentConfiguration(Action<ComponentContentConfiguration> configurationDelegate)
+    public void SetContentConfiguration(Action<ComponentContentConfiguration> configurationDelegate)
     {
         ComponentContentConfiguration configuration = new();
-        configurationDelegate.Invoke(configuration);
+        configurationDelegate(configuration);
 
         this.configuration = configuration;
     }

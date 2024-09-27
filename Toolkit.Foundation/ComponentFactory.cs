@@ -9,6 +9,7 @@ public class ComponentFactory(IServiceProvider provider,
 {
     public IComponentHost? Create<TComponent, TConfiguration>(string key,
         TConfiguration? configuration = null,
+        Action<IComponentBuilder>? builderDelegate = null,
         Action<IServiceCollection>? servicesDelegate = null)
         where TComponent : IComponent
         where TConfiguration :
@@ -17,6 +18,12 @@ public class ComponentFactory(IServiceProvider provider,
         if (provider.GetRequiredService<TComponent>() is TComponent component)
         {
             IComponentBuilder builder = component.Configure(key);
+
+            if (builderDelegate is not null)
+            {
+                builderDelegate(builder);
+            }
+
             builder.AddServices(services =>
             {
                 services.AddTransient(_ =>
