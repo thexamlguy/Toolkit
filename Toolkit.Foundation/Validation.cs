@@ -10,8 +10,8 @@ public class Validation(IValidatorCollection validators) :
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    public IReadOnlyDictionary<string, string> Errors =>
-        errors.AsReadOnly();
+    public IReadOnlyIndexDictionary<string, string> Errors => 
+        new ReadOnlyIndexDictionary<string, string>(errors);
 
     public bool HasErrors =>
         Errors.Count > 0;
@@ -116,6 +116,7 @@ public class Validation(IValidatorCollection validators) :
             OnPropertyChanged(nameof(Errors), null, null);
         }
     }
+
     private string GetPropertyName<T>(Expression<Func<T>> expression)
     {
         return expression.Body switch

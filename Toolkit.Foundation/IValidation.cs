@@ -6,7 +6,7 @@ namespace Toolkit.Foundation;
 public interface IValidation :
     INotifyPropertyChanged
 {
-    IReadOnlyDictionary<string, string> Errors { get; }
+    IReadOnlyIndexDictionary<string, string> Errors { get; }
 
     bool HasErrors { get; }
 
