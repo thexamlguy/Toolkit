@@ -11,21 +11,21 @@ public class FileProvider(ITopLevelProvider topLevelProvider) :
     {
         if (topLevelProvider.Get() is TopLevel topLevel)
         {
-            IReadOnlyList<IStorageFile> storageFiles = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions()
+            IReadOnlyList<IStorageFile> files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions()
             {
                 AllowMultiple = filter.AllowMultiple,
-                FileTypeFilter = new List<FilePickerFileType>
-                {
+                FileTypeFilter =
+                [
                     new(filter.Name)
                     {
                         Patterns = filter.Extensions is { Count: > 0 } ? filter.Extensions.Select(x => $"*.{x}").ToList() : ["*.*"]
                     }
-                }
+                ]
             });
 
-            return storageFiles.Select(file => file.Path.LocalPath).ToList();
+            return files.Select(x => x.Path.LocalPath).ToList();
         }
 
-        return Array.Empty<string>();
+        return [];
     }
 }

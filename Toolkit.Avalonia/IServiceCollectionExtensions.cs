@@ -126,6 +126,7 @@ public static class IServiceCollectionExtensions
     {
         services.AddTransient<ITopLevelProvider, TopLevelProvider>();
         services.AddTransient<IFileProvider, FileProvider>();
+        services.AddTransient<IFolderProvider, FolderProvider>();
 
         services.AddTransient<IClipboardWriter, ClipboardWriter>();
 
@@ -139,6 +140,7 @@ public static class IServiceCollectionExtensions
         services.AddTransient<INavigationRegion, NavigationRegion>();
 
         services.AddHandler<WriteClipboardHandler>();
+        services.AddHandler<SelectFoldersHandler>();
 
         services.AddHandler<ClassicDesktopStyleApplicationHandler>(nameof(IClassicDesktopStyleApplicationLifetime));
         services.AddHandler<SingleViewApplicationHandler>(nameof(ISingleViewApplicationLifetime));
@@ -157,6 +159,7 @@ public static class IServiceCollectionExtensions
             {
                 services.AddTransient<ITopLevelProvider, TopLevelProvider>();
                 services.AddTransient<IFileProvider, FileProvider>();
+                services.AddTransient<IFolderProvider, FolderProvider>();
 
                 services.AddTransient<IClipboardWriter, ClipboardWriter>();
 
@@ -170,6 +173,7 @@ public static class IServiceCollectionExtensions
                 services.AddTransient<INavigationRegion, NavigationRegion>();
 
                 services.AddHandler<WriteClipboardHandler>();
+                services.AddHandler<SelectFoldersHandler>();
 
                 services.AddHandler<ContentControlHandler>(nameof(ContentControl));
                 services.AddHandler<FrameHandler>(nameof(Frame));
