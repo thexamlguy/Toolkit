@@ -1,56 +1,57 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
 
 namespace Toolkit.UI.Avalonia;
 
-public class ListBoxExtension
+public class TabStripExtension
 {
     public static readonly AttachedProperty<bool> IsItemInvokedEnabledProperty =
-        AvaloniaProperty.RegisterAttached<ListBoxItem, bool>("IsItemInvokedEnabled",
-            typeof(ListBoxExtension), false);
+        AvaloniaProperty.RegisterAttached<TabStripItem, bool>("IsItemInvokedEnabled",
+            typeof(TabStripExtension), false);
 
     public static readonly RoutedEvent<ItemInvokedEventArgs> ItemInvokedEvent =
         RoutedEvent.Register<ItemInvokedEventArgs>("ItemInvoked",
-            RoutingStrategies.Bubble, typeof(ListBoxExtension));
+            RoutingStrategies.Bubble, typeof(TabStripExtension));
 
-    static ListBoxExtension()
+    static TabStripExtension()
     {
-        IsItemInvokedEnabledProperty.Changed.AddClassHandler<ListBoxItem>(OnIsItemClickEnabledPropertyChanged);
+        IsItemInvokedEnabledProperty.Changed.AddClassHandler<TabStripItem>(OnIsItemClickEnabledPropertyChanged);
     }
 
-    private static void OnIsItemClickEnabledPropertyChanged(ListBoxItem sender,
+    private static void OnIsItemClickEnabledPropertyChanged(TabStripItem sender,
         AvaloniaPropertyChangedEventArgs args)
     {
-        bool TrySetupListBox()
+        bool TrySetupTabStrip()
         {
-            if (sender.GetLogicalAncestors().OfType<ListBox>().FirstOrDefault() is ListBox listBox)
+            if (sender.GetLogicalAncestors().OfType<TabStrip>().FirstOrDefault() is TabStrip tabStrip)
             {
                 void OnItemInvoked(object? _, SelectionChangedEventArgs args)
                 {
                     if (args.AddedItems is { Count: > 0 })
                     {
-                        if (sender.DataContext == listBox.SelectedItem)
+                        if (sender.DataContext == tabStrip.SelectedItem)
                         {
                             sender.RaiseEvent(new ItemInvokedEventArgs { RoutedEvent = ItemInvokedEvent });
                         }
                     }
                 }
 
-                if (sender.DataContext == listBox.SelectedItem)
+                if (sender.DataContext == tabStrip.SelectedItem)
                 {
                     sender.RaiseEvent(new ItemInvokedEventArgs { RoutedEvent = ItemInvokedEvent });
                 }
 
                 void HandleUnloaded(object? _, RoutedEventArgs __)
                 {
-                    listBox.SelectionChanged -= OnItemInvoked;
-                    listBox.Unloaded -= HandleUnloaded;
+                    tabStrip.SelectionChanged -= OnItemInvoked;
+                    tabStrip.Unloaded -= HandleUnloaded;
                 }
 
-                listBox.SelectionChanged += OnItemInvoked;
-                listBox.Unloaded += HandleUnloaded;
+                tabStrip.SelectionChanged += OnItemInvoked;
+                tabStrip.Unloaded += HandleUnloaded;
 
                 return true;
             }
@@ -58,26 +59,26 @@ public class ListBoxExtension
             return false;
         }
 
-        if (!TrySetupListBox())
+        if (!TrySetupTabStrip())
         {
             void HandleLoaded(object? _, RoutedEventArgs __)
             {
-                TrySetupListBox();
+                TrySetupTabStrip();
             }
 
             sender.Loaded += HandleLoaded;
         }
     }
 
-    public static bool GetIsItemInvokedEnabled(ListBoxItem element) =>
+    public static bool GetIsItemInvokedEnabled(TabStripItem element) =>
         element.GetValue(IsItemInvokedEnabledProperty);
 
-    public static void SetIsItemInvokedEnabled(ListBoxItem element, bool value) =>
+    public static void SetIsItemInvokedEnabled(TabStripItem element, bool value) =>
         element.SetValue(IsItemInvokedEnabledProperty, value);
 
-    public static void AddItemInvokedHandler(ListBoxItem element, EventHandler<ItemInvokedEventArgs> handler) =>
+    public static void AddItemInvokedHandler(TabStripItem element, EventHandler<ItemInvokedEventArgs> handler) =>
         element.AddHandler(ItemInvokedEvent, handler);
 
-    public static void RemoveItemInvokedHandler(ListBoxItem element, EventHandler<ItemInvokedEventArgs> handler) =>
+    public static void RemoveItemInvokedHandler(TabStripItem element, EventHandler<ItemInvokedEventArgs> handler) =>
         element.RemoveHandler(ItemInvokedEvent, handler);
 }

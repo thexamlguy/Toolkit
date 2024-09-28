@@ -8,6 +8,7 @@
                 <MergeResourceInclude Source="../SettingsExpander/SettingsExpander.axaml" />
                 <MergeResourceInclude Source="../Overflow/Overflow.axaml" />
                 <MergeResourceInclude Source="../ContentBadge/ContentBadge.axaml" />
+                <MergeResourceInclude Source="../TabStrip/TabStrip.axaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Styles.Resources>
