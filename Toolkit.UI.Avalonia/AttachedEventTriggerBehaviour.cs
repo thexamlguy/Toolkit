@@ -4,7 +4,8 @@ using Avalonia.Xaml.Interactivity;
 
 namespace Toolkit.UI.Avalonia;
 
-public class AttachedEventTriggerBehaviour : Trigger
+public class AttachedEventTriggerBehaviour :
+    Trigger
 {
     public static readonly StyledProperty<RoutedEvent> RoutedEventProperty =
         AvaloniaProperty.Register<AttachedEventTriggerBehaviour, RoutedEvent>(nameof(RoutedEvent));
