@@ -64,7 +64,7 @@ public class DefaultHostBuilder :
                 services.AddHandler<NavigateHandler>();
                 services.AddHandler<NavigateBackHandler>();
 
-                services.AddInitializer<ComponentInitializer>();
+                services.AddInitialization<ComponentInitializer>();
                 services.AddHostedService<AppService>();
             });
     }

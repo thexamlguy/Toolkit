@@ -90,11 +90,19 @@ public static class IServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection AddInitializer<TInitializer>(this IServiceCollection services)
-        where TInitializer : class,
+    public static IServiceCollection AddInitialization<TInitialization>(this IServiceCollection services)
+        where TInitialization : class,
         IInitialization
     {
-        services.AddTransient<IInitialization, TInitializer>();
+        services.AddTransient<IInitialization, TInitialization>();
+        return services;
+    }
+
+    public static IServiceCollection AddAsyncInitialization<TInitialization>(this IServiceCollection services)
+        where TInitialization : class,
+        IAsyncInitialization
+    {
+        services.AddTransient<IAsyncInitialization, TInitialization>();
         return services;
     }
 
