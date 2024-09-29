@@ -1,3 +1,3 @@
 ﻿namespace Toolkit.Foundation;
 
-public record ValidateEventArgs<TValue>(TValue Value);
+public record ValidateEventArgs<TSender>(TSender? Sender = default);
