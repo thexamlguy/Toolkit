@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections;
 using System.Collections.Specialized;
@@ -275,6 +276,11 @@ public partial class ObservableCollection<TItem> :
     {
         foreach (TItem? item in items)
         {
+            if (item is IInitialization initialization)
+            {
+                initialization.Initialize();
+            }
+
             Add(item);
         }
     }
@@ -503,6 +509,7 @@ public partial class ObservableCollection<TItem> :
     {
     }
 
+    [RelayCommand]
     public virtual void Initialize()
     {
         if (IsInitialized)
