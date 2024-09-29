@@ -4,6 +4,10 @@ namespace Toolkit.Foundation;
 
 public interface IComponentBuilder
 {
+    string ConfigurationFile { get; set; }
+
+    string ContentRoot { get; set; }
+
     IComponentBuilder AddConfiguration<TConfiguration>(Action<TConfiguration> configurationDelegate)
         where TConfiguration : ComponentConfiguration, new();
 
@@ -17,6 +21,4 @@ public interface IComponentBuilder
     IComponentBuilder AddServices(Action<IServiceCollection> configureDelegate);
 
     IComponentHost Build();
-
-    void SetContentConfiguration(Action<ComponentContentConfiguration> configurationDelegate);
 }

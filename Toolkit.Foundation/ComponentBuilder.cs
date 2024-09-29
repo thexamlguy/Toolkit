@@ -9,7 +9,9 @@ public class ComponentBuilder :
 {
     private readonly IHostBuilder hostBuilder;
 
-    private ComponentContentConfiguration configuration = new();
+    public string ContentRoot { get; set; } = "Local";
+
+    public string ConfigurationFile { get; set; } = "Settings.json";
 
     private ComponentBuilder()
     {
@@ -65,7 +67,7 @@ public class ComponentBuilder :
         where TConfiguration :
         ComponentConfiguration, new()
     {
-        hostBuilder.AddConfiguration(section: section,
+        hostBuilder.AddConfiguration(section: section, path: ConfigurationFile,
             defaultConfiguration: configuration);
 
         return this;
@@ -86,21 +88,13 @@ public class ComponentBuilder :
 
     public IComponentHost Build()
     {
-        hostBuilder.UseContentRoot(configuration.ContentRoot, true)
+        hostBuilder.UseContentRoot(ContentRoot, true)
             .ConfigureAppConfiguration(config =>
             {
-                config.AddJsonFile(configuration.JsonFileName, true, true);
+                config.AddJsonFile(ConfigurationFile, true, true);
             });
 
         IHost host = hostBuilder.Build();
         return host.Services.GetRequiredService<IComponentHost>();
-    }
-
-    public void SetContentConfiguration(Action<ComponentContentConfiguration> configurationDelegate)
-    {
-        ComponentContentConfiguration configuration = new();
-        configurationDelegate(configuration);
-
-        this.configuration = configuration;
     }
 }
