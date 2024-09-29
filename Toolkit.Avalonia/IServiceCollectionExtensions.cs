@@ -141,6 +141,7 @@ public static class IServiceCollectionExtensions
 
         services.AddHandler<WriteClipboardHandler>();
         services.AddHandler<SelectFoldersHandler>();
+        services.AddHandler<SelectFilesHandler>();
 
         services.AddHandler<ClassicDesktopStyleApplicationHandler>(nameof(IClassicDesktopStyleApplicationLifetime));
         services.AddHandler<SingleViewApplicationHandler>(nameof(ISingleViewApplicationLifetime));
@@ -174,6 +175,7 @@ public static class IServiceCollectionExtensions
 
                 services.AddHandler<WriteClipboardHandler>();
                 services.AddHandler<SelectFoldersHandler>();
+                services.AddHandler<SelectFilesHandler>();
 
                 services.AddHandler<ContentControlHandler>(nameof(ContentControl));
                 services.AddHandler<FrameHandler>(nameof(Frame));

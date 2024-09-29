@@ -1,5 +1,6 @@
 ﻿namespace Toolkit.Foundation;
 
+
 public class SelectFoldersHandler(IFolderProvider folderProvider) :
     IHandler<SelectionEventArgs<FolderFilter>, IReadOnlyCollection<string>?>
 {
