@@ -2,12 +2,12 @@
 
 namespace Toolkit.Foundation;
 
-public class ServiceScopeFactory<TService>(IServiceScopeFactory serviceScopeFactory,
+public class ScopeServiceFactory<TService>(IServiceScopeFactory serviceScopeFactory,
     ICache<TService, IServiceScope> cache) :
     IServiceScopeFactory<TService>
     where TService : notnull
 {
-    public TService? Create(params object?[] parameters)
+    public (IServiceScope, TService)? Create(params object?[] parameters)
     {
         if (serviceScopeFactory.CreateScope() is IServiceScope serviceScope)
         {
@@ -16,7 +16,7 @@ public class ServiceScopeFactory<TService>(IServiceScopeFactory serviceScopeFact
                 if (factory.Create<TService>(parameters) is TService service)
                 {
                     cache.Add(service, serviceScope);
-                    return service;
+                    return (serviceScope, service);
                 }
             }
         }
