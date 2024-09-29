@@ -7,7 +7,7 @@ public class ScopeServiceFactory<TService>(IServiceScopeFactory serviceScopeFact
     IScopeServiceFactory<TService>
     where TService : notnull
 {
-    public (IServiceScope, TService)? Create(params object?[] parameters)
+    public (IServiceScope, TService) Create(params object?[] parameters)
     {
         if (serviceScopeFactory.CreateScope() is IServiceScope serviceScope)
         {

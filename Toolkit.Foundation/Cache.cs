@@ -195,7 +195,7 @@ public class Cache<TKey, TValue>(IComparer<TKey> comparer) :
     }
 
     private class KeyValuePairComparer<TK, TV>(IComparer<TK> comparer) :
-                                IComparer<KeyValuePair<TK, TV>>
+        IComparer<KeyValuePair<TK, TV>>
     {
         private readonly IComparer<TK> comparer = comparer ?? Comparer<TK>.Default;
 
