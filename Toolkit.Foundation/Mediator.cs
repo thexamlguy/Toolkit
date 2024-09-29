@@ -23,7 +23,7 @@ public class Mediator(IHandlerProvider handlerProvider,
             MethodInfo? handleMethod = handler?.GetType().GetMethod("Handle", [message.GetType(), typeof(CancellationToken)]);
             if (handleMethod is not null)
             {
-                return await (Task<TResponse?>)handleMethod.Invoke(handler, new object[] { message, cancellationToken })!;
+                return await (Task<TResponse?>)handleMethod.Invoke(handler, [message, cancellationToken])!;
             }
         }
 
@@ -47,7 +47,7 @@ public class Mediator(IHandlerProvider handlerProvider,
 
             if (handleMethod is not null)
             {
-                dynamic task = handleMethod.Invoke(handler, new object[] { message, cancellationToken })!;
+                dynamic task = handleMethod.Invoke(handler, [message, cancellationToken])!;
                 await task;
 
                 return task.Result;
@@ -57,35 +57,7 @@ public class Mediator(IHandlerProvider handlerProvider,
         return default;
     }
 
-    public async Task<List<object?>> HandleMany(Type responseType,
-        object message,
-        object? key = null,
-        CancellationToken cancellationToken = default)
-    {
-        List<object?> responses = [];
-        await foreach (object? response in HandleManyAsync(responseType, message, key, cancellationToken))
-        {
-            responses.Add(response);
-        }
-
-        return responses;
-    }
-
-    public async Task<IList<TResponse?>> HandleMany<TMessage, TResponse>(TMessage message,
-        object? key = null,
-        CancellationToken cancellationToken = default)
-        where TMessage : notnull
-    {
-        List<TResponse?> responses = [];
-        await foreach (TResponse? response in HandleManyAsync<TMessage, TResponse>(message, key, cancellationToken))
-        {
-            responses.Add(response);
-        }
-
-        return responses;
-    }
-
-    public async IAsyncEnumerable<object?> HandleManyAsync(Type responseType,
+    public async IAsyncEnumerable<object?> HandleAsyncMany(Type responseType,
         object message,
         object? key = null,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
@@ -102,12 +74,12 @@ public class Mediator(IHandlerProvider handlerProvider,
 
             if (handleMethod is not null)
             {
-                yield return await (Task<object?>)handleMethod.Invoke(handler, new object[] { message, cancellationToken })!;
+                yield return await (Task<object?>)handleMethod.Invoke(handler, [message, cancellationToken])!;
             }
         }
     }
 
-    public async IAsyncEnumerable<TResponse?> HandleManyAsync<TMessage, TResponse>(TMessage message,
+    public async IAsyncEnumerable<TResponse?> HandleAsyncMany<TMessage, TResponse>(TMessage message,
         object? key = null,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
         where TMessage : notnull
@@ -122,11 +94,38 @@ public class Mediator(IHandlerProvider handlerProvider,
             MethodInfo? handleMethod = handler?.GetType().GetMethod("Handle", [message.GetType(), typeof(CancellationToken)]);
             if (handleMethod is not null)
             {
-                yield return await (Task<TResponse?>)handleMethod.Invoke(handler, new object[] { message, cancellationToken })!;
+                yield return await (Task<TResponse?>)handleMethod.Invoke(handler, [message, cancellationToken])!;
             }
         }
     }
 
+    public async Task<List<object?>> HandleMany(Type responseType,
+                object message,
+        object? key = null,
+        CancellationToken cancellationToken = default)
+    {
+        List<object?> responses = [];
+        await foreach (object? response in HandleAsyncMany(responseType, message, key, cancellationToken))
+        {
+            responses.Add(response);
+        }
+
+        return responses;
+    }
+
+    public async Task<IList<TResponse?>> HandleMany<TMessage, TResponse>(TMessage message,
+        object? key = null,
+        CancellationToken cancellationToken = default)
+        where TMessage : notnull
+    {
+        List<TResponse?> responses = [];
+        await foreach (TResponse? response in HandleAsyncMany<TMessage, TResponse>(message, key, cancellationToken))
+        {
+            responses.Add(response);
+        }
+
+        return responses;
+    }
     private List<object?> GetHandlers(object message,
         Type handlerWrapperType,
         object? key)
@@ -155,8 +154,11 @@ public class Mediator(IHandlerProvider handlerProvider,
             provider.GetServices(handlerWrapperType);
         AddHandlers(keyedServices);
 
-        IEnumerable<object?> additionalHandlers = handlerProvider.Get(key);
-        AddHandlers(additionalHandlers);
+        if (key is not null)
+        {
+            IEnumerable<object?> additionalHandlers = handlerProvider.Get(key);
+            AddHandlers(additionalHandlers);
+        }
 
         return handlers.SelectMany(entry => entry.Value).ToList();
     }

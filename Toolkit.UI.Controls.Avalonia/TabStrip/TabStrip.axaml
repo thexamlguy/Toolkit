@@ -3,7 +3,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     x:CompileBindings="True">
     <ControlTheme x:Key="{x:Type TabStrip}" TargetType="TabStrip">
-        <Setter Property="MinHeight" Value="32" />
+        <Setter Property="MinHeight" Value="36" />
         <Setter Property="CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
         <Setter Property="Background" Value="{DynamicResource ControlAltFillColorSecondaryBrush}" />
         <Setter Property="BorderBrush" Value="{DynamicResource ControlStrokeColorDefaultBrush}" />
@@ -45,7 +45,7 @@
         <Setter Property="BorderBrush" Value="{DynamicResource ControlFillColorTransparentBrush}" />
         <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
         <Setter Property="FontWeight" Value="Normal" />
-        <Setter Property="Height" Value="32" />
+        <Setter Property="MinHeight" Value="36" />
         <Setter Property="MinWidth" Value="60" />
         <Setter Property="FontSize" Value="{DynamicResource ControlContentThemeFontSize}" />
         <Setter Property="VerticalAlignment" Value="Stretch" />
@@ -66,7 +66,6 @@
                             <BrushTransition Property="Background" Duration="00:00:00.083" />
                         </Transitions>
                     </Border.Transitions>
-
                     <Panel>
                         <Border
                             Name="Hover"
@@ -83,7 +82,6 @@
                                 </Transitions>
                             </Border.Transitions>
                         </Border>
-
                         <ContentPresenter
                             Name="PART_ContentPresenter"
                             Margin="11,5,11,6"
@@ -95,7 +93,6 @@
                             ContentTemplate="{TemplateBinding ContentTemplate}"
                             FontWeight="{TemplateBinding FontWeight}"
                             Foreground="{TemplateBinding Foreground}" />
-
                         <Rectangle
                             Name="Pill"
                             Width="4"
@@ -121,7 +118,6 @@
                 </Border>
             </ControlTemplate>
         </Setter>
-
 
         <Style Selector="^:pointerover">
             <Style Selector="^ /template/ Border#Hover">

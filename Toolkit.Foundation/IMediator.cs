@@ -12,12 +12,12 @@ public interface IMediator
         CancellationToken cancellationToken = default)
         where TMessage : notnull;
 
-    IAsyncEnumerable<object?> HandleManyAsync(Type responseType,
+    IAsyncEnumerable<object?> HandleAsyncMany(Type responseType,
         object message,
         object? key = null,
         CancellationToken cancellationToken = default);
 
-    IAsyncEnumerable<TResponse?> HandleManyAsync<TMessage, TResponse>(TMessage message,
+    IAsyncEnumerable<TResponse?> HandleAsyncMany<TMessage, TResponse>(TMessage message,
         object? key = null,
         CancellationToken cancellationToken = default)
         where TMessage : notnull;
