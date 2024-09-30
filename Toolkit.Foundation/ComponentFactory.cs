@@ -13,7 +13,7 @@ public class ComponentFactory(IServiceProvider provider,
         Action<IServiceCollection>? servicesDelegate = null)
         where TComponent : IComponent
         where TConfiguration :
-        ComponentConfiguration, new()
+        class, new()
     {
         if (provider.GetRequiredService<TComponent>() is TComponent component)
         {

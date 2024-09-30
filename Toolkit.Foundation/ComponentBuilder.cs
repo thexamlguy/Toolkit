@@ -50,7 +50,8 @@ public class ComponentBuilder :
     public static IComponentBuilder Create() => new ComponentBuilder();
 
     public IComponentBuilder AddConfiguration<TConfiguration>(Action<TConfiguration> configurationDelegate)
-        where TConfiguration : ComponentConfiguration, new()
+        where TConfiguration :
+        class, new()
     {
         TConfiguration configuration = new();
         if (configurationDelegate is not null)
@@ -65,7 +66,7 @@ public class ComponentBuilder :
     public IComponentBuilder AddConfiguration<TConfiguration>(string section,
         TConfiguration? configuration = null)
         where TConfiguration :
-        ComponentConfiguration, new()
+        class, new()
     {
         hostBuilder.AddConfiguration(section: section, path: ConfigurationFile,
             defaultConfiguration: configuration);
@@ -74,7 +75,8 @@ public class ComponentBuilder :
     }
 
     public IComponentBuilder AddConfiguration<TConfiguration>(string section)
-        where TConfiguration : ComponentConfiguration, new()
+        where TConfiguration :
+        class, new()
     {
         AddConfiguration<TConfiguration>(section, null);
         return this;

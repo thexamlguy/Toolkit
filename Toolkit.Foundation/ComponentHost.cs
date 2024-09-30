@@ -16,7 +16,7 @@ public class ComponentHost(IServiceProvider services,
     }
 
     public TConfiguration? GetConfiguration<TConfiguration>()
-        where TConfiguration : ComponentConfiguration
+        where TConfiguration : class
     {
         return Services.GetService<TConfiguration>();
     }

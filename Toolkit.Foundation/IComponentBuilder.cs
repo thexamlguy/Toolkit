@@ -9,14 +9,14 @@ public interface IComponentBuilder
     string ContentRoot { get; set; }
 
     IComponentBuilder AddConfiguration<TConfiguration>(Action<TConfiguration> configurationDelegate)
-        where TConfiguration : ComponentConfiguration, new();
+        where TConfiguration : class, new();
 
     IComponentBuilder AddConfiguration<TConfiguration>(string section,
         TConfiguration? configuration = null)
-        where TConfiguration : ComponentConfiguration, new();
+        where TConfiguration : class, new();
 
     IComponentBuilder AddConfiguration<TConfiguration>(string section)
-        where TConfiguration : ComponentConfiguration, new();
+        where TConfiguration : class, new();
 
     IComponentBuilder AddServices(Action<IServiceCollection> configureDelegate);
 

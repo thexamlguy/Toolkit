@@ -5,5 +5,7 @@ namespace Toolkit.Foundation;
 public interface IComponentHost :
     IHost
 {
-    TConfiguration? GetConfiguration<TConfiguration>() where TConfiguration : ComponentConfiguration;
+    TConfiguration? GetConfiguration<TConfiguration>()
+        where TConfiguration : 
+        class;
 }

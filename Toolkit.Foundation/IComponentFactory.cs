@@ -9,5 +9,5 @@ public interface IComponentFactory
         Action<IComponentBuilder>? builderDelegate = null,
         Action<IServiceCollection>? servicesDelegate = null)
         where TComponent : IComponent
-        where TConfiguration : ComponentConfiguration, new();
+        where TConfiguration : class, new();
 }
