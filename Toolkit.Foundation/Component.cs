@@ -22,9 +22,16 @@ public class Component :
         return factory.Create<TComponent>(builder);
     }
 
-    public IComponentBuilder Configure(string name) =>
-        Configuring(name, builder);
+    public IComponentBuilder Configure(string? name = null,
+        Action<IComponentBuilder>? builderDelegate = null)
+    {
+        if (builderDelegate is not null)
+        {
+            builderDelegate(builder);
+        }
 
-    public virtual IComponentBuilder Configuring(string name,
-        IComponentBuilder builder) => builder;
+        return Configuring(builder);
+    }
+
+    public virtual IComponentBuilder Configuring(IComponentBuilder builder) => builder;
 }

@@ -14,7 +14,7 @@ public class ComponentInitializer(IEnumerable<IComponent> components,
     {
         foreach (IComponent component in components)
         {
-            IComponentBuilder builder = component.Configure("");
+            IComponentBuilder builder = component.Configure();
             builder.AddServices(services =>
             {
                 services.AddTransient(_ =>

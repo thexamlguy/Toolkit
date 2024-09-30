@@ -2,5 +2,6 @@
 
 public interface IComponent
 {
-    IComponentBuilder Configure(string key);
+    IComponentBuilder Configure(string? name = null,
+        Action<IComponentBuilder>? builderDelegate = null);
 }
