@@ -4,8 +4,7 @@ namespace Toolkit.Foundation;
 
 public partial class ComponentConfigurationViewModel<TConfiguration, TValue, THeader, TDescription, TAction> :
     ValueViewModel<TValue>,
-    IComponentConfigurationViewModel,
-    INotificationHandler<ChangedEventArgs<TConfiguration>>
+    IComponentConfigurationViewModel
     where TConfiguration : class
 {
     public ComponentConfigurationViewModel(IServiceProvider provider,
@@ -18,11 +17,6 @@ public partial class ComponentConfigurationViewModel<TConfiguration, TValue, THe
         TDescription description,
         TAction action) : base(provider, factory, mediator, publisher, subscriber, disposer)
     {
-    }
-
-    public Task Handle(ChangedEventArgs<TConfiguration> args)
-    {
-        throw new NotImplementedException();
     }
 }
 

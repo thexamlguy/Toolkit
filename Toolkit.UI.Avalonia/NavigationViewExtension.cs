@@ -27,15 +27,14 @@ public class NavigationViewExtension
         {
             if (sender.GetLogicalAncestors().OfType<NavigationView>().FirstOrDefault() is NavigationView navigationView)
             {
-                void OnItemInvoked(object? _, FluentAvalonia.UI.Controls.NavigationViewItemInvokedEventArgs args)
+                sender.GetObservable(NavigationViewItem.IsSelectedProperty).Subscribe(args =>
                 {
-                    if (args.InvokedItemContainer == sender)
+                    if (args)
                     {
                         sender.RaiseEvent(new ItemInvokedEventArgs { RoutedEvent = ItemInvokedEvent });
                     }
-                }
+                });
 
-                navigationView.ItemInvoked += OnItemInvoked;
                 return true;
             }
 
@@ -44,13 +43,12 @@ public class NavigationViewExtension
 
         if (!TrySetupNavigationView())
         {
-            void OnAttachedToVisualTree(object? _, VisualTreeAttachmentEventArgs __)
+            void HandleLoaded(object? _, RoutedEventArgs __)
             {
-                sender.AttachedToVisualTree -= OnAttachedToVisualTree;
                 TrySetupNavigationView();
             }
 
-            sender.AttachedToVisualTree += OnAttachedToVisualTree;
+            sender.Loaded += HandleLoaded;
         }
     }
 
