@@ -4,8 +4,16 @@ namespace Toolkit.Foundation;
 
 public static class IServiceCollectionExtensions
 {
+    public static IServiceCollection AddAsyncInitialization<TInitialization>(this IServiceCollection services)
+        where TInitialization : class,
+        IAsyncInitialization
+    {
+        services.AddTransient<IAsyncInitialization, TInitialization>();
+        return services;
+    }
+
     public static IServiceCollection AddCache<TKey, TValue>(this IServiceCollection services)
-        where TKey : notnull
+            where TKey : notnull
         where TValue : notnull
     {
         services.AddScoped<ICache<TKey, TValue>, Cache<TKey, TValue>>();
@@ -97,15 +105,6 @@ public static class IServiceCollectionExtensions
         services.AddTransient<IInitialization, TInitialization>();
         return services;
     }
-
-    public static IServiceCollection AddAsyncInitialization<TInitialization>(this IServiceCollection services)
-        where TInitialization : class,
-        IAsyncInitialization
-    {
-        services.AddTransient<IAsyncInitialization, TInitialization>();
-        return services;
-    }
-
     public static IServiceCollection AddRange(this IServiceCollection services,
         IServiceCollection fromServices)
     {
@@ -124,7 +123,7 @@ public static class IServiceCollectionExtensions
     {
         return AddTemplate<TViewModel, TViewModel, TView>(services, key, serviceLifetime, parameters);
     }
-    
+
     public static IServiceCollection AddTemplate<TViewModel, TViewModelImplementation, TView>(this IServiceCollection services,
         object? key = null,
         ServiceLifetime serviceLifetime = ServiceLifetime.Transient,
@@ -142,7 +141,7 @@ public static class IServiceCollectionExtensions
         }
         else
         {
-            services.Add(new ServiceDescriptor(viewModelImplementationType, provider =>
+            services.Add(new ServiceDescriptor(viewModelType, provider =>
                 provider.GetRequiredService<IServiceFactory>().Create<TViewModelImplementation>(parameters)!, serviceLifetime));
         }
 
@@ -154,7 +153,7 @@ public static class IServiceCollectionExtensions
         }
         else
         {
-            services.Add(new ServiceDescriptor(viewModelImplementationType, key, (provider, key) =>
+            services.Add(new ServiceDescriptor(viewModelType, key, (provider, key) =>
                 provider.GetRequiredService<IServiceFactory>().Create<TViewModelImplementation>(parameters)!, serviceLifetime));
         }
 
@@ -164,5 +163,25 @@ public static class IServiceCollectionExtensions
             new ContentTemplateDescriptor(key, viewModelImplementationType, viewType, parameters));
 
         return services;
+    }
+
+    public static IServiceCollection AddValueTemplate<TConfiguration, TValue, TViewModel, TView>(this IServiceCollection services,
+                Func<TConfiguration, TValue> valueDelegate,
+        object? key = null,
+        ServiceLifetime serviceLifetime = ServiceLifetime.Transient,
+        params object[]? parameters)
+    {
+        parameters = [valueDelegate, .. parameters ?? Enumerable.Empty<object?>()];
+        return AddTemplate<TViewModel, TViewModel, TView>(services, key, serviceLifetime, parameters);
+    }
+
+    public static IServiceCollection AddValueTemplate<TConfiguration, TValue, TViewModel, TViewModelImplementation, TView>(this IServiceCollection services,
+        Func<TConfiguration, TValue> valueDelegate,
+        object? key = null,
+        ServiceLifetime serviceLifetime = ServiceLifetime.Transient,
+        params object[]? parameters)
+    {
+        parameters = [valueDelegate, .. parameters ?? Enumerable.Empty<object?>()];
+        return AddTemplate<TViewModel, TViewModelImplementation, TView>(services, key, serviceLifetime, parameters);
     }
 }
