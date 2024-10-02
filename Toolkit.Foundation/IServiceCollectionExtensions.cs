@@ -105,6 +105,7 @@ public static class IServiceCollectionExtensions
         services.AddTransient<IInitialization, TInitialization>();
         return services;
     }
+
     public static IServiceCollection AddRange(this IServiceCollection services,
         IServiceCollection fromServices)
     {
@@ -166,22 +167,24 @@ public static class IServiceCollectionExtensions
     }
 
     public static IServiceCollection AddValueTemplate<TConfiguration, TValue, TViewModel, TView>(this IServiceCollection services,
-                Func<TConfiguration, TValue> valueDelegate,
+        Func<TConfiguration, TValue> readDelegate,
+        Action<TValue?, TConfiguration> writeDelegate,
         object? key = null,
         ServiceLifetime serviceLifetime = ServiceLifetime.Transient,
         params object[]? parameters)
     {
-        parameters = [valueDelegate, .. parameters ?? Enumerable.Empty<object?>()];
+        parameters = [readDelegate, writeDelegate, .. parameters ?? Enumerable.Empty<object?>()];
         return AddTemplate<TViewModel, TViewModel, TView>(services, key, serviceLifetime, parameters);
     }
 
     public static IServiceCollection AddValueTemplate<TConfiguration, TValue, TViewModel, TViewModelImplementation, TView>(this IServiceCollection services,
-        Func<TConfiguration, TValue> valueDelegate,
+        Func<TConfiguration, TValue> readDelegate,
+        Action<TValue?, TConfiguration> writeDelegate,
         object? key = null,
         ServiceLifetime serviceLifetime = ServiceLifetime.Transient,
         params object[]? parameters)
     {
-        parameters = [valueDelegate, .. parameters ?? Enumerable.Empty<object?>()];
+        parameters = [readDelegate, writeDelegate, .. parameters ?? Enumerable.Empty<object?>()];
         return AddTemplate<TViewModel, TViewModelImplementation, TView>(services, key, serviceLifetime, parameters);
     }
 }
