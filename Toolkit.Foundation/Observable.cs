@@ -110,7 +110,6 @@ public partial class Observable(IServiceProvider provider,
 
 public partial class Observable<TValue> :
     Observable
-    where TValue : notnull
 {
     [ObservableProperty]
     private TValue? value;
@@ -126,16 +125,15 @@ public partial class Observable<TValue> :
         Value = value;
     }
 
-    protected virtual void OnValueChanged()
+    protected virtual void OnChanged(TValue? value)
     {
     }
 
-    partial void OnValueChanged(TValue? value) => OnValueChanged();
+    partial void OnValueChanged(TValue? value) => OnChanged(value);
 }
 
 public partial class Observable<TKey, TValue> :
     Observable
-    where TKey : notnull
 {
     [ObservableProperty]
     private TKey key;

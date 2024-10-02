@@ -7,35 +7,35 @@ using System.Reactive.Disposables;
 
 namespace Toolkit.Foundation;
 
-public partial class ObservableCollection<TItem> :
+public partial class ObservableCollection<TViewModel> :
     ObservableObject,
-    IObservableCollectionViewModel<TItem>,
+    IObservableCollectionViewModel<TViewModel>,
     IInitialization,
     IActivated,
     IDeactivating,
     IDeactivated,
-    IList<TItem>,
+    IList<TViewModel>,
     IList,
-    IReadOnlyList<TItem>,
+    IReadOnlyList<TViewModel>,
     INotifyCollectionChanged,
-    ICollectionSynchronization<TItem>,
+    ICollectionSynchronization<TViewModel>,
     IServiceProviderRequired,
     IServiceFactoryRequired,
     IMediatorRequired,
     IPublisherRequired,
     IDisposerRequired,
-    INotificationHandler<RemoveEventArgs<TItem>>,
-    INotificationHandler<RemoveAtEventArgs<TItem>>,
-    INotificationHandler<CreateEventArgs<TItem>>,
-    INotificationHandler<InsertEventArgs<TItem>>,
-    INotificationHandler<MoveEventArgs<TItem>>,
-    INotificationHandler<MoveToEventArgs<TItem>>,
-    INotificationHandler<ReplaceEventArgs<TItem>>,
-    INotificationHandler<SelectionEventArgs<TItem>>
-    where TItem : notnull,
+    INotificationHandler<RemoveEventArgs<TViewModel>>,
+    INotificationHandler<RemoveAtEventArgs<TViewModel>>,
+    INotificationHandler<CreateEventArgs<TViewModel>>,
+    INotificationHandler<InsertEventArgs<TViewModel>>,
+    INotificationHandler<MoveEventArgs<TViewModel>>,
+    INotificationHandler<MoveToEventArgs<TViewModel>>,
+    INotificationHandler<ReplaceEventArgs<TViewModel>>,
+    INotificationHandler<SelectionEventArgs<TViewModel>>
+    where TViewModel : notnull,
     IDisposable
 {
-    private readonly System.Collections.ObjectModel.ObservableCollection<TItem> collection = [];
+    private readonly System.Collections.ObjectModel.ObservableCollection<TViewModel> collection = [];
 
     private readonly IDispatcher dispatcher;
 
@@ -55,7 +55,7 @@ public partial class ObservableCollection<TItem> :
     private bool isInitialized;
 
     [ObservableProperty]
-    private TItem? selectedItem;
+    private TViewModel? selectedItem;
 
     public ObservableCollection(IServiceProvider provider,
         IServiceFactory factory,
@@ -81,7 +81,7 @@ public partial class ObservableCollection<TItem> :
         IPublisher publisher,
         ISubscriber subscriber,
         IDisposer disposer,
-        IEnumerable<TItem> items)
+        IEnumerable<TViewModel> items)
     {
         Provider = provider;
         Factory = factory;
@@ -104,7 +104,7 @@ public partial class ObservableCollection<TItem> :
 
     bool IList.IsFixedSize => false;
 
-    bool ICollection<TItem>.IsReadOnly => false;
+    bool ICollection<TViewModel>.IsReadOnly => false;
 
     bool IList.IsReadOnly => false;
 
@@ -120,7 +120,7 @@ public partial class ObservableCollection<TItem> :
 
     object ICollection.SyncRoot => this;
 
-    public TItem this[int index]
+    public TViewModel this[int index]
     {
         get => collection[index];
         set => SetItem(index, value);
@@ -131,11 +131,11 @@ public partial class ObservableCollection<TItem> :
         get => index >= 0 && collection.Count > 0 ? collection[index] : null;
         set
         {
-            TItem? item = default;
+            TViewModel? item = default;
 
             try
             {
-                item = (TItem)value!;
+                item = (TViewModel)value!;
             }
             catch (InvalidCastException)
             {
@@ -145,12 +145,12 @@ public partial class ObservableCollection<TItem> :
         }
     }
 
-    private Func<TItem>? defaultSelectionFactory;
+    private Func<TViewModel>? defaultSelectionFactory;
 
-    public void SetSource(IList<TItem> source,
-        Func<TItem>? defaultSelectionFactory)
+    public void SetSource(IList<TViewModel> source,
+        Func<TViewModel>? defaultSelectionFactory)
     {
-        foreach (TItem item in source)
+        foreach (TViewModel item in source)
         {
             Add(item);
         }
@@ -176,7 +176,7 @@ public partial class ObservableCollection<TItem> :
             case NotifyCollectionChangedAction.Add:
                 if (args.NewItems is not null)
                 {
-                    foreach (TItem newItem in args.NewItems)
+                    foreach (TViewModel newItem in args.NewItems)
                     {
                         Add(newItem);
                     }
@@ -186,9 +186,9 @@ public partial class ObservableCollection<TItem> :
             case NotifyCollectionChangedAction.Remove:
                 if (args.OldItems is not null)
                 {
-                    foreach (TItem oldItem in args.OldItems)
+                    foreach (TViewModel oldItem in args.OldItems)
                     {
-                        if (this.FirstOrDefault(x => x.Equals(oldItem)) is TItem removedItem)
+                        if (this.FirstOrDefault(x => x.Equals(oldItem)) is TViewModel removedItem)
                         {
                             Remove(removedItem);
                         }
@@ -199,9 +199,9 @@ public partial class ObservableCollection<TItem> :
             case NotifyCollectionChangedAction.Reset:
 
                 Clear();
-                if (sender is IEnumerable<TItem> collection)
+                if (sender is IEnumerable<TViewModel> collection)
                 {
-                    foreach (TItem item in collection)
+                    foreach (TViewModel item in collection)
                     {
                         Add(item);
                     }
@@ -227,8 +227,8 @@ public partial class ObservableCollection<TItem> :
         return Task.CompletedTask;
     }
 
-    public TItem Add<T>(params object?[] parameters)
-        where T : TItem
+    public TViewModel Add<T>(params object?[] parameters)
+        where T : TViewModel
     {
         T? item = Factory.Create<T>(args =>
         {
@@ -242,7 +242,7 @@ public partial class ObservableCollection<TItem> :
         return item;
     }
 
-    public void Add(TItem item)
+    public void Add(TViewModel item)
     {
         int index = collection.Count;
         InsertItem(index, item);
@@ -253,16 +253,16 @@ public partial class ObservableCollection<TItem> :
     public void Add(object item)
     {
         int index = collection.Count;
-        InsertItem(index, (TItem)item);
+        InsertItem(index, (TViewModel)item);
     }
 
     int IList.Add(object? value)
     {
-        TItem? item = default;
+        TViewModel? item = default;
 
         try
         {
-            item = (TItem)value!;
+            item = (TViewModel)value!;
         }
         catch (InvalidCastException)
         {
@@ -272,9 +272,9 @@ public partial class ObservableCollection<TItem> :
         return Count - 1;
     }
 
-    public void AddRange(IEnumerable<TItem> items)
+    public void AddRange(IEnumerable<TViewModel> items)
     {
-        foreach (TItem? item in items)
+        foreach (TViewModel? item in items)
         {
             if (item is IInitialization initialization)
             {
@@ -285,7 +285,7 @@ public partial class ObservableCollection<TItem> :
         }
     }
 
-    public void Reset(Action<ObservableCollection<TItem>> factory, bool disposeItems = true)
+    public void Reset(Action<ObservableCollection<TViewModel>> factory, bool disposeItems = true)
     {
         SelectedItem = default;
 
@@ -298,7 +298,7 @@ public partial class ObservableCollection<TItem> :
         isClearing = true;
         if (disposeItems)
         {
-            foreach (TItem item in this.ToList())
+            foreach (TViewModel item in this.ToList())
             {
                 Disposer.Dispose(item);
                 Disposer.Remove(this, item);
@@ -312,7 +312,7 @@ public partial class ObservableCollection<TItem> :
     public void Clear()
     {
         isClearing = true;
-        foreach (TItem item in this.ToList())
+        foreach (TViewModel item in this.ToList())
         {
             Disposer.Dispose(item);
             Disposer.Remove(this, item);
@@ -330,17 +330,17 @@ public partial class ObservableCollection<TItem> :
         }
     }
 
-    public bool Contains(TItem item) =>
+    public bool Contains(TViewModel item) =>
         collection.Contains(item);
 
     bool IList.Contains(object? value) =>
-        IsCompatibleObject(value) && Contains((TItem)value!);
+        IsCompatibleObject(value) && Contains((TViewModel)value!);
 
-    public void CopyTo(TItem[] array, int index) =>
+    public void CopyTo(TViewModel[] array, int index) =>
         collection.CopyTo(array, index);
 
     void ICollection.CopyTo(Array array, int index) =>
-        collection.CopyTo((TItem[])array, index);
+        collection.CopyTo((TViewModel[])array, index);
 
     public virtual Task OnDeactivated()
     {
@@ -369,17 +369,17 @@ public partial class ObservableCollection<TItem> :
         Publisher.Publish(builder.Value, builder.Key);
     }
 
-    public IEnumerator<TItem> GetEnumerator() =>
+    public IEnumerator<TViewModel> GetEnumerator() =>
         collection.GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator() =>
         ((IEnumerable)collection).GetEnumerator();
 
-    public Task Handle(RemoveEventArgs<TItem> args)
+    public Task Handle(RemoveEventArgs<TViewModel> args)
     {
         if (IsActivated)
         {
-            foreach (TItem item in this.ToList())
+            foreach (TViewModel item in this.ToList())
             {
                 if (args.Sender is not null && args.Sender.Equals(item))
                 {
@@ -395,11 +395,11 @@ public partial class ObservableCollection<TItem> :
         return Task.CompletedTask;
     }
 
-    public Task Handle(CreateEventArgs<TItem> args)
+    public Task Handle(CreateEventArgs<TViewModel> args)
     {
         if (IsActivated)
         {
-            if (args.Sender is TItem item)
+            if (args.Sender is TViewModel item)
             {
                 Add(item);
             }
@@ -412,11 +412,11 @@ public partial class ObservableCollection<TItem> :
         return Task.CompletedTask;
     }
 
-    public Task Handle(InsertEventArgs<TItem> args)
+    public Task Handle(InsertEventArgs<TViewModel> args)
     {
         if (IsActivated)
         {
-            if (args.Sender is TItem item)
+            if (args.Sender is TViewModel item)
             {
                 Insert(args.Index, item);
             }
@@ -429,7 +429,7 @@ public partial class ObservableCollection<TItem> :
         return Task.CompletedTask;
     }
 
-    public Task Handle(MoveToEventArgs<TItem> args)
+    public Task Handle(MoveToEventArgs<TViewModel> args)
     {
         if (IsActivated)
         {
@@ -443,11 +443,11 @@ public partial class ObservableCollection<TItem> :
         return Task.CompletedTask;
     }
 
-    public Task Handle(MoveEventArgs<TItem> args)
+    public Task Handle(MoveEventArgs<TViewModel> args)
     {
         if (IsActivated)
         {
-            if (args.Sender is TItem item)
+            if (args.Sender is TViewModel item)
             {
                 Move(args.Index, item);
             }
@@ -460,11 +460,11 @@ public partial class ObservableCollection<TItem> :
         return Task.CompletedTask;
     }
 
-    public Task Handle(ReplaceEventArgs<TItem> args)
+    public Task Handle(ReplaceEventArgs<TViewModel> args)
     {
         if (IsActivated)
         {
-            if (args.Sender is TItem item)
+            if (args.Sender is TViewModel item)
             {
                 Replace(args.Index, item);
             }
@@ -477,7 +477,7 @@ public partial class ObservableCollection<TItem> :
         return Task.CompletedTask;
     }
 
-    public Task Handle(RemoveAtEventArgs<TItem> args)
+    public Task Handle(RemoveAtEventArgs<TViewModel> args)
     {
         if (IsActivated)
         {
@@ -495,15 +495,15 @@ public partial class ObservableCollection<TItem> :
         return Task.CompletedTask;
     }
 
-    public Task Handle(SelectionEventArgs<TItem> args) =>
+    public Task Handle(SelectionEventArgs<TViewModel> args) =>
         Task.CompletedTask;
 
-    public int IndexOf(TItem item) =>
+    public int IndexOf(TViewModel item) =>
         collection.IndexOf(item);
 
     int IList.IndexOf(object? value) =>
         IsCompatibleObject(value) ?
-        IndexOf((TItem)value!) : -1;
+        IndexOf((TViewModel)value!) : -1;
 
     public virtual void OnInitialize()
     {
@@ -524,10 +524,10 @@ public partial class ObservableCollection<TItem> :
         Activate();
     }
 
-    public TItem Insert<T>(int index = 0,
+    public TViewModel Insert<T>(int index = 0,
         params object?[] parameters)
         where T :
-        TItem
+        TViewModel
     {
         T? item = Factory.Create<T>(args =>
         {
@@ -544,7 +544,7 @@ public partial class ObservableCollection<TItem> :
     }
 
     public void Insert(int index,
-        TItem item)
+        TViewModel item)
     {
         InsertItem(index, item);
         UpdateSelection(item);
@@ -553,7 +553,7 @@ public partial class ObservableCollection<TItem> :
     void IList.Insert(int index,
         object? value)
     {
-        if (value is TItem item)
+        if (value is TViewModel item)
         {
             Insert(index, item);
             UpdateSelection(item);
@@ -567,7 +567,7 @@ public partial class ObservableCollection<TItem> :
             return false;
         }
 
-        TItem item = this[oldIndex];
+        TViewModel item = this[oldIndex];
 
         bool moveSelection = false;
         if (item is ISelectable oldSelection)
@@ -594,7 +594,7 @@ public partial class ObservableCollection<TItem> :
         return true;
     }
 
-    public bool Move(int index, TItem item)
+    public bool Move(int index, TViewModel item)
     {
         int oldIndex = collection.IndexOf(item);
         if (oldIndex < 0)
@@ -608,7 +608,7 @@ public partial class ObservableCollection<TItem> :
         return true;
     }
 
-    public bool Remove(TItem item)
+    public bool Remove(TViewModel item)
     {
         int index = collection.IndexOf(item);
         if (index < 0)
@@ -619,13 +619,13 @@ public partial class ObservableCollection<TItem> :
         Disposer.Dispose(item);
         Disposer.Remove(this, item);
 
-        TItem? oldSelection = SelectedItem;
+        TViewModel? oldSelection = SelectedItem;
         RemoveItem(index);
 
         if (item.Equals(oldSelection))
         {
             int newIndex = Math.Min(index, Count - 1);
-            TItem? selectedItem = newIndex >= 0 ? this[newIndex] : default;
+            TViewModel? selectedItem = newIndex >= 0 ? this[newIndex] : default;
             dispatcher.Invoke(() => SelectedItem = selectedItem);
         }
 
@@ -636,7 +636,7 @@ public partial class ObservableCollection<TItem> :
     {
         if (IsCompatibleObject(value))
         {
-            Remove((TItem)value!);
+            Remove((TViewModel)value!);
         }
     }
 
@@ -644,7 +644,7 @@ public partial class ObservableCollection<TItem> :
         RemoveItem(index);
 
     public bool Replace(int index,
-        TItem item)
+        TViewModel item)
     {
         if (index <= Count - 1)
         {
@@ -688,13 +688,13 @@ public partial class ObservableCollection<TItem> :
     }
 
     protected virtual ActivationBuilder ActivationBuilder() =>
-        new(new ActivationEventArgs<TItem>());
+        new(new ActivationEventArgs<TViewModel>());
 
     protected virtual void ClearItems() =>
         collection.Clear();
 
     protected virtual void InsertItem(int index,
-        TItem item)
+        TViewModel item)
     {
         Disposer.Add(this, item);
         Disposer.Add(item, Disposable.Create(() =>
@@ -716,11 +716,11 @@ public partial class ObservableCollection<TItem> :
     protected virtual void RemoveItem(int index) =>
         collection.RemoveAt(index);
 
-    protected virtual void SetItem(int index, TItem item) =>
+    protected virtual void SetItem(int index, TViewModel item) =>
         collection[index] = item;
 
     private static bool IsCompatibleObject(object? value) =>
-        (value is TItem) || (value == null && default(TItem) == null);
+        (value is TViewModel) || (value == null && default(TViewModel) == null);
 
     private void OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs args)
     {
@@ -740,7 +740,7 @@ public partial class ObservableCollection<TItem> :
         }
     }
 
-    partial void OnSelectedItemChanged(TItem? oldValue, TItem? newValue)
+    partial void OnSelectedItemChanged(TViewModel? oldValue, TViewModel? newValue)
     {
         if (oldValue is ISelectable oldSelection)
         {
@@ -760,7 +760,7 @@ public partial class ObservableCollection<TItem> :
     {
     }
 
-    private void UpdateSelection(TItem item)
+    private void UpdateSelection(TViewModel item)
     {
         if (item is ISelectable newSelection)
         {
@@ -777,35 +777,53 @@ public partial class ObservableCollection<TItem> :
     }
 }
 
-public partial class ObservableCollection<TValue, TViewModel>(IServiceProvider provider,
-    IServiceFactory factory,
-    IMediator mediator,
-    IPublisher publisher,
-    ISubscriber subscriber,
-    IDisposer disposer,
-    TValue value) : ObservableCollection<TViewModel>(provider, factory, mediator, publisher, subscriber, disposer)
-    where TViewModel : notnull, IDisposable
+public partial class ObservableCollection<TValue, TViewModel> :
+    ObservableCollection<TViewModel>
+    where TViewModel : IDisposable
 {
     [ObservableProperty]
-    private TValue value = value;
+    private TValue? value;
 
-    protected virtual void OnValueChanged()
+    public ObservableCollection(IServiceProvider provider, 
+        IServiceFactory factory,
+        IMediator mediator,
+        IPublisher publisher, 
+        ISubscriber subscriber,
+        IDisposer disposer,
+        TValue? value = default) : base(provider, factory, mediator, publisher, subscriber, disposer)
     {
+        Value = value;
     }
 
-    partial void OnValueChanged(TValue value) => OnValueChanged();
+    public ObservableCollection(IServiceProvider provider,
+        IServiceFactory factory, 
+        IMediator mediator,
+        IPublisher publisher,
+        ISubscriber subscriber, 
+        IDisposer disposer, 
+        IEnumerable<TViewModel> items,
+        TValue? value = default) : base(provider, factory, mediator, publisher, subscriber, disposer, items)
+    {
+        Value = value;
+    }
+
+    protected virtual void OnChanged(TValue? value)
+    {
+
+    }
+
+    partial void OnValueChanged(TValue? value) => OnChanged(value);
 }
 
 public partial class ObservableCollection<TViewModel, TKey, TValue> :
     ObservableCollection<TViewModel>
-    where TViewModel : notnull, IDisposable
-    where TKey : notnull
+    where TViewModel : IDisposable
 {
     [ObservableProperty]
     private TKey key;
 
     [ObservableProperty]
-    private TValue value;
+    private TValue? value;
 
     public ObservableCollection(IServiceProvider provider,
         IServiceFactory factory,
@@ -814,7 +832,7 @@ public partial class ObservableCollection<TViewModel, TKey, TValue> :
         ISubscriber subscriber,
         IDisposer disposer,
         TKey key,
-        TValue value) : base(provider, factory, mediator, publisher, subscriber, disposer)
+        TValue? value = default) : base(provider, factory, mediator, publisher, subscriber, disposer)
     {
         Key = key;
         Value = value;
@@ -828,17 +846,11 @@ public partial class ObservableCollection<TViewModel, TKey, TValue> :
         IDisposer disposer,
         IEnumerable<TViewModel> items,
         TKey key,
-        TValue value) : base(provider, factory, mediator, publisher, subscriber, disposer, items)
+        TValue? value = default) : base(provider, factory, mediator, publisher, subscriber, disposer, items)
     {
         Key = key;
         Value = value;
     }
-
-    protected virtual void OnValueChanged()
-    {
-    }
-
-    partial void OnValueChanged(TValue value) => OnValueChanged();
 }
 
 public class ObservableCollection :
