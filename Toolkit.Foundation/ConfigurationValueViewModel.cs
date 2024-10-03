@@ -15,21 +15,28 @@ public partial class ConfigurationValueViewModel<TConfiguration, TValue>(IServic
     INotificationHandler<ChangedEventArgs<TConfiguration>>
     where TConfiguration : class
 {
-    public Task Handle(ChangedEventArgs<TConfiguration> args)
+    public async Task Handle(ChangedEventArgs<TConfiguration> args)
     {
-        throw new NotImplementedException();
+        if (args.Sender is TConfiguration configuration)
+        {
+           // await Task.Run(() => Value = read(configuration));
+        }
     }
 
-    protected override void OnChanged(TValue? value)
+    public override async Task OnActivated()
     {
-        writer.Write(args => write(value, args));
+        await Task.Run(() => Value = read(configuration));
+        await base.OnActivated();
+    }
+
+    protected override async void OnChanged(TValue? value)
+    {
+        if (IsActivated)
+        {
+            await Task.Run(() => writer.Write(args => write(value, args)));
+        }
+
         base.OnChanged(value);
-    }
-
-    public override Task OnActivated()
-    {
-        Value = read(configuration);
-        return base.OnActivated();
     }
 }
 
@@ -41,10 +48,9 @@ public partial class ConfigurationValueViewModel<TConfiguration, TValue, TItem> 
     IDisposable
 {
     private readonly TConfiguration configuration;
-    private readonly IWritableConfiguration<TConfiguration> writer;
     private readonly Func<TConfiguration, TValue?> read;
     private readonly Action<TValue?, TConfiguration> write;
-
+    private readonly IWritableConfiguration<TConfiguration> writer;
     public ConfigurationValueViewModel(IServiceProvider provider, 
         IServiceFactory factory, 
         IMediator mediator, 
@@ -86,20 +92,27 @@ public partial class ConfigurationValueViewModel<TConfiguration, TValue, TItem> 
         Value = value;
     }
 
-    public Task Handle(ChangedEventArgs<TConfiguration> args)
+    public async Task Handle(ChangedEventArgs<TConfiguration> args)
     {
-        throw new NotImplementedException();
+        if (args.Sender is TConfiguration configuration)
+        {
+           // await Task.Run(() => Value = read(configuration));
+        }
     }
 
-    protected override void OnChanged(TValue? value)
+    public override async Task OnActivated()
     {
-        writer.Write(args => write(value, args));
+        await Task.Run(() => Value = read(configuration));
+        await base.OnActivated();
+    }
+
+    protected override async void OnChanged(TValue? value)
+    {
+        if (IsActivated)
+        {
+            await Task.Run(() => writer.Write(args => write(value, args)));
+        }
+
         base.OnChanged(value);
-    }
-
-    public override Task OnActivated()
-    {
-        Value = read(configuration);
-        return base.OnActivated();
     }
 }

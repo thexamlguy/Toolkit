@@ -141,10 +141,10 @@ public static class IHostBuilderExtension
                     }
 
                     return new ConfigurationSource<TConfiguration>(provider.GetRequiredService<IConfigurationFile<TConfiguration>>(),
-                        section, defaultSerializer);
+                        section,
+                        defaultSerializer);
                 });
 
-                //services.AddHostedService<ConfigurationMonitor<TConfiguration>>();
                 services.TryAddKeyedTransient<IConfigurationReader<TConfiguration>>(section, (provider, key) =>
                     new ConfigurationReader<TConfiguration>(provider.GetRequiredKeyedService<IConfigurationSource<TConfiguration>>(key),
                         provider.GetRequiredKeyedService<IConfigurationFactory<TConfiguration>>(key)));
@@ -179,6 +179,12 @@ public static class IHostBuilderExtension
 
                 services.AddTransient(provider =>
                     provider.GetRequiredKeyedService<IConfigurationDescriptor<TConfiguration>>(section).Value);
+
+                services.AddHostedService(provider => 
+                    new ConfigurationMonitor<TConfiguration>(section, 
+                        provider.GetRequiredService<IConfigurationFile<TConfiguration>>(),
+                        provider.GetRequiredService<IServiceProvider>(), 
+                        provider.GetRequiredService<IPublisher>()));
             }
         });
 
@@ -186,7 +192,7 @@ public static class IHostBuilderExtension
     }
 
     public static IHostBuilder UseContentRoot(this IHostBuilder hostBuilder,
-                                        string contentRoot,
+        string contentRoot,
         bool createDirectory)
     {
         if (createDirectory)

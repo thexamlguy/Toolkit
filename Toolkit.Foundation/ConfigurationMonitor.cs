@@ -1,7 +1,10 @@
-﻿namespace Toolkit.Foundation;
+﻿using Microsoft.Extensions.DependencyInjection;
 
-public class ConfigurationMonitor<TConfiguration>(IConfigurationFile<TConfiguration> file,
-    IConfigurationReader<TConfiguration> reader,
+namespace Toolkit.Foundation;
+
+public class ConfigurationMonitor<TConfiguration>(string section,
+    IConfigurationFile<TConfiguration> file, 
+    IServiceProvider serviceProvider,
     IPublisher publisher) :
     IConfigurationMonitor<TConfiguration>
     where TConfiguration :
@@ -14,9 +17,11 @@ public class ConfigurationMonitor<TConfiguration>(IConfigurationFile<TConfigurat
         void ChangedHandler(object sender,
             FileSystemEventArgs args)
         {
-            if (reader.Read() is { } configuration)
+            if (serviceProvider.GetRequiredKeyedService<IConfigurationDescriptor<TConfiguration>>(section) is 
+                IConfigurationDescriptor<TConfiguration> configuration)
             {
-                publisher.PublishUI(new ChangedEventArgs<TConfiguration>(configuration));
+                ConfigurationCache.Remove(section);
+                publisher.PublishUI(new ChangedEventArgs<TConfiguration>(configuration.Value));
             }
         }
 

@@ -10,5 +10,3 @@ public interface IConfigurationSource<TConfiguration>
 
     void Set(object value);
 }
-
-public interface IRemovable : IDisposable;
