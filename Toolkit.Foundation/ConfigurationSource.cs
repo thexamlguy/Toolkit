@@ -13,8 +13,6 @@ public class ConfigurationSource<TConfiguration>(IConfigurationFile<TConfigurati
     where TConfiguration :
     class
 {
-    private readonly object lockingObject = new();
-
     private static readonly Func<JsonSerializerOptions> defaultSerializerOptions = new(() =>
     {
         return new JsonSerializerOptions
@@ -29,6 +27,8 @@ public class ConfigurationSource<TConfiguration>(IConfigurationFile<TConfigurati
             }
         };
     });
+
+    private readonly object lockingObject = new();
 
     public void Set(TConfiguration value) => Set((object)value);
 
@@ -92,12 +92,12 @@ public class ConfigurationSource<TConfiguration>(IConfigurationFile<TConfigurati
                     }
                     else
                     {
-                        array[index] = valueNode;
+                        array[index] = MergeNodes(array[index], valueNode);
                     }
                 }
                 else
                 {
-                    currentNode[lastKey] = valueNode;
+                    currentNode[lastKey] = MergeNodes(currentNode[lastKey], valueNode);
                 }
             }
 
@@ -157,6 +157,45 @@ public class ConfigurationSource<TConfiguration>(IConfigurationFile<TConfigurati
 
             value = default;
             return false;
+        }
+    }
+
+    private JsonNode? CloneNode(JsonNode? node)
+    {
+        if (node is null)
+        {
+            return null;
+        }
+
+        string serialized = JsonSerializer.Serialize(node, serializerOptions ?? defaultSerializerOptions());
+        return JsonNode.Parse(serialized);
+    }
+
+    private JsonNode? MergeNodes(JsonNode? existingNode, JsonNode? newNode)
+    {
+        newNode = CloneNode(newNode);
+
+        if (existingNode is JsonObject existingObject && newNode is JsonObject newObject)
+        {
+            foreach (KeyValuePair<string, JsonNode?> property in newObject)
+            {
+                existingObject[property.Key] = MergeNodes(existingObject[property.Key], property.Value);
+            }
+
+            return existingObject;
+        }
+        else if (existingNode is JsonArray existingArray && newNode is JsonArray newArray)
+        {
+            foreach (JsonNode? item in newArray)
+            {
+                existingArray.Add(item);
+            }
+
+            return existingArray;
+        }
+        else
+        {
+            return newNode;
         }
     }
 }

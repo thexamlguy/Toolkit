@@ -16,7 +16,7 @@ public class ComponentFactory(IServiceProvider provider,
     {
         if (provider.GetRequiredService<TComponent>() is TComponent component)
         {
-            IComponentBuilder builder = component.Configure(name, builderDelegate);
+            IComponentBuilder builder = component.Configure(name, configuration, builderDelegate);
 
             builder.AddServices(services =>
             {
@@ -42,7 +42,6 @@ public class ComponentFactory(IServiceProvider provider,
                 services.AddSingleton(new NamedComponent(name));
             });
 
-            builder.AddConfiguration(name, configuration);
             IComponentHost host = builder.Build();
 
             scopes.Add(new ComponentScopeDescriptor(name,
