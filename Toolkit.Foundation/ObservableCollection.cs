@@ -524,6 +524,32 @@ public partial class ObservableCollection<TViewModel> :
         Activate();
     }
 
+    public bool Replace<T>(int index, 
+        params object?[] parameters)
+        where T :
+        TViewModel
+    {
+        if (index <= Count - 1)
+        {
+            RemoveItem(index);
+        }
+        else
+        {
+            index = Count;
+        }
+
+        T? item = Factory.Create<T>(args =>
+        {
+            if (args is IInitialization initialization)
+            {
+                initialization.Initialize();
+            }
+        }, parameters);
+
+        Insert(index, item);
+        return true;
+    }
+
     public TViewModel Insert<T>(int index = 0,
         params object?[] parameters)
         where T :
