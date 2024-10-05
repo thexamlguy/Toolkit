@@ -9,7 +9,8 @@ using Avalonia.Media.Imaging;
 
 namespace Toolkit.UI.Controls.Avalonia;
 
-public class ImageCropper : TemplatedControl
+public class ImageCropper :
+    TemplatedControl
 {
     public static readonly StyledProperty<IImage?> CurrentAreaBitmapProperty =
         AvaloniaProperty.Register<ImageCropper, IImage?>(nameof(CurrentAreaBitmap));
@@ -225,20 +226,33 @@ public class ImageCropper : TemplatedControl
             case "TopLeftButton":
                 newWidth = Math.Max(0, border.Width - deltaX);
                 newHeight = Math.Max(0, border.Height - deltaY);
-                leftPosition += deltaX;
-                topPosition += deltaY;
+                if (newWidth > 0) 
+                { 
+                    leftPosition += deltaX;
+                }
+
+                if (newHeight > 0)
+                { 
+                    topPosition += deltaY;
+                }
                 break;
 
             case "TopRightButton":
                 newWidth = Math.Max(0, border.Width + deltaX);
                 newHeight = Math.Max(0, border.Height - deltaY);
-                topPosition += deltaY;
+                if (newHeight > 0)
+                { 
+                    topPosition += deltaY; 
+                }
                 break;
 
             case "BottomLeftButton":
                 newWidth = Math.Max(0, border.Width - deltaX);
                 newHeight = Math.Max(0, border.Height + deltaY);
-                leftPosition += deltaX;
+                if (newWidth > 0) 
+                {
+                    leftPosition += deltaX;
+                }
                 break;
 
             case "BottomRightButton":
@@ -255,23 +269,27 @@ public class ImageCropper : TemplatedControl
         if (thumb.Name == "TopLeftButton" || thumb.Name == "BottomLeftButton")
         {
             leftPosition = Math.Max(0, leftPosition);
-            newWidth = Math.Max(0, border.Width - (leftPosition - Canvas.GetLeft(border)));
+            if (newWidth > 0)
+            {
+                newWidth = Math.Max(0, border.Width - (leftPosition - Canvas.GetLeft(border)));
+            }
         }
         else if (thumb.Name == "TopRightButton" || thumb.Name == "BottomRightButton")
         {
-            double rightBoundary = canvas.Width;
-            newWidth = Math.Min(newWidth, rightBoundary - leftPosition);
+            newWidth = Math.Min(newWidth, canvas.Width - leftPosition);
         }
 
         if (thumb.Name == "TopLeftButton" || thumb.Name == "TopRightButton")
         {
             topPosition = Math.Max(0, topPosition);
-            newHeight = Math.Max(0, border.Height - (topPosition - Canvas.GetTop(border)));
+            if (newHeight > 0) 
+            { 
+                newHeight = Math.Max(0, border.Height - (topPosition - Canvas.GetTop(border)));
+            }
         }
         else if (thumb.Name == "BottomLeftButton" || thumb.Name == "BottomRightButton")
         {
-            double bottomBoundary = canvas.Height;
-            newHeight = Math.Min(newHeight, bottomBoundary - topPosition);
+            newHeight = Math.Min(newHeight, canvas.Height - topPosition);
         }
 
         border.Width = newWidth;
@@ -283,7 +301,6 @@ public class ImageCropper : TemplatedControl
         PositionThumbs();
         Render();
     }
-
 
     private void PositionThumbs()
     {
@@ -343,7 +360,7 @@ public class ImageCropper : TemplatedControl
         Canvas.SetTop(rectangleLeft, borderTop);
 
         rectangleTop.Width = Math.Max(0, canvas.Width);
-        rectangleTop.Height = Math.Max(0, borderTop);
+        rectangleTop.Height = Math.Max(0, borderTop - 0.5);
 
         double rightX = borderLeft + border.Width;
 
