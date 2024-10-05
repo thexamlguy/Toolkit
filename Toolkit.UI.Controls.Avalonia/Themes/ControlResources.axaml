@@ -69,6 +69,7 @@
                 <MergeResourceInclude Source="../Overflow/Overflow.axaml" />
                 <MergeResourceInclude Source="../ContentBadge/ContentBadge.axaml" />
                 <MergeResourceInclude Source="../TabStrip/TabStrip.axaml" />
+                <MergeResourceInclude Source="../ImageCropper/ImageCropper.axaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Styles.Resources>

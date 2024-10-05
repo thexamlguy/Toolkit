@@ -1,21 +1,22 @@
 ﻿using System.Collections.Concurrent;
+using System.Text.RegularExpressions;
 
 namespace Toolkit.Foundation;
 
 public class DirectoryObserver
 {
     public static async Task<string[]> EnumerateFiles(string path,
-        string[] filter,
+        string[] patterns,
         int count,
         CancellationToken cancellationToken = default)
     {
         string[] files = [];
-        HashSet<string> extensions = filter.Select(x => $".{x.ToLower()}").ToHashSet();
+        List<Regex> regexPatterns = patterns.Select(pattern => new Regex(pattern, RegexOptions.IgnoreCase)).ToList();
 
         bool IsBatchComplete()
         {
             files = Directory.EnumerateFiles(path, "*.*", SearchOption.TopDirectoryOnly)
-                   .Where(x => extensions.Contains(Path.GetExtension(x).ToLower()))
+                   .Where(file => regexPatterns.Any(regex => regex.IsMatch(Path.GetFileName(file))))
                    .ToArray();
 
             if (files.Length != count)
@@ -24,7 +25,8 @@ public class DirectoryObserver
             }
 
             ConcurrentBag<bool> fileAccessResults = [];
-            Parallel.ForEach(files, (file) =>
+
+            Parallel.ForEach(files, file =>
             {
                 try
                 {
