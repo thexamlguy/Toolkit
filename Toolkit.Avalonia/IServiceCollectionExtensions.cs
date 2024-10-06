@@ -35,6 +35,7 @@ public static class IServiceCollectionExtensions
         services.AddHandler<ContentControlHandler>(nameof(ContentControl));
         services.AddHandler<FrameHandler>(nameof(Frame));
         services.AddHandler<ContentDialogHandler>(nameof(ContentDialog));
+        services.AddHandler<TaskDialogHandler>(nameof(TaskDialog));
 
         services.AddScoped<INavigationRegionCollection, NavigationRegionCollection>(provider => new NavigationRegionCollection
         {
@@ -67,6 +68,7 @@ public static class IServiceCollectionExtensions
                 services.AddHandler<ContentControlHandler>(nameof(ContentControl));
                 services.AddHandler<FrameHandler>(nameof(Frame));
                 services.AddHandler<ContentDialogHandler>(nameof(ContentDialog));
+                services.AddHandler<TaskDialogHandler>(nameof(TaskDialog));
             })));
 
         return services;

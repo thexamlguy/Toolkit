@@ -6,12 +6,12 @@
         <ResourceDictionary x:Key="Light">
             <StaticResource x:Key="ImageCropperThumbBackground" ResourceKey="AccentFillColorDefaultBrush" />
             <StaticResource x:Key="ImageCropperThumbBrush" ResourceKey="ControlElevationBorderBrush" />
-            <StaticResource x:Key="ImageCropperThumbBackground" ResourceKey="ControlSolidFillColorDefaultBrush" />
+            <StaticResource x:Key="ImageCropperOuterThumbBackground" ResourceKey="ControlSolidFillColorDefaultBrush" />
         </ResourceDictionary>
         <ResourceDictionary x:Key="Dark">
             <StaticResource x:Key="ImageCropperThumbBackground" ResourceKey="AccentFillColorDefaultBrush" />
             <StaticResource x:Key="ImageCropperThumbBrush" ResourceKey="ControlElevationBorderBrush" />
-            <StaticResource x:Key="ImageCropperThumbBackground" ResourceKey="ControlSolidFillColorDefaultBrush" />
+            <StaticResource x:Key="ImageCropperOuterThumbBackground" ResourceKey="ControlSolidFillColorDefaultBrush" />
         </ResourceDictionary>
     </ResourceDictionary.ThemeDictionaries>
     <CornerRadius x:Key="ImageCropperThumbCornerRadius">10</CornerRadius>
@@ -29,10 +29,10 @@
                 <ControlTemplate>
                     <Border
                         Margin="-2"
-                        Background="{DynamicResource ImageCropperThumbBackground}"
+                        Background="{DynamicResource ImageCropperOuterThumbBackground}"
                         BorderBrush="{TemplateBinding BorderBrush}"
                         BorderThickness="{TemplateBinding BorderThickness}"
-                        CornerRadius="{DynamicResource ImageCropperThumbCornerRadius}">
+                        CornerRadius="{DynamicResource ImageCropperOuterThumbCornerRadius}">
                         <Ellipse
                             Name="InnerThumb"
                             Width="{DynamicResource ImageCropperInnerThumbWidth}"

@@ -2,6 +2,8 @@
     <Styles.Resources>
         <ResourceDictionary>
             <FontFamily x:Key="FluentThemeFontFamily">/Fonts/#FluentSystemIcons-Resizable</FontFamily>
+			<Thickness x:Key="TaskDialogHeaderPadding">60 0 12 9</Thickness>
+			<Thickness x:Key="TaskDialogHeaderPaddingNoIcon">18 0 12 9</Thickness>
             <ControlTheme x:Key="TextBoxButtonStyle" TargetType="Button">
                 <Setter Property="Foreground" Value="{DynamicResource TextControlButtonForeground}" />
                 <Setter Property="Background" Value="Transparent" />
@@ -70,6 +72,7 @@
                 <MergeResourceInclude Source="../ContentBadge/ContentBadge.axaml" />
                 <MergeResourceInclude Source="../TabStrip/TabStrip.axaml" />
                 <MergeResourceInclude Source="../ImageCropper/ImageCropper.axaml" />
+                <MergeResourceInclude Source="../ContentCard/ContentCard.axaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Styles.Resources>

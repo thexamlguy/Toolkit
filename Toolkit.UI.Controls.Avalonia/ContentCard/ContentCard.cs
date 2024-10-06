@@ -2,6 +2,6 @@
 
 namespace Toolkit.UI.Controls.Avalonia;
 
-public class CardContent : ContentControl
+public class ContentCard : ContentControl
 {
 }

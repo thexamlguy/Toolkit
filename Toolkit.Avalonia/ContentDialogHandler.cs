@@ -9,15 +9,15 @@ public class ContentDialogHandler :
 {
     public async Task Handle(NavigateEventArgs<ContentDialog> args)
     {
-        if (args.Template is ContentDialog contentDialog)
+        if (args.Template is ContentDialog dialog)
         {
-            contentDialog.DataContext = args.Content;
+            dialog.DataContext = args.Content;
 
             async void HandlePrimaryButtonClick(FluentAvalonia.UI.Controls.ContentDialog sender,
                 FluentAvalonia.UI.Controls.ContentDialogButtonClickEventArgs args)
             {
-                contentDialog.PrimaryButtonClick -= HandlePrimaryButtonClick;
-                if (contentDialog.DataContext is object content)
+                dialog.PrimaryButtonClick -= HandlePrimaryButtonClick;
+                if (dialog.DataContext is object content)
                 {
                     if (content is IPrimaryConfirmation primaryConfirmation)
                     {
@@ -25,7 +25,7 @@ public class ContentDialogHandler :
                         if (!await primaryConfirmation.ConfirmPrimary())
                         {
                             args.Cancel = true;
-                            contentDialog.PrimaryButtonClick += HandlePrimaryButtonClick;
+                            dialog.PrimaryButtonClick += HandlePrimaryButtonClick;
                         }
 
                         deferral.Complete();
@@ -36,16 +36,16 @@ public class ContentDialogHandler :
             async void HandleSecondaryButtonClick(FluentAvalonia.UI.Controls.ContentDialog sender,
                 FluentAvalonia.UI.Controls.ContentDialogButtonClickEventArgs args)
             {
-                contentDialog.SecondaryButtonClick -= HandleSecondaryButtonClick;
-                if (contentDialog.DataContext is object content)
+                dialog.SecondaryButtonClick -= HandleSecondaryButtonClick;
+                if (dialog.DataContext is object content)
                 {
                     if (content is ISecondaryConfirmation secondaryConfirmation)
                     {
                         Deferral deferral = args.GetDeferral();
-                        if (!await secondaryConfirmation.Confirm())
+                        if (!await secondaryConfirmation.ConfirmSecondary())
                         {
                             args.Cancel = true;
-                            contentDialog.SecondaryButtonClick += HandleSecondaryButtonClick;
+                            dialog.SecondaryButtonClick += HandleSecondaryButtonClick;
                         }
 
                         deferral.Complete();
@@ -56,11 +56,11 @@ public class ContentDialogHandler :
             async void HandleClosing(FluentAvalonia.UI.Controls.ContentDialog sender,
                  FluentAvalonia.UI.Controls.ContentDialogClosingEventArgs args)
             {
-                if (args.Result == FluentAvalonia.UI.Controls.ContentDialogResult.Primary ||
-                    args.Result == FluentAvalonia.UI.Controls.ContentDialogResult.Secondary)
+                if (args.Result is FluentAvalonia.UI.Controls.ContentDialogResult.Primary ||
+                    args.Result is FluentAvalonia.UI.Controls.ContentDialogResult.Secondary)
                 {
-                    contentDialog.Closing -= HandleClosing;
-                    if (contentDialog.DataContext is object content)
+                    dialog.Closing -= HandleClosing;
+                    if (dialog.DataContext is object content)
                     {
                         bool cancelled = false;
                         if (content is IConfirmation confirmation)
@@ -71,7 +71,7 @@ public class ContentDialogHandler :
                                 args.Cancel = true;
                                 cancelled = true;
 
-                                contentDialog.Closing += HandleClosing;
+                                dialog.Closing += HandleClosing;
                             }
 
                             deferral.Complete();
@@ -91,8 +91,8 @@ public class ContentDialogHandler :
             async void HandleOpened(FluentAvalonia.UI.Controls.ContentDialog sender,
                 EventArgs args)
             {
-                contentDialog.Opened -= HandleOpened;
-                if (contentDialog.DataContext is object content)
+                dialog.Opened -= HandleOpened;
+                if (dialog.DataContext is object content)
                 {
                     if (content is IActivated activated)
                     {
@@ -104,8 +104,8 @@ public class ContentDialogHandler :
             async void HandleClosed(FluentAvalonia.UI.Controls.ContentDialog sender,
                 FluentAvalonia.UI.Controls.ContentDialogClosedEventArgs args)
             {
-                contentDialog.Closed -= HandleClosed;
-                if (contentDialog.DataContext is object content)
+                dialog.Closed -= HandleClosed;
+                if (dialog.DataContext is object content)
                 {
                     if (content is IDeactivated deactivated)
                     {
@@ -114,17 +114,17 @@ public class ContentDialogHandler :
                 }
             }
 
-            contentDialog.Opened += HandleOpened;
-            contentDialog.Closing += HandleClosing;
-            contentDialog.Closed += HandleClosed;
+            dialog.Opened += HandleOpened;
+            dialog.Closing += HandleClosing;
+            dialog.Closed += HandleClosed;
 
-            contentDialog.PrimaryButtonClick += HandlePrimaryButtonClick;
-            contentDialog.SecondaryButtonClick += HandleSecondaryButtonClick;
+            dialog.PrimaryButtonClick += HandlePrimaryButtonClick;
+            dialog.SecondaryButtonClick += HandleSecondaryButtonClick;
 
-            await contentDialog.ShowAsync();
+            await dialog.ShowAsync();
 
-            contentDialog.PrimaryButtonClick += HandlePrimaryButtonClick;
-            contentDialog.SecondaryButtonClick += HandleSecondaryButtonClick;
+            dialog.PrimaryButtonClick += HandlePrimaryButtonClick;
+            dialog.SecondaryButtonClick += HandleSecondaryButtonClick;
         }
     }
 }
