@@ -118,7 +118,9 @@ public static class IHostBuilderExtension
                     context.Properties.Add(section, new List<Type> { typeof(TConfiguration) });
                 }
 
-                services.TryAddSingleton<IConfigurationFile<TConfiguration>>(provider =>
+                services.AddKeyedScoped<IConfigurationCache, ConfigurationCache>(section);
+
+                services.TryAddKeyedTransient<IConfigurationFile<TConfiguration>>(section, (provider, key) =>
                 {
                     IFileInfo? fileInfo = null;
                     if (provider.GetService<IHostEnvironment>() is IHostEnvironment hostEnvironment)
@@ -140,8 +142,9 @@ public static class IHostBuilderExtension
                         serializerDelegate.Invoke(defaultSerializer);
                     }
 
-                    return new ConfigurationSource<TConfiguration>(provider.GetRequiredService<IConfigurationFile<TConfiguration>>(),
+                    return new ConfigurationSource<TConfiguration>(provider.GetRequiredKeyedService<IConfigurationFile<TConfiguration>>(section),
                         section,
+                        provider.GetRequiredKeyedService<IConfigurationCache>(section),
                         defaultSerializer);
                 });
 
@@ -174,15 +177,16 @@ public static class IHostBuilderExtension
                 services.TryAddKeyedTransient<IConfigurationDescriptor<TConfiguration>>(section, (provider, key) =>
                     new ConfigurationDescriptor<TConfiguration>(section, provider.GetRequiredKeyedService<IConfigurationReader<TConfiguration>>(key)));
 
-                services.AddTransient(provider =>
+                services.TryAddTransient(provider =>
                     provider.GetRequiredKeyedService<IConfigurationDescriptor<TConfiguration>>(section));
 
-                services.AddTransient(provider =>
+                services.TryAddTransient(provider =>
                     provider.GetRequiredKeyedService<IConfigurationDescriptor<TConfiguration>>(section).Value);
 
                 services.AddHostedService(provider => 
-                    new ConfigurationMonitor<TConfiguration>(section, 
-                        provider.GetRequiredService<IConfigurationFile<TConfiguration>>(),
+                    new ConfigurationMonitor<TConfiguration>(section,
+                        provider.GetRequiredKeyedService<IConfigurationCache>(section),
+                        provider.GetRequiredKeyedService<IConfigurationFile<TConfiguration>>(section),
                         provider.GetRequiredService<IServiceProvider>(), 
                         provider.GetRequiredService<IPublisher>()));
             }

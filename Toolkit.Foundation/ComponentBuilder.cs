@@ -68,8 +68,7 @@ public class ComponentBuilder :
         where TConfiguration :
         class, new()
     {
-        hostBuilder.AddConfiguration(section: section, path: ConfigurationFile,
-            defaultConfiguration: configuration);
+        hostBuilder.AddConfiguration(section, ConfigurationFile, configuration);
 
         return this;
     }
@@ -90,7 +89,8 @@ public class ComponentBuilder :
 
     public IComponentHost Build()
     {
-        hostBuilder.UseContentRoot(ContentRoot, true)
+        hostBuilder
+            .UseContentRoot(ContentRoot, true)
             .ConfigureAppConfiguration(config =>
             {
                 config.AddJsonFile(ConfigurationFile, true, true);

@@ -3,6 +3,7 @@
 namespace Toolkit.Foundation;
 
 public class ConfigurationMonitor<TConfiguration>(string section,
+    IConfigurationCache cache,
     IConfigurationFile<TConfiguration> file, 
     IServiceProvider serviceProvider,
     IPublisher publisher) :
@@ -20,7 +21,7 @@ public class ConfigurationMonitor<TConfiguration>(string section,
             if (serviceProvider.GetRequiredKeyedService<IConfigurationDescriptor<TConfiguration>>(section) is 
                 IConfigurationDescriptor<TConfiguration> configuration)
             {
-                ConfigurationCache.Remove(section);
+                cache.Remove(section);
                 publisher.PublishUI(new ChangedEventArgs<TConfiguration>(configuration.Value));
             }
         }

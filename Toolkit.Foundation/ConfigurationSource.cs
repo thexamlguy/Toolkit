@@ -9,6 +9,7 @@ namespace Toolkit.Foundation;
 
 public class ConfigurationSource<TConfiguration>(IConfigurationFile<TConfiguration> configurationFile,
     string section,
+    IConfigurationCache cache,
     JsonSerializerOptions? serializerOptions = null) :
     IConfigurationSource<TConfiguration>
     where TConfiguration :
@@ -58,13 +59,13 @@ public class ConfigurationSource<TConfiguration>(IConfigurationFile<TConfigurati
             using Stream stream2 = new FileStream(fileInfo.PhysicalPath!, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
             JsonSerializer.Serialize(stream2, rootNode, serializerOptions ?? defaultSerializerOptions());
 
-            ConfigurationCache.Set(section, value);
+            cache.Set(section, value);
         }
     }
 
     public bool TryGet(out TConfiguration? value)
     {
-        if (ConfigurationCache.TryGet(section, out value))
+        if (cache.TryGet(section, out value))
         {
             return true;
         }
@@ -102,7 +103,7 @@ public class ConfigurationSource<TConfiguration>(IConfigurationFile<TConfigurati
             if (currentNode != null && currentNode[segments[lastIndex]] is JsonNode sectionNode)
             {
                 value = JsonSerializer.Deserialize<TConfiguration>(sectionNode, serializerOptions ?? defaultSerializerOptions());
-                ConfigurationCache.Set(section, value);
+                cache.Set(section, value);
                 return true;
             }
 
@@ -136,22 +137,29 @@ public class ConfigurationSource<TConfiguration>(IConfigurationFile<TConfigurati
         if (currentNode is not null)
         {
             string lastKey = segments[lastIndex];
-            if (currentNode is JsonArray array && int.TryParse(lastKey, out int index))
+            if (valueNode is JsonArray)
             {
-                if (array.Count <= index)
-                {
-                    array.Add(valueNode);
-                }
-                else
-                {
-                    array[index] = MergeNodes(array[index], valueNode);
-                }
+                currentNode[lastKey] = valueNode;
             }
             else
             {
                 currentNode[lastKey] = MergeNodes(currentNode[lastKey], valueNode);
             }
         }
+    }
+
+    private JsonNode? MergeNodes(JsonNode? existingNode, JsonNode? newNode)
+    {
+        if (existingNode is JsonObject existingObject && newNode is JsonObject newObject)
+        {
+            foreach (KeyValuePair<string, JsonNode?> property in newObject)
+            {
+                existingObject[property.Key] = MergeNodes(existingObject[property.Key], CloneNode(property.Value));
+            }
+            return existingObject;
+        }
+
+        return newNode;
     }
 
     private JsonNode? CloneNode(JsonNode? node)
@@ -164,6 +172,7 @@ public class ConfigurationSource<TConfiguration>(IConfigurationFile<TConfigurati
         string serialized = JsonSerializer.Serialize(node, serializerOptions ?? defaultSerializerOptions());
         return JsonNode.Parse(serialized);
     }
+
 
     private void EnsureFileExists(string? filePath)
     {
@@ -179,31 +188,5 @@ public class ConfigurationSource<TConfiguration>(IConfigurationFile<TConfigurati
         }
 
         File.WriteAllText(filePath, "{}");
-    }
-
-    private JsonNode? MergeNodes(JsonNode? existingNode, JsonNode? newNode)
-    {
-        if (existingNode is JsonObject existingObject && newNode is JsonObject newObject)
-        {
-            foreach (KeyValuePair<string, JsonNode?> property in newObject)
-            {
-                existingObject[property.Key] = MergeNodes(existingObject[property.Key], CloneNode(property.Value));
-            }
-
-            return existingObject;
-        }
-        else if (existingNode is JsonArray existingArray && newNode is JsonArray newArray)
-        {
-            foreach (JsonNode? item in newArray)
-            {
-                existingArray.Add(CloneNode(item));
-            }
-
-            return existingArray;
-        }
-        else
-        {
-            return newNode;
-        }
     }
 }
