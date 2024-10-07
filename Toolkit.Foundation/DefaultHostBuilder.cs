@@ -53,10 +53,10 @@ public class DefaultHostBuilder :
                 services.AddScoped<INavigation, Navigation>();
 
                 services.AddSingleton(new NamedComponent("Root"));
-                services.AddScoped<IComponentScopeCollection, ComponentScopeCollection>(provider => new ComponentScopeCollection
-                {
+                services.AddScoped<IComponentScopeCollection, ComponentScopeCollection>(provider =>
+                [
                     new ComponentScopeDescriptor("Root", provider.GetRequiredService<IServiceProvider>())
-                });
+                ]);
 
                 services.AddTransient<IComponentFactory, ComponentFactory>();
                 services.AddTransient<IComponentScopeProvider, ComponentScopeProvider>();

@@ -20,6 +20,12 @@ public class ComponentFactory(IServiceProvider provider,
 
             builder.AddServices(services =>
             {
+                services.AddTransient(_ => 
+                    provider.GetRequiredService<IProxyServiceCollection<IComponentBuilder>>());
+
+                services.AddTransient(_ =>
+                    provider.GetRequiredService<IComponentFactory>());
+
                 services.AddTransient(_ =>
                     provider.GetRequiredService<IProxyService<IPublisher>>());
 
@@ -31,7 +37,7 @@ public class ComponentFactory(IServiceProvider provider,
 
                 services.AddScoped(_ =>
                     provider.GetRequiredService<INavigationRegionProvider>());
-
+              
                 services.AddScoped(_ =>
                     provider.GetRequiredService<IComponentScopeCollection>());
 
