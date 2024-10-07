@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.FileProviders;
+﻿using Json.More;
+using Microsoft.Extensions.FileProviders;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -23,7 +24,8 @@ public class ConfigurationSource<TConfiguration>(IConfigurationFile<TConfigurati
             Converters =
             {
                 new JsonStringEnumConverter(),
-                new DictionaryStringObjectJsonConverter()
+                new DictionaryStringObjectJsonConverter(),
+                new JsonArrayTupleConverter()
             }
         };
     };

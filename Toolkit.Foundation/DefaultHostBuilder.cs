@@ -10,11 +10,6 @@ public class DefaultHostBuilder :
     public static IHostBuilder Create()
     {
         return new HostBuilder()
-            .UseContentRoot("Local", true)
-            .ConfigureAppConfiguration((context, config) =>
-            {
-                config.AddJsonFile("Settings.json", true, true);
-            })
             .ConfigureServices((context, services) =>
             {
                 services.AddScoped<IServiceFactory>(provider =>
