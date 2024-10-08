@@ -58,7 +58,7 @@ public class ConfigurationSource<TConfiguration>(IConfigurationFile<TConfigurati
 
             using Stream stream2 = new FileStream(fileInfo.PhysicalPath!, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
             JsonSerializer.Serialize(stream2, rootNode, serializerOptions ?? defaultSerializerOptions());
-
+            
             cache.Set(section, value);
         }
     }
