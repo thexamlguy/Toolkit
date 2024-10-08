@@ -22,38 +22,37 @@ public class Component :
         return factory.Create<TComponent>(builder);
     }
 
-    public IComponentBuilder Configure(string name,
-        Action<IComponentBuilder>? builderDelegate = null)
-    {
-        if (builderDelegate is not null)
-        {
-            builderDelegate(builder);
-        }
-
-        return Configuring(builder);
-    }
-
-    public IComponentBuilder Configure(Action<IComponentBuilder>? builderDelegate = null)
+    public IComponentBuilder Configure(Action<IComponentBuilder>? componentDelegate = null)
     { 
-        if (builderDelegate is not null)
+        if (componentDelegate is not null)
         {
-            builderDelegate(builder);
+            componentDelegate(builder);
         }
 
         return Configuring(builder);
     }
 
-    public IComponentBuilder Configure<TConfiguration>(string name, 
-        TConfiguration? configuration = null,
-        Action<IComponentBuilder>? builderDelegate = null)
+    public IComponentBuilder Configure<TConfiguration>(Action<IConfigurationBuilder<TConfiguration>>? configurationDelegate = null,
+        Action<IComponentBuilder>? componentDelegate = null)
         where TConfiguration : class, new()
     {
-        if (builderDelegate is not null)
+        if (componentDelegate is not null)
         {
-            builderDelegate(builder);
+            componentDelegate(builder);
         }
 
-        builder.AddConfiguration(name, configuration);
+        if (configurationDelegate is not null)
+        {
+            ConfigurationBuilder<TConfiguration> configurationBuilder = new();
+
+            configurationDelegate(configurationBuilder);
+
+            if (configurationBuilder.Section is { Length: > 0 } section)
+            {
+                builder.AddConfiguration(section, configurationBuilder.Configuration ?? new TConfiguration());
+            }
+        }
+
         return Configuring(builder);
     }
 

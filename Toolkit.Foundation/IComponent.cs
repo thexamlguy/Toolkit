@@ -2,13 +2,9 @@
 
 public interface IComponent
 {
-    IComponentBuilder Configure(string name,
-        Action<IComponentBuilder>? builderDelegate = null);
+    IComponentBuilder Configure(Action<IComponentBuilder>? configurationDelegate = null);
 
-    IComponentBuilder Configure(Action<IComponentBuilder>? builderDelegate = null);
-
-    IComponentBuilder Configure<TConfiguration>(string name,
-        TConfiguration? configuration = null,
-        Action<IComponentBuilder>? builderDelegate = null)
+    IComponentBuilder Configure<TConfiguration>(Action<IConfigurationBuilder<TConfiguration>>? configurationDelegate = null,
+        Action<IComponentBuilder>? componentDelegate = null)
         where TConfiguration : class, new();
 }
