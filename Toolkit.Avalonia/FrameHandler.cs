@@ -7,7 +7,7 @@ using Toolkit.UI.Controls.Avalonia;
 
 namespace Toolkit.Avalonia;
 
-public class FrameHandler :
+public class FrameHandler(ITransientNavigationStore<Frame> navigationStore) :
     INotificationHandler<NavigateEventArgs<Frame>>,
     INotificationHandler<NavigateBackEventArgs<Frame>>
 {
@@ -18,19 +18,16 @@ public class FrameHandler :
             frame.NavigationPageFactory ??= new NavigationPageFactory();
             if (args.Template is Control control)
             {
-                void NavigatedTo(Control sender)
+                void Navigated(Control sender)
                 {
-                    async void HandleNavigatedTo(object? _,
-                        NavigationEventArgs __)
+                    async void HandleNavigatedTo(object? _, NavigationEventArgs __)
                     {
-                        async void HandleNavigatingFrom(object? _,
-                            NavigatingCancelEventArgs args)
+                        async void HandleNavigatingFrom(object? _, NavigatingCancelEventArgs args)
                         {
                             sender.RemoveHandler(Frame.NavigatingFromEvent, HandleNavigatingFrom);
                             control.Unloaded -= HandleUnloaded;
 
-                            async void HandleNavigatedFrom(object? _,
-                                NavigationEventArgs args)
+                            async void HandleNavigatedFrom(object? _, NavigationEventArgs args)
                             {
                                 sender.RemoveHandler(Frame.NavigatedFromEvent, HandleNavigatedFrom);
                                 if (sender.DataContext is object content)
@@ -40,9 +37,11 @@ public class FrameHandler :
                                         await deactivated.OnDeactivated();
                                     }
 
-                                    if (content is not IKeepAlive)
+                                    if (content is IDisposable disposable)
                                     {
-                                        if (content is IDisposable disposable)
+                                        FrameNavigationOptions? options = navigationStore.Get<FrameNavigationOptions>(frame);
+                                        if (options is not FrameNavigationOptions frameOptions ||
+                                            !frameOptions.IsNavigationStackEnabled)
                                         {
                                             disposable.Dispose();
                                         }
@@ -51,9 +50,10 @@ public class FrameHandler :
                             }
 
                             sender.AddHandler(Frame.NavigatedFromEvent, HandleNavigatedFrom);
+
                             if (sender.DataContext is object content)
                             {
-                                if (content is IConfirmation confirmation &&
+                                if (content is IConfirmation confirmation && 
                                     !await confirmation.Confirm())
                                 {
                                     args.Cancel = true;
@@ -106,7 +106,6 @@ public class FrameHandler :
                 }
 
                 control.DataContext = args.Content;
-                NavigatedTo(control);
 
                 FrameNavigationOptions navigationOptions = new();
                 List<Action> postNavigateActions = [];
@@ -133,31 +132,27 @@ public class FrameHandler :
 
                 if (args.Parameters is not null)
                 {
-                    if (args.Parameters.TryGetValue("Transition",
-                        out object? transition))
+                    if (args.Parameters.TryGetValue("Transition", out object? transition))
                     {
                         switch ($"{transition}")
                         {
                             case "Suppress":
-                                navigationOptions.TransitionInfoOverride =
-                                    new SuppressNavigationTransitionInfo();
+                                navigationOptions.TransitionInfoOverride = new SuppressNavigationTransitionInfo();
                                 break;
 
                             case "FromLeft":
                             case "FromRight":
                             case "FromTop":
                             case "FromBottom":
-                                navigationOptions.TransitionInfoOverride =
-                                    new SlideNavigationTransitionInfo
-                                    {
-                                        Effect = Enum.Parse<SlideNavigationTransitionEffect>($"{transition}")
-                                    };
+                                navigationOptions.TransitionInfoOverride = new SlideNavigationTransitionInfo
+                                {
+                                    Effect = Enum.Parse<SlideNavigationTransitionEffect>($"{transition}")
+                                };
                                 break;
                         }
                     }
 
-                    if (args.Parameters.TryGetValue("IsBackStackEnabled",
-                        out object? isBackStackEnabled))
+                    if (args.Parameters.TryGetValue("IsBackStackEnabled", out object? isBackStackEnabled))
                     {
                         if (isBackStackEnabled is bool value)
                         {
@@ -165,8 +160,7 @@ public class FrameHandler :
                         }
                     }
 
-                    if (args.Parameters.TryGetValue("ClearBackStack",
-                        out object? clearBackStack))
+                    if (args.Parameters.TryGetValue("ClearBackStack", out object? clearBackStack))
                     {
                         if (clearBackStack is bool clearBool)
                         {
@@ -178,8 +172,7 @@ public class FrameHandler :
 
                         if (clearBackStack is string clearString)
                         {
-                            if (clearString.StartsWith('[') && clearString.EndsWith(']') &&
-                                clearString.Contains('-'))
+                            if (clearString.StartsWith('[') && clearString.EndsWith(']') && clearString.Contains('-'))
                             {
                                 string range = clearString.Trim('[', ']');
                                 string[] parts = range.Split('-');
@@ -202,6 +195,9 @@ public class FrameHandler :
                     }
                 }
 
+                Navigated(control);
+
+                navigationStore.Set(frame, navigationOptions);
                 frame.NavigateFromObject(control, navigationOptions);
 
                 foreach (Action postAction in postNavigateActions)

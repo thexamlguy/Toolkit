@@ -33,7 +33,10 @@ public static class IServiceCollectionExtensions
         services.AddHandler<ClassicDesktopStyleApplicationHandler>(nameof(IClassicDesktopStyleApplicationLifetime));
         services.AddHandler<SingleViewApplicationHandler>(nameof(ISingleViewApplicationLifetime));
         services.AddHandler<ContentControlHandler>(nameof(ContentControl));
+
         services.AddHandler<FrameHandler>(nameof(Frame));
+        services.TryAddSingleton<ITransientNavigationStore<Frame>, TransientNavigationStore<Frame>>();
+
         services.AddHandler<ContentDialogHandler>(nameof(ContentDialog));
         services.AddHandler<TaskDialogHandler>(nameof(TaskDialog));
 
@@ -66,7 +69,11 @@ public static class IServiceCollectionExtensions
                 services.AddHandler<SelectFilesHandler>();
 
                 services.AddHandler<ContentControlHandler>(nameof(ContentControl));
+
                 services.AddHandler<FrameHandler>(nameof(Frame));
+
+                services.TryAddSingleton(provider.GetRequiredService<ITransientNavigationStore<Frame>>());
+
                 services.AddHandler<ContentDialogHandler>(nameof(ContentDialog));
                 services.AddHandler<TaskDialogHandler>(nameof(TaskDialog));
             })));

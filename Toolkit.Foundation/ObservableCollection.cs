@@ -46,6 +46,8 @@ public partial class ObservableCollection<TViewModel> :
     [ObservableProperty]
     private int count;
 
+    private Func<TViewModel>? defaultSelectionFactory;
+
     [ObservableProperty]
     private bool isActivated;
 
@@ -145,86 +147,27 @@ public partial class ObservableCollection<TViewModel> :
         }
     }
 
-    private Func<TViewModel>? defaultSelectionFactory;
-
-    public void SetSource(IList<TViewModel> source,
-        Func<TViewModel>? defaultSelectionFactory)
+    public void Activate(Func<ActivationBuilder> activateDelegate,
+        bool reset = false)
     {
-        foreach (TViewModel item in source)
+        if (reset)
         {
-            Add(item);
+            Clear();
         }
 
-        if (defaultSelectionFactory is not null)
-        {
-            this.defaultSelectionFactory = defaultSelectionFactory;
-            SelectedItem = defaultSelectionFactory.Invoke();
-        }
-
-        if (source is INotifyCollectionChanged observableSource)
-        {
-            observableSource.CollectionChanged -= SourceCollectionChanged;
-            observableSource.CollectionChanged += SourceCollectionChanged;
-        }
+        ActivationBuilder builder = activateDelegate.Invoke();
+        Publisher.Publish(builder.Value, builder.Key);
     }
 
-    private void SourceCollectionChanged(object? sender,
-        NotifyCollectionChangedEventArgs args)
+    public void Activate(bool reset = false)
     {
-        switch (args.Action)
+        if (reset)
         {
-            case NotifyCollectionChangedAction.Add:
-                if (args.NewItems is not null)
-                {
-                    foreach (TViewModel newItem in args.NewItems)
-                    {
-                        Add(newItem);
-                    }
-                }
-                break;
-
-            case NotifyCollectionChangedAction.Remove:
-                if (args.OldItems is not null)
-                {
-                    foreach (TViewModel oldItem in args.OldItems)
-                    {
-                        if (this.FirstOrDefault(x => x.Equals(oldItem)) is TViewModel removedItem)
-                        {
-                            Remove(removedItem);
-                        }
-                    }
-                }
-                break;
-
-            case NotifyCollectionChangedAction.Reset:
-
-                Clear();
-                if (sender is IEnumerable<TViewModel> collection)
-                {
-                    foreach (TViewModel item in collection)
-                    {
-                        Add(item);
-                    }
-
-                    if (defaultSelectionFactory is not null)
-                    {
-                        SelectedItem = defaultSelectionFactory.Invoke();
-                    }
-                }
-                break;
-        }
-    }
-
-    public virtual Task OnActivated()
-    {
-        IsActivated = true;
-        while (pendingEvents.Count > 0)
-        {
-            object current = pendingEvents.Dequeue();
-            Handle((dynamic)current);
+            Clear();
         }
 
-        return Task.CompletedTask;
+        ActivationBuilder builder = ActivationBuilder();
+        Publisher.PublishUI(builder.Value, builder.Key);
     }
 
     public TViewModel Add<T>(params object?[] parameters)
@@ -285,14 +228,6 @@ public partial class ObservableCollection<TViewModel> :
         }
     }
 
-    public void Reset(Action<ObservableCollection<TViewModel>> factory, bool disposeItems = true)
-    {
-        SelectedItem = default;
-
-        Clear(disposeItems);
-        factory.Invoke(this);
-    }
-
     public void Clear(bool disposeItems = false)
     {
         isClearing = true;
@@ -342,31 +277,10 @@ public partial class ObservableCollection<TViewModel> :
     void ICollection.CopyTo(Array array, int index) =>
         collection.CopyTo((TViewModel[])array, index);
 
-    public virtual Task OnDeactivated()
-    {
-        IsActivated = false;
-        return Task.CompletedTask;
-    }
-
-    public virtual Task OnDeactivating() =>
-        Task.CompletedTask;
-
     public virtual void Dispose()
     {
         GC.SuppressFinalize(this);
         Disposer.Dispose(this);
-    }
-
-    public void Activate(Func<ActivationBuilder> activateDelegate,
-        bool reset = false)
-    {
-        if (reset)
-        {
-            Clear();
-        }
-
-        ActivationBuilder builder = activateDelegate.Invoke();
-        Publisher.Publish(builder.Value, builder.Key);
     }
 
     public IEnumerator<TViewModel> GetEnumerator() =>
@@ -505,10 +419,6 @@ public partial class ObservableCollection<TViewModel> :
         IsCompatibleObject(value) ?
         IndexOf((TViewModel)value!) : -1;
 
-    public virtual void OnInitialize()
-    {
-    }
-
     [RelayCommand]
     public virtual void Initialize()
     {
@@ -519,35 +429,10 @@ public partial class ObservableCollection<TViewModel> :
 
         IsInitialized = true;
         Subscriber.Subscribe(this);
+
         OnInitialize();
 
         Activate();
-    }
-
-    public bool Replace<T>(int index, 
-        params object?[] parameters)
-        where T :
-        TViewModel
-    {
-        if (index <= Count - 1)
-        {
-            RemoveItem(index);
-        }
-        else
-        {
-            index = Count;
-        }
-
-        T? item = Factory.Create<T>(args =>
-        {
-            if (args is IInitialization initialization)
-            {
-                initialization.Initialize();
-            }
-        }, parameters);
-
-        Insert(index, item);
-        return true;
     }
 
     public TViewModel Insert<T>(int index = 0,
@@ -634,6 +519,31 @@ public partial class ObservableCollection<TViewModel> :
         return true;
     }
 
+    public virtual Task OnActivated()
+    {
+        IsActivated = true;
+        while (pendingEvents.Count > 0)
+        {
+            object current = pendingEvents.Dequeue();
+            Handle((dynamic)current);
+        }
+
+        return Task.CompletedTask;
+    }
+
+    public virtual Task OnDeactivated()
+    {
+        IsActivated = false;
+        return Task.CompletedTask;
+    }
+
+    public virtual Task OnDeactivating() =>
+        Task.CompletedTask;
+
+    public virtual void OnInitialize()
+    {
+    }
+
     public bool Remove(TViewModel item)
     {
         int index = collection.IndexOf(item);
@@ -669,6 +579,32 @@ public partial class ObservableCollection<TViewModel> :
     public void RemoveAt(int index) =>
         RemoveItem(index);
 
+    public bool Replace<T>(int index,
+        params object?[] parameters)
+        where T :
+        TViewModel
+    {
+        if (index <= Count - 1)
+        {
+            RemoveItem(index);
+        }
+        else
+        {
+            index = Count;
+        }
+
+        T? item = Factory.Create<T>(args =>
+        {
+            if (args is IInitialization initialization)
+            {
+                initialization.Initialize();
+            }
+        }, parameters);
+
+        Insert(index, item);
+        return true;
+    }
+
     public bool Replace(int index,
         TViewModel item)
     {
@@ -685,6 +621,14 @@ public partial class ObservableCollection<TViewModel> :
         return true;
     }
 
+    public void Reset(Action<ObservableCollection<TViewModel>> factory, bool disposeItems = true)
+    {
+        SelectedItem = default;
+
+        Clear(disposeItems);
+        factory.Invoke(this);
+    }
+
     public void Revert()
     {
         foreach (object trackedProperty in trackedProperties.Values)
@@ -693,15 +637,24 @@ public partial class ObservableCollection<TViewModel> :
         }
     }
 
-    public void Activate(bool reset = false)
+    public void SetSource(IList<TViewModel> source,                                                                                                                                                                                       Func<TViewModel>? defaultSelectionFactory)
     {
-        if (reset)
+        foreach (TViewModel item in source)
         {
-            Clear();
+            Add(item);
         }
 
-        ActivationBuilder builder = ActivationBuilder();
-        Publisher.PublishUI(builder.Value, builder.Key);
+        if (defaultSelectionFactory is not null)
+        {
+            this.defaultSelectionFactory = defaultSelectionFactory;
+            SelectedItem = defaultSelectionFactory.Invoke();
+        }
+
+        if (source is INotifyCollectionChanged observableSource)
+        {
+            observableSource.CollectionChanged -= SourceCollectionChanged;
+            observableSource.CollectionChanged += SourceCollectionChanged;
+        }
     }
 
     public void Track<T>(string propertyName, Func<T> getter, Action<T> setter)
@@ -725,7 +678,7 @@ public partial class ObservableCollection<TViewModel> :
         Disposer.Add(this, item);
         Disposer.Add(item, Disposable.Create(() =>
         {
-            if (item is IRemovable && !isClearing)
+            if (item is IDisposable && !isClearing)
             {
                 if (item is IList collection)
                 {
@@ -737,6 +690,10 @@ public partial class ObservableCollection<TViewModel> :
         }));
 
         collection.Insert(index > Count ? Count : index, item);
+    }
+
+    protected virtual void OnSelectedItemChanged()
+    {
     }
 
     protected virtual void RemoveItem(int index) =>
@@ -782,10 +739,52 @@ public partial class ObservableCollection<TViewModel> :
         OnSelectedItemChanged();
     }
 
-    protected virtual void OnSelectedItemChanged()
+    private void SourceCollectionChanged(object? sender,
+        NotifyCollectionChangedEventArgs args)
     {
-    }
+        switch (args.Action)
+        {
+            case NotifyCollectionChangedAction.Add:
+                if (args.NewItems is not null)
+                {
+                    foreach (TViewModel newItem in args.NewItems)
+                    {
+                        Add(newItem);
+                    }
+                }
+                break;
 
+            case NotifyCollectionChangedAction.Remove:
+                if (args.OldItems is not null)
+                {
+                    foreach (TViewModel oldItem in args.OldItems)
+                    {
+                        if (this.FirstOrDefault(x => x.Equals(oldItem)) is TViewModel removedItem)
+                        {
+                            Remove(removedItem);
+                        }
+                    }
+                }
+                break;
+
+            case NotifyCollectionChangedAction.Reset:
+
+                Clear();
+                if (sender is IEnumerable<TViewModel> collection)
+                {
+                    foreach (TViewModel item in collection)
+                    {
+                        Add(item);
+                    }
+
+                    if (defaultSelectionFactory is not null)
+                    {
+                        SelectedItem = defaultSelectionFactory.Invoke();
+                    }
+                }
+                break;
+        }
+    }
     private void UpdateSelection(TViewModel item)
     {
         if (item is ISelectable newSelection)

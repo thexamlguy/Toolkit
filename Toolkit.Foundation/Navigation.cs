@@ -62,7 +62,7 @@ public class Navigation(IServiceProvider provider,
 
                     if (region is not null)
                     {
-                        object? content = await contentFactory.CreateAsync(descriptor, resolvedArguments);
+                        object? content = contentFactory.Create(descriptor, resolvedArguments);
                         if (content is not null)
                         {
                             Type navigationType = region is Type type ? type : region.GetType();

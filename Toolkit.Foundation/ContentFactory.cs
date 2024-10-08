@@ -1,9 +1,10 @@
 ﻿namespace Toolkit.Foundation;
 
 public class ContentFactory(IServiceProvider provider,
-    IServiceFactory factory) : IContentFactory
+    IServiceFactory factory) : 
+    IContentFactory
 {
-    public Task<object?> CreateAsync(IContentTemplateDescriptor descriptor,
+    public object? Create(IContentTemplateDescriptor descriptor,
         object[] parameters)
     {
         object? content = parameters is { Length: > 0 }
@@ -22,6 +23,6 @@ public class ContentFactory(IServiceProvider provider,
                     }
                 }, descriptor.Key);
 
-        return Task.FromResult<object?>(content);
+        return content;
     }
 }
