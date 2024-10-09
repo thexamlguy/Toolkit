@@ -35,7 +35,6 @@
                         </Border>
                     </ControlTemplate>
                 </Setter>
-
                 <Style Selector="^:pointerover">
                     <Style Selector="^ /template/ Border#ButtonLayoutGrid">
                         <Setter Property="Background" Value="{DynamicResource TextControlButtonBackgroundPointerOver}" />
@@ -46,7 +45,6 @@
                         <Setter Property="Foreground" Value="{DynamicResource TextControlButtonForegroundPointerOver}" />
                     </Style>
                 </Style>
-
                 <Style Selector="^:pressed">
                     <Style Selector="^ /template/ Border#ButtonLayoutGrid">
                         <Setter Property="Background" Value="{DynamicResource TextControlButtonBackgroundPressed}" />
@@ -57,7 +55,6 @@
                         <Setter Property="Foreground" Value="{DynamicResource TextControlButtonForegroundPressed}" />
                     </Style>
                 </Style>
-
                 <Style Selector="^:disabled /template/ Border#ButtonLayoutGrid">
                     <Setter Property="Opacity" Value="0" />
                 </Style>
@@ -72,7 +69,7 @@
                 <MergeResourceInclude Source="../ImageCropper/ImageCropper.axaml" />
                 <MergeResourceInclude Source="../ContentCard/ContentCard.axaml" />
                 <MergeResourceInclude Source="../TaskDialog/TaskDialog.axaml" />
-
+                <MergeResourceInclude Source="../ContentColorPicker/ContentColorPicker.axaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Styles.Resources>
