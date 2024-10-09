@@ -1,73 +1,163 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.PanAndZoom;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
+using Avalonia.Media;
+using Avalonia.Media.Imaging;
 
 namespace Toolkit.UI.Controls.Avalonia;
 
-public class ContentColorPicker : ContentControl
+public class ContentColorPicker : 
+    ContentControl
 {
+    public static readonly StyledProperty<double> PeekOffsetProperty =
+           AvaloniaProperty.Register<ContentColorPicker, double>(nameof(PeekOffset), 20);
+
+    public static readonly StyledProperty<int> PeekPixelsProperty =
+      AvaloniaProperty.Register<ContentColorPicker, int>(nameof(PeekPixels), 20);
+
+    private readonly Image image = new();
+
     private Canvas? canvas;
-    private Border? preview;
+    private (double X, double Y) lastPointerPosition;
+    private Border? peekBorder;
+    private ZoomBorder? zoomBorder;
+
+    public double PeekOffset
+    {
+        get => GetValue(PeekOffsetProperty);
+        set => SetValue(PeekOffsetProperty, value);
+    }
+
+    public int PeekPixels
+    {
+        get => GetValue(PeekPixelsProperty);
+        set => SetValue(PeekPixelsProperty, value);
+    }
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs args)
     {
         base.OnApplyTemplate(args);
 
+        PointerMoved -= OnPointerMoved;
+        PointerExited -= OnPointerExited;
+        PointerEntered -= OnPointerEntered;
+
+        PointerMoved += OnPointerMoved;
+        PointerExited += OnPointerExited;
+        PointerEntered += OnPointerEntered;
+
         canvas = args.NameScope.Find<Canvas>("Canvas");
 
-        if (canvas is not null)
+        zoomBorder = args.NameScope.Find<ZoomBorder>("ZoomBorder");
+        if (zoomBorder is not null)
         {
-            canvas.PointerMoved += OnPointerMoved;
-            canvas.PointerExited += OnPointerExited;
-            canvas.PointerEntered += OnPointerEntered;
+            zoomBorder.ZoomChanged += OnZoomChanged;
         }
 
-        preview = args.NameScope.Find<Border>("Preview");
+        peekBorder = args.NameScope.Find<Border>("PeekBorder");
+        if (peekBorder is not null)
+        {
+            peekBorder.Child = image;
+        }
     }
 
-    private void OnPointerMoved(object? sender, 
+    private void OnPointerEntered(object? sender,
         PointerEventArgs args)
     {
-        if (canvas is null || preview is null)
+        if (peekBorder is not null)
         {
-            return;
+            peekBorder.IsVisible = true;
         }
+    }
 
+    private void OnPointerExited(object? sender,
+        PointerEventArgs args)
+    {
+        if (peekBorder is not null)
+        {
+            peekBorder.IsVisible = false;
+        }
+    }
+
+    private void OnPointerMoved(object? sender,
+        PointerEventArgs args)
+    {
         double relativeX = args.GetPosition(canvas).X;
         double relativeY = args.GetPosition(canvas).Y;
 
-        double newX = relativeX < 0 ? 0 : (relativeX > canvas.Bounds.Width ? canvas.Bounds.Width : relativeX);
-        double newY = relativeY < 0 ? 0 : (relativeY > canvas.Bounds.Height ? canvas.Bounds.Height : relativeY);
+        lastPointerPosition = (relativeX, relativeY);
 
-        if (newX < 0 || newX > canvas.Bounds.Width || newY < 0 || newY > canvas.Bounds.Height)
-        {
-            preview.IsVisible = false;
-            return;
-        }
-
-        Canvas.SetLeft(preview, newX);
-        Canvas.SetTop(preview, newY);
+        UpdatePeekPosition(relativeX, relativeY);
     }
 
-    private void OnPointerEntered(object? sender, 
-        PointerEventArgs args)
+    private void OnZoomChanged(object sender,
+        ZoomChangedEventArgs args) => UpdatePeekPreview(lastPointerPosition.X, lastPointerPosition.Y);
+
+    private Bitmap RenderToBitmap(Visual visual,
+        double centreX,
+        double centreY)
     {
-        if (preview is null)
+        int width = PeekPixels;
+        int height = PeekPixels;
+
+        double x = Math.Max(centreX - width / 2, 0);
+        double y = Math.Max(centreY - height / 2, 0);
+
+        x = Math.Min(x, visual.Bounds.Width - width);
+        y = Math.Min(y, visual.Bounds.Height - height);
+
+        PixelSize pixelSize = new(width, height);
+        RenderTargetBitmap renderTarget = new(pixelSize);
+
+        using (DrawingContext drawingContext = renderTarget.CreateDrawingContext())
         {
-            return;
+            drawingContext.PushClip(new Rect(0, 0, width, height));
+            drawingContext.FillRectangle(new VisualBrush(visual), new Rect(-x, -y,
+                visual.Bounds.Width, visual.Bounds.Height));
         }
 
-        preview.IsVisible = true;
+        return renderTarget;
     }
 
-    private void OnPointerExited(object? sender, 
-        PointerEventArgs args)
+    private void UpdatePeekPosition(double relativeX,
+        double relativeY)
     {
-        if (preview is null)
+        if (canvas is null || peekBorder is null)
         {
             return;
         }
 
-        preview.IsVisible = false;
+        double peekOffset = PeekOffset;
+
+        double newX = relativeX + peekOffset;
+        double newY = relativeY + peekOffset;
+
+        newX = Math.Clamp(newX, -peekBorder.Bounds.Width, canvas.Bounds.Width);
+        newY = Math.Clamp(newY, -peekBorder.Bounds.Height, canvas.Bounds.Height);
+
+        Canvas.SetLeft(peekBorder, newX);
+        Canvas.SetTop(peekBorder, newY);
+
+        bool isPointerInside = relativeX >= -peekOffset && relativeX <= canvas.Bounds.Width + peekOffset &&
+            relativeY >= -peekOffset && relativeY <= canvas.Bounds.Height + peekOffset;
+
+        peekBorder.IsVisible = isPointerInside;
+
+        if (isPointerInside)
+        {
+            UpdatePeekPreview(relativeX, relativeY);
+        }
+    }
+
+    private void UpdatePeekPreview(double relativeX, 
+        double relativeY)
+    {
+        if (zoomBorder is not null)
+        {
+            Bitmap bitmap = RenderToBitmap(zoomBorder, relativeX, relativeY);
+            image.Source = bitmap;
+        }
     }
 }
