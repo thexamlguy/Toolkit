@@ -155,6 +155,8 @@ public class ContentCropper : ContentControl
             InitializeCropRect();
         }
 
+        UpdateCropRectangle();
+
         PositionThumbs();
         RenderOverLays();
     }
@@ -182,12 +184,14 @@ public class ContentCropper : ContentControl
 
         UpdateCropArea(width, height);
         UpdateCropRatios();
+        UpdateCropRectangle();
 
         PositionThumbs();
         RenderOverLays();
     }
 
-    private void OnBorderPointerMoved(object? sender, PointerEventArgs args)
+    private void OnBorderPointerMoved(object? sender, 
+        PointerEventArgs args)
     {
         if (!isDragging || canvas is null || border is null)
         {
@@ -200,6 +204,8 @@ public class ContentCropper : ContentControl
 
         Canvas.SetLeft(border, newX);
         Canvas.SetTop(border, newY);
+
+        UpdateCropRectangle();
 
         PositionThumbs();
         RenderOverLays();
@@ -225,8 +231,7 @@ public class ContentCropper : ContentControl
         UpdateCropRatios();
     }
 
-    private void OnThumbDragDelta(object? sender,
-        VectorEventArgs args)
+    private void OnThumbDragDelta(object? sender, VectorEventArgs args)
     {
         if (canvas is null || border is null || sender is not Thumb thumb)
         {
@@ -275,6 +280,7 @@ public class ContentCropper : ContentControl
         Canvas.SetTop(border, topPosition);
 
         UpdateCropRatios();
+        UpdateCropRectangle();
 
         PositionThumbs();
         RenderOverLays();
@@ -353,19 +359,6 @@ public class ContentCropper : ContentControl
         rectangleBottom.Height = Math.Max(0, canvas.Height - bottomY);
         Canvas.SetTop(rectangleBottom, bottomY);
     }
-    private void UpdateCropRatios()
-    {
-        if (canvas == null || border == null)
-        {
-            return;
-        }
-
-        cropLeftRatio = Canvas.GetLeft(border) / canvas.Width;
-        cropTopRatio = Canvas.GetTop(border) / canvas.Height;
-        cropWidthRatio = border.Width / canvas.Width;
-        cropHeightRatio = border.Height / canvas.Height;
-    }
-
 
     private void UpdateCropArea(double width, double height)
     {
@@ -407,5 +400,31 @@ public class ContentCropper : ContentControl
         border.PointerMoved += OnBorderPointerMoved;
         border.PointerReleased -= OnBorderPointerReleased;
         border.PointerReleased += OnBorderPointerReleased;
+    }
+
+    private void UpdateCropRatios()
+    {
+        if (canvas == null || border == null)
+        {
+            return;
+        }
+
+        cropLeftRatio = Canvas.GetLeft(border) / canvas.Width;
+        cropTopRatio = Canvas.GetTop(border) / canvas.Height;
+        cropWidthRatio = border.Width / canvas.Width;
+        cropHeightRatio = border.Height / canvas.Height;
+    }
+
+    private void UpdateCropRectangle()
+    {
+        if (canvas is null || border is null)
+        {
+            return;
+        }
+
+        double left = Canvas.GetLeft(border);
+        double top = Canvas.GetTop(border);
+
+        CropRectangle = new Rect(left, top, border.Width, border.Height);
     }
 }
