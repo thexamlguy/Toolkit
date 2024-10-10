@@ -1,39 +1,34 @@
-﻿using Avalonia;
+﻿using Avalonia.Controls.Primitives;
 using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
-using Avalonia.Controls.Shapes;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using Avalonia.Media;
-using Avalonia.Media.Imaging;
+using Avalonia;
+using Avalonia.Controls.Shapes;
 
 namespace Toolkit.UI.Controls.Avalonia;
 
-public class ImageCropper :
-    TemplatedControl
+public class ContentCropper : ContentControl
 {
-    public static readonly StyledProperty<IImage?> CurrentAreaBitmapProperty =
-        AvaloniaProperty.Register<ImageCropper, IImage?>(nameof(CurrentAreaBitmap));
-
-    public static readonly StyledProperty<Rect> CurrentRectProperty =
-        AvaloniaProperty.Register<ImageCropper, Rect>(nameof(CurrentRect));
+    public static readonly StyledProperty<Rect> CropRectangleProperty =
+        AvaloniaProperty.Register<ContentCropper, Rect>(nameof(CropRectangle));
 
     public static readonly StyledProperty<bool> IsRatioScaleProperty =
-        AvaloniaProperty.Register<ImageCropper, bool>(nameof(IsRatioScale));
+        AvaloniaProperty.Register<ContentCropper, bool>(nameof(IsRatioScale));
 
     public static readonly StyledProperty<double> RectScaleProperty =
-        AvaloniaProperty.Register<ImageCropper, double>(nameof(RectScale), 0.5);
+        AvaloniaProperty.Register<ContentCropper, double>(nameof(RectScale), 0.5);
 
     public static readonly StyledProperty<Size> ScaleSizeProperty =
-        AvaloniaProperty.Register<ImageCropper, Size>(nameof(ScaleSize), new Size(2, 1));
-
-    public static readonly StyledProperty<IImage?> SourceProperty =
-        AvaloniaProperty.Register<ImageCropper, IImage?>(nameof(Source));
+        AvaloniaProperty.Register<ContentCropper, Size>(nameof(ScaleSize), new Size(2, 1));
 
     private Border? border;
     private Thumb? bottomLeftButton;
     private Thumb? bottomRightButton;
     private Canvas? canvas;
+    private double cropHeightRatio;
+    private double cropLeftRatio;
+    private double cropTopRatio;
+    private double cropWidthRatio;
     private bool isDragging;
     private double offsetX;
     private double offsetY;
@@ -41,25 +36,18 @@ public class ImageCropper :
     private Rectangle? rectangleLeft;
     private Rectangle? rectangleRight;
     private Rectangle? rectangleTop;
-
     private Thumb? topLeftButton;
     private Thumb? topRightButton;
 
-    static ImageCropper()
+    static ContentCropper()
     {
-        AffectsRender<ImageCropper>(SourceProperty, RectScaleProperty);
+        AffectsRender<ContentCropper>(RectScaleProperty, ContentProperty);
     }
 
-    public IImage? CurrentAreaBitmap
+    public Rect CropRectangle
     {
-        get => GetValue(CurrentAreaBitmapProperty);
-        private set => SetValue(CurrentAreaBitmapProperty, value);
-    }
-
-    public Rect CurrentRect
-    {
-        get => GetValue(CurrentRectProperty);
-        private set => SetValue(CurrentRectProperty, value);
+        get => GetValue(CropRectangleProperty);
+        private set => SetValue(CropRectangleProperty, value);
     }
 
     public bool IsRatioScale
@@ -78,12 +66,6 @@ public class ImageCropper :
     {
         get => GetValue(ScaleSizeProperty);
         set => SetValue(ScaleSizeProperty, value);
-    }
-
-    public IImage? Source
-    {
-        get => GetValue(SourceProperty);
-        set => SetValue(SourceProperty, value);
     }
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs args)
@@ -120,59 +102,85 @@ public class ImageCropper :
         {
             bottomRightButton.DragDelta += OnThumbDragDelta;
         }
-
-        DrawImage();
     }
 
     protected override void OnLoaded(RoutedEventArgs args)
     {
         base.OnLoaded(args);
-        DrawImage();
+        InitializeCropRect();
     }
 
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
 
-        if (change.Property == SourceProperty ||
-            change.Property == IsRatioScaleProperty ||
-            change.Property == RectScaleProperty)
+        if (change.Property == IsRatioScaleProperty ||
+            change.Property == RectScaleProperty || 
+            change.Property == ContentProperty)
         {
-            DrawImage();
+            InitializeCropRect();
         }
     }
 
-    private void DrawImage()
+    protected override void OnSizeChanged(SizeChangedEventArgs args)
     {
-        if (canvas is null || Source is not Bitmap bitmap)
+        base.OnSizeChanged(args);
+
+        if (canvas is null || border is null)
         {
             return;
         }
 
-        double maxWidth = DesiredSize.Width;
-        double maxHeight = DesiredSize.Height;
+        double newContentWidth = Bounds.Width;
+        double newContentHeight = Bounds.Height;
 
-        double imageWidth = Source.Size.Width;
-        double imageHeight = Source.Size.Height;
+        canvas.Width = newContentWidth;
+        canvas.Height = newContentHeight;
 
-        double scaleFactor = Math.Min(maxWidth / imageWidth, maxHeight / imageHeight);
-        double width = imageWidth * scaleFactor;
-        double height = imageHeight * scaleFactor;
+        // Calculate new positions and sizes based on updated ratios
+        double newCropLeft = cropLeftRatio * newContentWidth;
+        double newCropTop = cropTopRatio * newContentHeight;
+        double newCropWidth = cropWidthRatio * newContentWidth;
+        double newCropHeight = cropHeightRatio * newContentHeight;
+
+        // Check if the crop rectangle was resized or moved, and update accordingly
+        if (border.Width != newCropWidth || border.Height != newCropHeight)
+        {
+            border.Width = newCropWidth;
+            border.Height = newCropHeight;
+            Canvas.SetLeft(border, newCropLeft);
+            Canvas.SetTop(border, newCropTop);
+        }
+
+        PositionThumbs();
+        RenderOverLays();
+    }
+
+    private void InitializeCropRect()
+    {
+        if (canvas is null || Content is not Control content)
+        {
+            return;
+        }
+
+        double maxWidth = Bounds.Width;
+        double maxHeight = Bounds.Height;
+
+        double contentWidth = content.Bounds.Width > 0 ? content.Bounds.Width : maxWidth * 0.5;
+        double contentHeight = content.Bounds.Height > 0 ? content.Bounds.Height : maxHeight * 0.5;
+
+        double scaleFactor = Math.Min(maxWidth / contentWidth, maxHeight / contentHeight);
+        double width = contentWidth * scaleFactor;
+        double height = contentHeight * scaleFactor;
 
         canvas.Width = width;
         canvas.Height = height;
 
-        canvas.Background = new ImageBrush
-        {
-            Source = bitmap
-        };
-
-        UpdatePunchThrough(width, height);
-        Render();
+        UpdateCropArea(width, height);
+        RenderOverLays();
     }
 
-    private void OnBorderPointerMoved(object? sender,
-        PointerEventArgs args)
+    private void OnBorderPointerMoved(object? sender, PointerEventArgs args)
     {
         if (!isDragging || canvas is null || border is null)
         {
@@ -187,11 +195,10 @@ public class ImageCropper :
         Canvas.SetTop(border, newY);
 
         PositionThumbs();
-        Render();
+        RenderOverLays();
     }
 
-    private void OnBorderPointerPressed(object? sender,
-        PointerPressedEventArgs args)
+    private void OnBorderPointerPressed(object? sender, PointerPressedEventArgs args)
     {
         if (!isDragging && border is not null)
         {
@@ -203,8 +210,11 @@ public class ImageCropper :
         }
     }
 
-    private void OnBorderPointerReleased(object? sender,
-        PointerReleasedEventArgs args) => isDragging = false;
+    private void OnBorderPointerReleased(object? sender, PointerReleasedEventArgs args)
+    {
+        isDragging = false;
+        UpdateCropRatios();
+    }
 
     private void OnThumbDragDelta(object? sender, VectorEventArgs args)
     {
@@ -226,33 +236,20 @@ public class ImageCropper :
             case "TopLeftButton":
                 newWidth = Math.Max(0, border.Width - deltaX);
                 newHeight = Math.Max(0, border.Height - deltaY);
-                if (newWidth > 0) 
-                { 
-                    leftPosition += deltaX;
-                }
-
-                if (newHeight > 0)
-                { 
-                    topPosition += deltaY;
-                }
+                if (newWidth > 0) leftPosition += deltaX;
+                if (newHeight > 0) topPosition += deltaY;
                 break;
 
             case "TopRightButton":
                 newWidth = Math.Max(0, border.Width + deltaX);
                 newHeight = Math.Max(0, border.Height - deltaY);
-                if (newHeight > 0)
-                { 
-                    topPosition += deltaY; 
-                }
+                if (newHeight > 0) topPosition += deltaY;
                 break;
 
             case "BottomLeftButton":
                 newWidth = Math.Max(0, border.Width - deltaX);
                 newHeight = Math.Max(0, border.Height + deltaY);
-                if (newWidth > 0) 
-                {
-                    leftPosition += deltaX;
-                }
+                if (newWidth > 0) leftPosition += deltaX;
                 break;
 
             case "BottomRightButton":
@@ -261,45 +258,16 @@ public class ImageCropper :
                 break;
         }
 
-        if (newWidth < 0 || newHeight < 0)
-        {
-            return;
-        }
-
-        if (thumb.Name == "TopLeftButton" || thumb.Name == "BottomLeftButton")
-        {
-            leftPosition = Math.Max(0, leftPosition);
-            if (newWidth > 0)
-            {
-                newWidth = Math.Max(0, border.Width - (leftPosition - Canvas.GetLeft(border)));
-            }
-        }
-        else if (thumb.Name == "TopRightButton" || thumb.Name == "BottomRightButton")
-        {
-            newWidth = Math.Min(newWidth, canvas.Width - leftPosition);
-        }
-
-        if (thumb.Name == "TopLeftButton" || thumb.Name == "TopRightButton")
-        {
-            topPosition = Math.Max(0, topPosition);
-            if (newHeight > 0) 
-            { 
-                newHeight = Math.Max(0, border.Height - (topPosition - Canvas.GetTop(border)));
-            }
-        }
-        else if (thumb.Name == "BottomLeftButton" || thumb.Name == "BottomRightButton")
-        {
-            newHeight = Math.Min(newHeight, canvas.Height - topPosition);
-        }
-
         border.Width = newWidth;
         border.Height = newHeight;
 
         Canvas.SetLeft(border, leftPosition);
         Canvas.SetTop(border, topPosition);
 
+        UpdateCropRatios();
+
         PositionThumbs();
-        Render();
+        RenderOverLays();
     }
 
     private void PositionThumbs()
@@ -340,7 +308,7 @@ public class ImageCropper :
         }
     }
 
-    private void Render()
+    private void RenderOverLays()
     {
         if (canvas == null ||
             border == null ||
@@ -376,11 +344,22 @@ public class ImageCropper :
         Canvas.SetTop(rectangleBottom, bottomY);
     }
 
-    private void UpdatePunchThrough(double width,
-        double height)
+    private void UpdateCropRatios()
     {
-        if (canvas == null || 
-            border == null)
+        if (canvas == null || border == null)
+        {
+            return;
+        }
+
+        cropLeftRatio = Canvas.GetLeft(border) / canvas.Width;
+        cropTopRatio = Canvas.GetTop(border) / canvas.Height;
+        cropWidthRatio = border.Width / canvas.Width;
+        cropHeightRatio = border.Height / canvas.Height;
+    }
+
+    private void UpdateCropArea(double width, double height)
+    {
+        if (canvas == null || border == null)
         {
             return;
         }
@@ -420,4 +399,3 @@ public class ImageCropper :
         border.PointerReleased += OnBorderPointerReleased;
     }
 }
-

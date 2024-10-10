@@ -66,7 +66,7 @@
                 <MergeResourceInclude Source="../Overflow/Overflow.axaml" />
                 <MergeResourceInclude Source="../ContentBadge/ContentBadge.axaml" />
                 <MergeResourceInclude Source="../TabStrip/TabStrip.axaml" />
-                <MergeResourceInclude Source="../ImageCropper/ImageCropper.axaml" />
+                <MergeResourceInclude Source="../ContentCropper/ContentCropper.axaml" />
                 <MergeResourceInclude Source="../ContentCard/ContentCard.axaml" />
                 <MergeResourceInclude Source="../TaskDialog/TaskDialog.axaml" />
                 <MergeResourceInclude Source="../ContentColorPicker/ContentColorPicker.axaml" />
