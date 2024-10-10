@@ -18,6 +18,16 @@ public class ImageResizer :
             stream.Seek(0, SeekOrigin.Begin);
             using SKBitmap sKBitmap = SKBitmap.Decode(stream);
 
+            if (targetHeight == 0 && maintainAspectRatio)
+            {
+                targetHeight = (int)((float)targetWidth / sKBitmap.Width * sKBitmap.Height);
+            }
+
+            if (targetWidth == 0 && maintainAspectRatio)
+            {
+                targetWidth = (int)((float)targetHeight / sKBitmap.Height * sKBitmap.Width);
+            }
+
             float widthRatio = (float)targetWidth / sKBitmap.Width;
             float heightRatio = (float)targetHeight / sKBitmap.Height;
             float scale = maintainAspectRatio ? Math.Max(widthRatio, heightRatio) : Math.Min(widthRatio, heightRatio);
@@ -65,4 +75,5 @@ public class ImageResizer :
 
         return bitmap;
     }
+
 }
