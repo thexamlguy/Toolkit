@@ -137,24 +137,28 @@ public class ContentCropper : ContentControl
         canvas.Width = newContentWidth;
         canvas.Height = newContentHeight;
 
-        // Calculate new positions and sizes based on updated ratios
-        double newCropLeft = cropLeftRatio * newContentWidth;
-        double newCropTop = cropTopRatio * newContentHeight;
-        double newCropWidth = cropWidthRatio * newContentWidth;
-        double newCropHeight = cropHeightRatio * newContentHeight;
-
-        // Check if the crop rectangle was resized or moved, and update accordingly
-        if (border.Width != newCropWidth || border.Height != newCropHeight)
+        if (border.Width > 0 && border.Height > 0)
         {
+            double newCropLeft = cropLeftRatio * newContentWidth;
+            double newCropTop = cropTopRatio * newContentHeight;
+            double newCropWidth = cropWidthRatio * newContentWidth;
+            double newCropHeight = cropHeightRatio * newContentHeight;
+
             border.Width = newCropWidth;
             border.Height = newCropHeight;
+
             Canvas.SetLeft(border, newCropLeft);
             Canvas.SetTop(border, newCropTop);
+        }
+        else
+        {
+            InitializeCropRect();
         }
 
         PositionThumbs();
         RenderOverLays();
     }
+
 
     private void InitializeCropRect()
     {
@@ -177,6 +181,9 @@ public class ContentCropper : ContentControl
         canvas.Height = height;
 
         UpdateCropArea(width, height);
+        UpdateCropRatios();
+
+        PositionThumbs();
         RenderOverLays();
     }
 
@@ -198,7 +205,8 @@ public class ContentCropper : ContentControl
         RenderOverLays();
     }
 
-    private void OnBorderPointerPressed(object? sender, PointerPressedEventArgs args)
+    private void OnBorderPointerPressed(object? sender,
+        PointerPressedEventArgs args)
     {
         if (!isDragging && border is not null)
         {
@@ -210,13 +218,15 @@ public class ContentCropper : ContentControl
         }
     }
 
-    private void OnBorderPointerReleased(object? sender, PointerReleasedEventArgs args)
+    private void OnBorderPointerReleased(object? sender,
+        PointerReleasedEventArgs args)
     {
         isDragging = false;
         UpdateCropRatios();
     }
 
-    private void OnThumbDragDelta(object? sender, VectorEventArgs args)
+    private void OnThumbDragDelta(object? sender,
+        VectorEventArgs args)
     {
         if (canvas is null || border is null || sender is not Thumb thumb)
         {
@@ -343,7 +353,6 @@ public class ContentCropper : ContentControl
         rectangleBottom.Height = Math.Max(0, canvas.Height - bottomY);
         Canvas.SetTop(rectangleBottom, bottomY);
     }
-
     private void UpdateCropRatios()
     {
         if (canvas == null || border == null)
@@ -356,6 +365,7 @@ public class ContentCropper : ContentControl
         cropWidthRatio = border.Width / canvas.Width;
         cropHeightRatio = border.Height / canvas.Height;
     }
+
 
     private void UpdateCropArea(double width, double height)
     {
