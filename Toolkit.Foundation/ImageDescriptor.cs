@@ -1,4 +1,4 @@
 ﻿namespace Toolkit.Foundation;
 
-public record ImageDescriptor(object Image, int Width, int Height) :
+public record ImageDescriptor(object Image, double Width, double Height) :
     IImageDescriptor;

@@ -4,7 +4,7 @@ public interface IImageDescriptor
 {
     object Image { get; }
 
-    int Width { get; }
+    double Width { get; }
 
-    int Height { get; }
+    double Height { get; }
 }

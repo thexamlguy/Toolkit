@@ -7,29 +7,29 @@ public class ImageResizer :
     IImageResizer
 {
     public Bitmap Resize(Stream stream,
-        int targetWidth,
-        int targetHeight,
+        double width,
+        double height,
         bool maintainAspectRatio)
     {
         Bitmap bitmap = new(stream);
 
-        if (bitmap.Size.Width != targetWidth || bitmap.Size.Height != targetHeight)
+        if (bitmap.Size.Width != width || bitmap.Size.Height != height)
         {
             stream.Seek(0, SeekOrigin.Begin);
             using SKBitmap sKBitmap = SKBitmap.Decode(stream);
 
-            if (targetHeight == 0 && maintainAspectRatio)
+            if (height == 0 && maintainAspectRatio)
             {
-                targetHeight = (int)((float)targetWidth / sKBitmap.Width * sKBitmap.Height);
+                height = (int)((float)width / sKBitmap.Width * sKBitmap.Height);
             }
 
-            if (targetWidth == 0 && maintainAspectRatio)
+            if (width == 0 && maintainAspectRatio)
             {
-                targetWidth = (int)((float)targetHeight / sKBitmap.Height * sKBitmap.Width);
+                width = (int)((float)height / sKBitmap.Height * sKBitmap.Width);
             }
 
-            float widthRatio = (float)targetWidth / sKBitmap.Width;
-            float heightRatio = (float)targetHeight / sKBitmap.Height;
+            float widthRatio = (float)width / sKBitmap.Width;
+            float heightRatio = (float)height / sKBitmap.Height;
             float scale = maintainAspectRatio ? Math.Max(widthRatio, heightRatio) : Math.Min(widthRatio, heightRatio);
 
             int newWidth = (int)(sKBitmap.Width * scale);
@@ -50,14 +50,14 @@ public class ImageResizer :
             SKBitmap cropped;
             if (maintainAspectRatio)
             {
-                int cropX = (newWidth - targetWidth) / 2;
-                int cropY = (newHeight - targetHeight) / 2;
+                int cropX = (int)(newWidth - width) / 2;
+                int cropY = (int)(newHeight - height) / 2;
 
-                cropped = new SKBitmap(targetWidth, targetHeight);
+                cropped = new SKBitmap((int)width, (int)height);
                 using SKCanvas croppedCanvas = new(cropped);
-                SKRect cropRect = new(cropX, cropY, cropX + targetWidth, cropY + targetHeight);
+                SKRect cropRect = new(cropX, cropY, (int)(cropX + width), cropY + (int)height);
                 croppedCanvas.Clear(SKColors.Transparent);
-                croppedCanvas.DrawBitmap(resized, cropRect, new SKRect(0, 0, targetWidth, targetHeight));
+                croppedCanvas.DrawBitmap(resized, cropRect, new SKRect(0, 0, (int)width, (int)height));
             }
             else
             {
