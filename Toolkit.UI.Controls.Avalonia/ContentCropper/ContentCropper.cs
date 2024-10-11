@@ -69,6 +69,7 @@ public class ContentCropper : ContentControl
         get => GetValue(ScaleSizeProperty);
         set => SetValue(ScaleSizeProperty, value);
     }
+
     protected override void OnApplyTemplate(TemplateAppliedEventArgs args)
     {
         base.OnApplyTemplate(args);
@@ -252,8 +253,6 @@ public class ContentCropper : ContentControl
         isDragging = false;
         UpdateCropRatios();
     }
-
-
 
     private void OnThumbDragDelta(object? sender, VectorEventArgs args)
     {
