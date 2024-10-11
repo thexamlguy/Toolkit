@@ -25,6 +25,10 @@
     <Thickness x:Key="ContentCropperTopRightThumbBorderThickness">0,3,3,0</Thickness>
     <Thickness x:Key="ContentCropperBottomRightThumbBorderThickness">0,0,3,3</Thickness>
     <Thickness x:Key="ContentCropperBottomLeftThumbBorderThickness">3,0,0,3</Thickness>
+    <Thickness x:Key="ContentCropperLeftThumbBorderThickness">3,0,0,0</Thickness>
+    <Thickness x:Key="ContentCropperTopThumbBorderThickness">0,3,0,0</Thickness>
+    <Thickness x:Key="ContentCropperRightThumbBorderThickness">0,0,3,0</Thickness>
+    <Thickness x:Key="ContentCropperBottomThumbBorderThickness">0,0,0,3</Thickness>
 
     <ControlTheme x:Key="ContentCropperThumbStyle" TargetType="Thumb">
         <Setter Property="BorderBrush" Value="{DynamicResource ContentCropperInnerBorderBrush}" />
@@ -90,6 +94,34 @@
                             Height="{StaticResource ContentCropperThumbHeight}"
                             BorderThickness="{StaticResource ContentCropperBottomRightThumbBorderThickness}"
                             Cursor="BottomRightCorner"
+                            Theme="{StaticResource ContentCropperThumbStyle}" />
+                        <Thumb
+                            x:Name="LeftButton"
+                            Width="{StaticResource ContentCropperThumbWidth}"
+                            Height="{StaticResource ContentCropperThumbHeight}"
+                            BorderThickness="{StaticResource ContentCropperLeftThumbBorderThickness}"
+                            Cursor="LeftSide"
+                            Theme="{StaticResource ContentCropperThumbStyle}" />
+                        <Thumb
+                            x:Name="RightButton"
+                            Width="{StaticResource ContentCropperThumbWidth}"
+                            Height="{StaticResource ContentCropperThumbHeight}"
+                            BorderThickness="{StaticResource ContentCropperRightThumbBorderThickness}"
+                            Cursor="RightSide"
+                            Theme="{StaticResource ContentCropperThumbStyle}" />
+                        <Thumb
+                            x:Name="TopButton"
+                            Width="{StaticResource ContentCropperThumbWidth}"
+                            Height="{StaticResource ContentCropperThumbHeight}"
+                            BorderThickness="{StaticResource ContentCropperTopThumbBorderThickness}"
+                            Cursor="TopSide"
+                            Theme="{StaticResource ContentCropperThumbStyle}" />
+                        <Thumb
+                            x:Name="BottomButton"
+                            Width="{StaticResource ContentCropperThumbWidth}"
+                            Height="{StaticResource ContentCropperThumbHeight}"
+                            BorderThickness="{StaticResource ContentCropperBottomThumbBorderThickness}"
+                            Cursor="BottomSide"
                             Theme="{StaticResource ContentCropperThumbStyle}" />
                     </Canvas>
                 </Grid>

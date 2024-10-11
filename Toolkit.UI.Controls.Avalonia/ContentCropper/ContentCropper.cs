@@ -36,6 +36,10 @@ public class ContentCropper : ContentControl
     private Path? overlayPath;
     private Thumb? topLeftButton;
     private Thumb? topRightButton;
+    private Thumb? leftButton;
+    private Thumb? rightButton;
+    private Thumb? topButton;
+    private Thumb? bottomButton;
 
     static ContentCropper()
     {
@@ -96,6 +100,31 @@ public class ContentCropper : ContentControl
         {
             bottomRightButton.DragDelta += OnThumbDragDelta;
         }
+
+        leftButton = args.NameScope.Find<Thumb>("LeftButton");
+        if (leftButton is not null)
+        {
+            leftButton.DragDelta += OnThumbDragDelta;
+        }
+
+        rightButton = args.NameScope.Find<Thumb>("RightButton");
+        if (rightButton is not null)
+        {
+            rightButton.DragDelta += OnThumbDragDelta;
+        }
+
+        topButton = args.NameScope.Find<Thumb>("TopButton");
+        if (topButton is not null)
+        {
+            topButton.DragDelta += OnThumbDragDelta;
+        }
+
+        bottomButton = args.NameScope.Find<Thumb>("BottomButton");
+        if (bottomButton is not null)
+        {
+            bottomButton.DragDelta += OnThumbDragDelta;
+        }
+
     }
 
     protected override void OnLoaded(RoutedEventArgs args)
@@ -154,7 +183,6 @@ public class ContentCropper : ContentControl
         PositionThumbs();
         RenderOverLays();
     }
-
 
     private void InitializeCropRect()
     {
@@ -225,12 +253,17 @@ public class ContentCropper : ContentControl
         UpdateCropRatios();
     }
 
+
+
     private void OnThumbDragDelta(object? sender, VectorEventArgs args)
     {
         if (canvas is null || border is null || sender is not Thumb thumb)
         {
             return;
         }
+        
+        double minimumWidth = 20; 
+        double minimumHeight = 20; 
 
         double deltaX = args.Vector.X;
         double deltaY = args.Vector.Y;
@@ -240,43 +273,109 @@ public class ContentCropper : ContentControl
         double newWidth = border.Width;
         double newHeight = border.Height;
 
+        bool canResizeWidth = true;
+        bool canResizeHeight = true;
+
         switch (thumb.Name)
         {
             case "TopLeftButton":
-                newWidth = Math.Max(0, border.Width - deltaX);
-                newHeight = Math.Max(0, border.Height - deltaY);
-                if (newWidth > 0)
+                if (border.Width - deltaX < minimumWidth)
                 {
+                    canResizeWidth = false;
+                }
+
+                if (border.Height - deltaY < minimumHeight)
+                {
+                    canResizeHeight = false;
+                }
+
+                if (canResizeWidth)
+                {
+                    newWidth = border.Width - deltaX;
                     leftPosition += deltaX;
                 }
-                if (newHeight > 0)
+
+                if (canResizeHeight)
                 {
+                    newHeight = border.Height - deltaY;
                     topPosition += deltaY;
                 }
                 break;
 
             case "TopRightButton":
-                newWidth = Math.Max(0, border.Width + deltaX);
-                newHeight = Math.Max(0, border.Height - deltaY);
-                if (newHeight > 0)
+                if (border.Height - deltaY < minimumHeight)
                 {
+                    canResizeHeight = false;
+                }
+
+                newWidth = border.Width + deltaX;
+                if (canResizeHeight)
+                {
+                    newHeight = border.Height - deltaY;
                     topPosition += deltaY;
                 }
                 break;
 
             case "BottomLeftButton":
-                newWidth = Math.Max(0, border.Width - deltaX);
-                newHeight = Math.Max(0, border.Height + deltaY);
-                if (newWidth > 0)
+                if (border.Width - deltaX < minimumWidth)
                 {
+                    canResizeWidth = false;
+                }
+
+                newWidth = border.Width - deltaX;
+                if (canResizeWidth)
+                {
+                    leftPosition += deltaX;
+                }
+
+                newHeight = border.Height + deltaY;
+                break;
+
+            case "BottomRightButton":
+                newWidth = border.Width + deltaX;
+                newHeight = border.Height + deltaY;
+                break;
+
+            case "TopButton":
+                if (border.Height - deltaY < minimumHeight)
+                {
+                    canResizeHeight = false;
+                }
+
+                if (canResizeHeight)
+                {
+                    newHeight = border.Height - deltaY;
+                    topPosition += deltaY;
+                }
+                break;
+
+            case "BottomButton":
+                newHeight = border.Height + deltaY;
+                break;
+
+            case "LeftButton":
+                if (border.Width - deltaX < minimumWidth)
+                {
+                    canResizeWidth = false;
+                }
+
+                if (canResizeWidth)
+                {
+                    newWidth = border.Width - deltaX;
                     leftPosition += deltaX;
                 }
                 break;
 
-            case "BottomRightButton":
-                newWidth = Math.Max(0, border.Width + deltaX);
-                newHeight = Math.Max(0, border.Height + deltaY);
+            case "RightButton":
+                newWidth = border.Width + deltaX;
                 break;
+        }
+
+        if (leftPosition < 0 || leftPosition + newWidth > canvas.Width ||
+            topPosition < 0 || topPosition + newHeight > canvas.Height ||
+            newWidth < minimumWidth || newHeight < minimumHeight)
+        {
+            return;
         }
 
         border.Width = newWidth;
@@ -294,11 +393,7 @@ public class ContentCropper : ContentControl
 
     private void PositionThumbs()
     {
-        if (border == null ||
-            canvas == null)
-        {
-            return;
-        }
+        if (border == null || canvas == null) return;
 
         double borderLeft = Canvas.GetLeft(border);
         double borderTop = Canvas.GetTop(border);
@@ -327,6 +422,30 @@ public class ContentCropper : ContentControl
         {
             Canvas.SetLeft(bottomRightButton, borderLeft + borderWidth - bottomRightButton.Width);
             Canvas.SetTop(bottomRightButton, borderTop + borderHeight - bottomRightButton.Height);
+        }
+
+        if (leftButton is not null)
+        {
+            Canvas.SetLeft(leftButton, borderLeft);
+            Canvas.SetTop(leftButton, borderTop + borderHeight / 2 - leftButton.Height / 2);
+        }
+
+        if (rightButton is not null)
+        {
+            Canvas.SetLeft(rightButton, borderLeft + borderWidth - rightButton.Width);
+            Canvas.SetTop(rightButton, borderTop + borderHeight / 2 - rightButton.Height / 2);
+        }
+
+        if (topButton is not null)
+        {
+            Canvas.SetLeft(topButton, borderLeft + borderWidth / 2 - topButton.Width / 2);
+            Canvas.SetTop(topButton, borderTop);
+        }
+
+        if (bottomButton is not null)
+        {
+            Canvas.SetLeft(bottomButton, borderLeft + borderWidth / 2 - bottomButton.Width / 2);
+            Canvas.SetTop(bottomButton, borderTop + borderHeight - bottomButton.Height);
         }
     }
 
