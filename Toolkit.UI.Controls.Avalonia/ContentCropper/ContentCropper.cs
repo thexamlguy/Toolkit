@@ -3,7 +3,8 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia;
-using Avalonia.Controls.Shapes;
+using Avalonia.Media;
+using Path = Avalonia.Controls.Shapes.Path;
 
 namespace Toolkit.UI.Controls.Avalonia;
 
@@ -32,10 +33,7 @@ public class ContentCropper : ContentControl
     private bool isDragging;
     private double offsetX;
     private double offsetY;
-    private Rectangle? rectangleBottom;
-    private Rectangle? rectangleLeft;
-    private Rectangle? rectangleRight;
-    private Rectangle? rectangleTop;
+    private Path? overlayPath;
     private Thumb? topLeftButton;
     private Thumb? topRightButton;
 
@@ -67,16 +65,12 @@ public class ContentCropper : ContentControl
         get => GetValue(ScaleSizeProperty);
         set => SetValue(ScaleSizeProperty, value);
     }
-
     protected override void OnApplyTemplate(TemplateAppliedEventArgs args)
     {
         base.OnApplyTemplate(args);
 
         canvas = args.NameScope.Find<Canvas>("Canvas");
-        rectangleLeft = args.NameScope.Find<Rectangle>("RectangleLeft");
-        rectangleTop = args.NameScope.Find<Rectangle>("RectangleTop");
-        rectangleRight = args.NameScope.Find<Rectangle>("RectangleRight");
-        rectangleBottom = args.NameScope.Find<Rectangle>("RectangleBottom");
+        overlayPath = args.NameScope.Find<Path>("OverlayPath");
         border = args.NameScope.Find<Border>("Border");
 
         topLeftButton = args.NameScope.Find<Thumb>("TopLeftButton");
@@ -338,38 +332,30 @@ public class ContentCropper : ContentControl
 
     private void RenderOverLays()
     {
-        if (canvas == null ||
-            border == null ||
-            rectangleLeft == null ||
-            rectangleTop == null ||
-            rectangleRight == null ||
-            rectangleBottom == null)
+        if (canvas == null || border == null || overlayPath == null)
         {
             return;
         }
 
         double borderTop = Canvas.GetTop(border);
         double borderLeft = Canvas.GetLeft(border);
+        double borderWidth = border.Width;
+        double borderHeight = border.Height;
 
-        rectangleLeft.Width = Math.Max(0, borderLeft);
-        rectangleLeft.Height = Math.Max(0, border.Height);
-        Canvas.SetTop(rectangleLeft, borderTop);
+        RectangleGeometry outerRect = new(new Rect(0, 0, 
+            canvas.Width, 
+            canvas.Height));
 
-        rectangleTop.Width = Math.Max(0, canvas.Width);
-        rectangleTop.Height = Math.Max(0, borderTop - 0.5);
+        RectangleGeometry innerRect = new(new Rect(borderLeft, 
+            borderTop, 
+            borderWidth, 
+            borderHeight));
 
-        double rightX = borderLeft + border.Width;
+        CombinedGeometry punchThroughGeometry = new(GeometryCombineMode.Exclude, 
+            outerRect,
+            innerRect);
 
-        rectangleRight.Width = Math.Max(0, canvas.Width - rightX);
-        rectangleRight.Height = Math.Max(0, border.Height);
-        Canvas.SetLeft(rectangleRight, rightX);
-        Canvas.SetTop(rectangleRight, borderTop);
-
-        double bottomY = borderTop + border.Height;
-
-        rectangleBottom.Width = Math.Max(0, canvas.Width);
-        rectangleBottom.Height = Math.Max(0, canvas.Height - bottomY);
-        Canvas.SetTop(rectangleBottom, bottomY);
+        overlayPath.Data = punchThroughGeometry;
     }
 
     private void UpdateCropArea(double width, double height)

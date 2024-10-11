@@ -56,22 +56,7 @@
                             ContentTemplate="{TemplateBinding ContentTemplate}" />
                     </ZoomBorder>
                     <Canvas x:Name="Canvas">
-                        <Rectangle
-                            x:Name="RectangleLeft"
-                            Fill="{DynamicResource ContentCropperOverlayBrush}"
-                            UseLayoutRounding="True" />
-                        <Rectangle
-                            x:Name="RectangleTop"
-                            Fill="{DynamicResource ContentCropperOverlayBrush}"
-                            UseLayoutRounding="True" />
-                        <Rectangle
-                            x:Name="RectangleRight"
-                            Fill="{DynamicResource ContentCropperOverlayBrush}"
-                            UseLayoutRounding="True" />
-                        <Rectangle
-                            x:Name="RectangleBottom"
-                            Fill="{DynamicResource ContentCropperOverlayBrush}"
-                            UseLayoutRounding="True" />
+                        <Path x:Name="OverlayPath" Fill="{DynamicResource ContentCropperOverlayBrush}" />
                         <Border
                             x:Name="Border"
                             Background="Transparent"
