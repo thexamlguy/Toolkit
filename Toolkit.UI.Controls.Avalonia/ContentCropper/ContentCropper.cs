@@ -251,20 +251,32 @@ public class ContentCropper : ContentControl
             case "TopLeftButton":
                 newWidth = Math.Max(0, border.Width - deltaX);
                 newHeight = Math.Max(0, border.Height - deltaY);
-                if (newWidth > 0) leftPosition += deltaX;
-                if (newHeight > 0) topPosition += deltaY;
+                if (newWidth > 0)
+                {
+                    leftPosition += deltaX;
+                }
+                if (newHeight > 0)
+                {
+                    topPosition += deltaY;
+                }
                 break;
 
             case "TopRightButton":
                 newWidth = Math.Max(0, border.Width + deltaX);
                 newHeight = Math.Max(0, border.Height - deltaY);
-                if (newHeight > 0) topPosition += deltaY;
+                if (newHeight > 0)
+                {
+                    topPosition += deltaY;
+                }
                 break;
 
             case "BottomLeftButton":
                 newWidth = Math.Max(0, border.Width - deltaX);
                 newHeight = Math.Max(0, border.Height + deltaY);
-                if (newWidth > 0) leftPosition += deltaX;
+                if (newWidth > 0)
+                {
+                    leftPosition += deltaX;
+                }
                 break;
 
             case "BottomRightButton":
@@ -301,26 +313,26 @@ public class ContentCropper : ContentControl
 
         if (topLeftButton is not null)
         {
-            Canvas.SetLeft(topLeftButton, borderLeft - (topLeftButton.Width / 2));
-            Canvas.SetTop(topLeftButton, borderTop - (topLeftButton.Height / 2));
+            Canvas.SetLeft(topLeftButton, borderLeft);
+            Canvas.SetTop(topLeftButton, borderTop);
         }
 
         if (topRightButton is not null)
         {
-            Canvas.SetLeft(topRightButton, borderLeft + borderWidth - (topRightButton.Width / 2));
-            Canvas.SetTop(topRightButton, borderTop - (topRightButton.Height / 2));
+            Canvas.SetLeft(topRightButton, borderLeft + borderWidth - topRightButton.Width);
+            Canvas.SetTop(topRightButton, borderTop);
         }
 
         if (bottomLeftButton is not null)
         {
-            Canvas.SetLeft(bottomLeftButton, borderLeft - (bottomLeftButton.Width / 2));
-            Canvas.SetTop(bottomLeftButton, borderTop + borderHeight - (bottomLeftButton.Height / 2));
+            Canvas.SetLeft(bottomLeftButton, borderLeft);
+            Canvas.SetTop(bottomLeftButton, borderTop + borderHeight - bottomLeftButton.Height);
         }
 
         if (bottomRightButton is not null)
         {
-            Canvas.SetLeft(bottomRightButton, borderLeft + borderWidth - (bottomRightButton.Width / 2));
-            Canvas.SetTop(bottomRightButton, borderTop + borderHeight - (bottomRightButton.Height / 2));
+            Canvas.SetLeft(bottomRightButton, borderLeft + borderWidth - bottomRightButton.Width);
+            Canvas.SetTop(bottomRightButton, borderTop + borderHeight - bottomRightButton.Height);
         }
     }
 
