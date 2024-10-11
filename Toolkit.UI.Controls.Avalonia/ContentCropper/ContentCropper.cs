@@ -5,11 +5,16 @@ using Avalonia.Interactivity;
 using Avalonia;
 using Avalonia.Media;
 using Path = Avalonia.Controls.Shapes.Path;
+using Avalonia.Media.Imaging;
 
 namespace Toolkit.UI.Controls.Avalonia;
 
 public class ContentCropper : ContentControl
 {
+    public static readonly DirectProperty<ContentCropper, Bitmap?> CroppedBitmapProperty =
+        AvaloniaProperty.RegisterDirect<ContentCropper, Bitmap?>(nameof(CroppedBitmap),
+            o => o.CroppedBitmap);
+
     public static readonly StyledProperty<Rect> CropRectangleProperty =
         AvaloniaProperty.Register<ContentCropper, Rect>(nameof(CropRectangle));
 
@@ -23,29 +28,35 @@ public class ContentCropper : ContentControl
         AvaloniaProperty.Register<ContentCropper, Size>(nameof(ScaleSize), new Size(2, 1));
 
     private Border? border;
+    private Thumb? bottomButton;
     private Thumb? bottomLeftButton;
     private Thumb? bottomRightButton;
     private Canvas? canvas;
     private double cropHeightRatio;
     private double cropLeftRatio;
+    private Bitmap? croppedBitmap;
     private double cropTopRatio;
     private double cropWidthRatio;
     private bool isDragging;
+    private Thumb? leftButton;
     private double offsetX;
     private double offsetY;
     private Path? overlayPath;
-    private Thumb? topLeftButton;
-    private Thumb? topRightButton;
-    private Thumb? leftButton;
     private Thumb? rightButton;
     private Thumb? topButton;
-    private Thumb? bottomButton;
+    private Thumb? topLeftButton;
+    private Thumb? topRightButton;
 
     static ContentCropper()
     {
         AffectsRender<ContentCropper>(RectScaleProperty, ContentProperty);
     }
 
+    public Bitmap? CroppedBitmap
+    {
+        get => croppedBitmap;
+        private set => SetAndRaise(CroppedBitmapProperty, ref croppedBitmap, value);
+    }
     public Rect CropRectangle
     {
         get => GetValue(CropRectangleProperty);
@@ -139,7 +150,7 @@ public class ContentCropper : ContentControl
         base.OnPropertyChanged(change);
 
         if (change.Property == IsRatioScaleProperty ||
-            change.Property == RectScaleProperty || 
+            change.Property == RectScaleProperty ||
             change.Property == ContentProperty)
         {
             InitializeCropRect();
@@ -213,7 +224,7 @@ public class ContentCropper : ContentControl
         RenderOverLays();
     }
 
-    private void OnBorderPointerMoved(object? sender, 
+    private void OnBorderPointerMoved(object? sender,
         PointerEventArgs args)
     {
         if (!isDragging || canvas is null || border is null)
@@ -260,9 +271,9 @@ public class ContentCropper : ContentControl
         {
             return;
         }
-        
-        double minimumWidth = 20; 
-        double minimumHeight = 20; 
+
+        double minimumWidth = 20;
+        double minimumHeight = 20;
 
         double deltaX = args.Vector.X;
         double deltaY = args.Vector.Y;
@@ -460,16 +471,16 @@ public class ContentCropper : ContentControl
         double borderWidth = border.Width;
         double borderHeight = border.Height;
 
-        RectangleGeometry outerRect = new(new Rect(0, 0, 
-            canvas.Width, 
+        RectangleGeometry outerRect = new(new Rect(0, 0,
+            canvas.Width,
             canvas.Height));
 
-        RectangleGeometry innerRect = new(new Rect(borderLeft, 
-            borderTop, 
-            borderWidth, 
+        RectangleGeometry innerRect = new(new Rect(borderLeft,
+            borderTop,
+            borderWidth,
             borderHeight));
 
-        CombinedGeometry punchThroughGeometry = new(GeometryCombineMode.Exclude, 
+        CombinedGeometry punchThroughGeometry = new(GeometryCombineMode.Exclude,
             outerRect,
             innerRect);
 
@@ -518,6 +529,32 @@ public class ContentCropper : ContentControl
         border.PointerReleased += OnBorderPointerReleased;
     }
 
+    private void UpdateCroppedBitmap(Visual visual,
+        double centreX,
+        double centreY)
+    {
+        int width = (int)border.Width;
+        int height = (int)border.Height;
+
+        double x = Math.Max(centreX - width / 2, 0);
+        double y = Math.Max(centreY - height / 2, 0);
+
+        x = Math.Min(x, visual.Bounds.Width - width);
+        y = Math.Min(y, visual.Bounds.Height - height);
+
+        PixelSize pixelSize = new(width, height);
+        RenderTargetBitmap renderTarget = new(pixelSize);
+
+        using (DrawingContext drawingContext = renderTarget.CreateDrawingContext())
+        {
+            drawingContext.PushClip(new Rect(0, 0, width, height));
+            drawingContext.FillRectangle(new VisualBrush(visual), new Rect(-x, -y,
+                visual.Bounds.Width, visual.Bounds.Height));
+        }
+
+        CroppedBitmap = renderTarget;
+    }
+
     private void UpdateCropRatios()
     {
         if (canvas == null || border == null)
@@ -542,5 +579,6 @@ public class ContentCropper : ContentControl
         double top = Canvas.GetTop(border);
 
         CropRectangle = new Rect(left, top, border.Width, border.Height);
+        UpdateCroppedBitmap(canvas, border.Width, border.Height);
     }
 }
