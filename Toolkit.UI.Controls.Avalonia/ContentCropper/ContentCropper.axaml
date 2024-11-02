@@ -1,0 +1,131 @@
+<ResourceDictionary
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Toolkit.UI.Controls.Avalonia">
+    <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Light">
+
+
+            <StaticResource x:Key="ContentCropperOverlayBrush" ResourceKey="SmokeFillColorDefaultBrush" />
+            <StaticResource x:Key="ContentCropperInnerBorderBrush" ResourceKey="FocusStrokeColorOuter" />
+
+        </ResourceDictionary>
+        <ResourceDictionary x:Key="Dark">
+
+            <StaticResource x:Key="ContentCropperOuterThumbBackground" ResourceKey="ControlSolidFillColorDefaultBrush" />
+            <StaticResource x:Key="ContentCropperOverlayBrush" ResourceKey="SmokeFillColorDefaultBrush" />
+            <StaticResource x:Key="ContentCropperInnerBorderBrush" ResourceKey="FocusStrokeColorOuter" />
+        </ResourceDictionary>
+    </ResourceDictionary.ThemeDictionaries>
+
+    <x:Double x:Key="ContentCropperThumbWidth">18</x:Double>
+    <x:Double x:Key="ContentCropperThumbHeight">18</x:Double>
+
+    <Thickness x:Key="ContentCropperTopLeftThumbBorderThickness">3,3,0,0</Thickness>
+    <Thickness x:Key="ContentCropperTopRightThumbBorderThickness">0,3,3,0</Thickness>
+    <Thickness x:Key="ContentCropperBottomRightThumbBorderThickness">0,0,3,3</Thickness>
+    <Thickness x:Key="ContentCropperBottomLeftThumbBorderThickness">3,0,0,3</Thickness>
+    <Thickness x:Key="ContentCropperLeftThumbBorderThickness">3,0,0,0</Thickness>
+    <Thickness x:Key="ContentCropperTopThumbBorderThickness">0,3,0,0</Thickness>
+    <Thickness x:Key="ContentCropperRightThumbBorderThickness">0,0,3,0</Thickness>
+    <Thickness x:Key="ContentCropperBottomThumbBorderThickness">0,0,0,3</Thickness>
+
+    <ControlTheme x:Key="ContentCropperThumbStyle" TargetType="Thumb">
+        <Setter Property="BorderBrush" Value="{DynamicResource ContentCropperInnerBorderBrush}" />
+        <Setter Property="ClipToBounds" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Border
+                        Background="Transparent"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </ControlTheme>
+
+    <ControlTheme x:Key="{x:Type ContentCropper}" TargetType="ContentCropper">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid>
+                    <ZoomBorder
+                        x:Name="ZoomBorder"
+                        ClipToBounds="True"
+                        PanButton="Left">
+                        <ContentPresenter
+                            HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                            Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}" />
+                    </ZoomBorder>
+                    <Canvas x:Name="Canvas">
+                        <Path x:Name="OverlayPath" Fill="{DynamicResource ContentCropperOverlayBrush}" />
+                        <Border
+                            x:Name="Border"
+                            Background="Transparent"
+                            BorderBrush="{DynamicResource ContentCropperInnerBorderBrush}"
+                            BorderThickness="1"
+                            Cursor="SizeAll" />
+                        <Thumb
+                            x:Name="TopLeftButton"
+                            Width="{StaticResource ContentCropperThumbWidth}"
+                            Height="{StaticResource ContentCropperThumbHeight}"
+                            BorderThickness="{StaticResource ContentCropperTopLeftThumbBorderThickness}"
+                            Cursor="TopLeftCorner"
+                            Theme="{StaticResource ContentCropperThumbStyle}" />
+                        <Thumb
+                            x:Name="TopRightButton"
+                            Width="{StaticResource ContentCropperThumbWidth}"
+                            Height="{StaticResource ContentCropperThumbHeight}"
+                            BorderThickness="{StaticResource ContentCropperTopRightThumbBorderThickness}"
+                            Cursor="TopRightCorner"
+                            Theme="{StaticResource ContentCropperThumbStyle}" />
+                        <Thumb
+                            x:Name="BottomLeftButton"
+                            Width="{StaticResource ContentCropperThumbWidth}"
+                            Height="{StaticResource ContentCropperThumbHeight}"
+                            BorderThickness="{StaticResource ContentCropperBottomLeftThumbBorderThickness}"
+                            Cursor="BottomLeftCorner"
+                            Theme="{StaticResource ContentCropperThumbStyle}" />
+                        <Thumb
+                            x:Name="BottomRightButton"
+                            Width="{StaticResource ContentCropperThumbWidth}"
+                            Height="{StaticResource ContentCropperThumbHeight}"
+                            BorderThickness="{StaticResource ContentCropperBottomRightThumbBorderThickness}"
+                            Cursor="BottomRightCorner"
+                            Theme="{StaticResource ContentCropperThumbStyle}" />
+                        <Thumb
+                            x:Name="LeftButton"
+                            Width="{StaticResource ContentCropperThumbWidth}"
+                            Height="{StaticResource ContentCropperThumbHeight}"
+                            BorderThickness="{StaticResource ContentCropperLeftThumbBorderThickness}"
+                            Cursor="LeftSide"
+                            Theme="{StaticResource ContentCropperThumbStyle}" />
+                        <Thumb
+                            x:Name="RightButton"
+                            Width="{StaticResource ContentCropperThumbWidth}"
+                            Height="{StaticResource ContentCropperThumbHeight}"
+                            BorderThickness="{StaticResource ContentCropperRightThumbBorderThickness}"
+                            Cursor="RightSide"
+                            Theme="{StaticResource ContentCropperThumbStyle}" />
+                        <Thumb
+                            x:Name="TopButton"
+                            Width="{StaticResource ContentCropperThumbWidth}"
+                            Height="{StaticResource ContentCropperThumbHeight}"
+                            BorderThickness="{StaticResource ContentCropperTopThumbBorderThickness}"
+                            Cursor="TopSide"
+                            Theme="{StaticResource ContentCropperThumbStyle}" />
+                        <Thumb
+                            x:Name="BottomButton"
+                            Width="{StaticResource ContentCropperThumbWidth}"
+                            Height="{StaticResource ContentCropperThumbHeight}"
+                            BorderThickness="{StaticResource ContentCropperBottomThumbBorderThickness}"
+                            Cursor="BottomSide"
+                            Theme="{StaticResource ContentCropperThumbStyle}" />
+                    </Canvas>
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </ControlTheme>
+</ResourceDictionary>

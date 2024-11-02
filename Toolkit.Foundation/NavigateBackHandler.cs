@@ -3,20 +3,20 @@
 namespace Toolkit.Foundation;
 
 public class NavigateBackHandler(IComponentScopeProvider provider) :
-    INotificationHandler<NavigateBack>
+    INotificationHandler<NavigateBackEventArgs>
 {
-    public async Task Handle(NavigateBack args,
-        CancellationToken cancellationToken)
+    public Task Handle(NavigateBackEventArgs args)
     {
-        if (provider.Get(args.Scope ?? "Default")
-            is IServiceProvider scope)
+        if (provider.Get(args.Scope ?? "Root")
+            is ComponentScopeDescriptor descriptor)
         {
-            if (scope.GetService<INavigationScope>() is INavigationScope navigationScope)
+            if (descriptor?.Services?.GetService<INavigation>() is
+                INavigation navigationScope)
             {
-                await navigationScope.NavigateBackAsync(args.Context, cancellationToken);
+                navigationScope.Back(args.Context);
             }
         }
+
+        return Task.CompletedTask;
     }
 }
-
-

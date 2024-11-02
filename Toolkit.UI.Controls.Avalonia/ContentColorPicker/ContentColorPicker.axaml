@@ -1,0 +1,49 @@
+<ResourceDictionary
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Toolkit.UI.Controls.Avalonia">
+    <ControlTheme x:Key="{x:Type ContentColorPicker}" TargetType="ContentColorPicker">
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Stretch" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="VerticalAlignment" Value="Top" />
+        <Setter Property="ClipToBounds" Value="False" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border
+                    Padding="{TemplateBinding Padding}"
+                    Background="{TemplateBinding Background}"
+                    BackgroundSizing="{TemplateBinding BackgroundSizing}"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    CornerRadius="{TemplateBinding CornerRadius}">
+                    <Grid>
+                        <ZoomBorder
+                            x:Name="ZoomBorder"
+                            ClipToBounds="True"
+                            PanButton="Left">
+                            <ContentPresenter
+                                HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                Content="{TemplateBinding Content}"
+                                ContentTemplate="{TemplateBinding ContentTemplate}" />
+                        </ZoomBorder>
+                        <Canvas
+                            x:Name="Canvas"
+                            Width="{TemplateBinding Width}"
+                            Height="{TemplateBinding Height}"
+                            ClipToBounds="False">
+                            <Border
+                                x:Name="PeekBorder"
+                                Width="100"
+                                Height="100"
+                                Background="Pink"
+                                ClipToBounds="False"
+                                IsVisible="False" />
+                        </Canvas>
+                    </Grid>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </ControlTheme>
+</ResourceDictionary>

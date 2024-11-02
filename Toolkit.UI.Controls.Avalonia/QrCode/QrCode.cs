@@ -1,7 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Controls;
@@ -10,6 +6,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Gma.QrCodeNet.Encoding;
+using System.Collections;
 
 namespace Toolkit.UI.Controls.Avalonia;
 
@@ -20,41 +17,48 @@ namespace Toolkit.UI.Controls.Avalonia;
 public class QrCode : Control
 {
     #region Properties
+
     /// <summary>
     /// Property for the Background brush (i.e. the area that has no data)
     /// </summary>
     public static readonly StyledProperty<IBrush?> BackgroundProperty = Border.BackgroundProperty.AddOwner<QrCode>();
+
     /// <summary>
     /// Property for the Foreground brush (i.e. the actual data)
     /// </summary>
     public static readonly StyledProperty<IBrush?> ForegroundProperty = TextElement.ForegroundProperty.AddOwner<TemplatedControl>();
+
     /// <summary>
     /// Property indicating how rounded the corners will be
     /// </summary>
     public static readonly StyledProperty<CornerRadius> CornerRadiusProperty = Border.CornerRadiusProperty.AddOwner<QrCode>();
+
     /// <summary>
     /// Property indicating the Quiet Zone (distance between the edge of the control and where the data actually starts)
-    /// 
+    ///
     /// Note: The Quiet Zone (aka Padding) is defined in the QC Code standard (ISO 18004) as the width of 4 modules on all
     /// sides, but is implemented separately in this control.  Official support may wish to remove this property as adjusting
     /// it will technically make the generated QRCodes "non-standard".  This implementation does not currently concern itself
     /// with this as the code itself it not meant for public consumption.
     /// </summary>
     public static readonly StyledProperty<Thickness> PaddingProperty = Decorator.PaddingProperty.AddOwner<QrCode>();
+
     /// <summary>
     /// Property indicating whether the Quiet Zone of 4 modules should be added to the QR Code as additional padding.  Default: True
     ///
     /// Note: Disabling the Quiet Zone makes the generated QRCodes "non-standard" according to the ISO 18004 standard.
     /// The padding created by the Quiet Zone depends on the module size and therefore on the amount of data. This can be
-    /// disabled and a fixed <see cref="Padding"/> can be set instead to have more control over the layout. 
+    /// disabled and a fixed <see cref="Padding"/> can be set instead to have more control over the layout.
     /// </summary>
     public static readonly StyledProperty<bool> IsQuietZoneEnabledProperty = AvaloniaProperty.Register<QrCode, bool>(nameof(IsQuietZoneEnabled), true);
+
     /// <summary>
     /// Property indicating the Error Correction Code of the generated data.  Default: Medium
     ///
     /// Note: See <see cref="EccLevel" /> for the specific definitions of each value.
     /// </summary>
     public static readonly StyledProperty<EccLevel> ErrorCorrectionProperty = AvaloniaProperty.Register<QrCode, EccLevel>(nameof(ErrorCorrection), EccLevel.Medium);
+
     /// <summary>
     /// Property for the data represented in the QRCode
     /// </summary>
@@ -66,52 +70,61 @@ public class QrCode : Control
         get => GetValue(BackgroundProperty) ?? Brushes.White;
         set => SetValue(BackgroundProperty, value);
     }
+
     /// <inheritdoc cref="ForegroundProperty" />
     public IBrush Foreground
     {
         get => GetValue(ForegroundProperty) ?? Brushes.Black;
         set => SetValue(ForegroundProperty, value);
     }
+
     /// <inheritdoc cref="CornerRadiusProperty" />
     public CornerRadius CornerRadius
     {
         get => GetValue(CornerRadiusProperty);
         set => SetValue(CornerRadiusProperty, value);
     }
+
     /// <inheritdoc cref="PaddingProperty" />
     public Thickness Padding
     {
         get => GetValue(PaddingProperty);
         set => SetValue(PaddingProperty, value);
     }
+
     /// <inheritdoc cref="IsQuietZoneEnabledProperty" />
     public bool IsQuietZoneEnabled
     {
         get => GetValue(IsQuietZoneEnabledProperty);
         set => SetValue(IsQuietZoneEnabledProperty, value);
     }
+
     /// <inheritdoc cref="ErrorCorrectionProperty" />
     public EccLevel ErrorCorrection
     {
         get => GetValue(ErrorCorrectionProperty);
         set => SetValue(ErrorCorrectionProperty, value);
     }
+
     /// <inheritdoc cref="DataProperty" />
     public string? Data
     {
         get => GetValue(DataProperty);
         set => SetValue(DataProperty, value);
     }
-    #endregion
+
+    #endregion Properties
 
     /// <summary>
-    /// Engine to actually calculate the bit matrix of the QRCode.  Currently a Nuget package, but official support may wish to implement and remove such dependency 
+    /// Engine to actually calculate the bit matrix of the QRCode.  Currently a Nuget package, but official support may wish to implement and remove such dependency
     /// </summary>
     private static readonly QrEncoder QrCodeGenerator = new();
+
     /// <summary>
     /// A cache of currently set bits in the bit matrix.  This is used to potentially speed up processing.
     /// </summary>
     private readonly Hashtable _setBitsTable = new();
+
     /// <summary>
     /// A cache of the last encoded QRCode.  This is used to reuse the last generated data whenever a style property like Width, Height or Padding was changed.
     /// </summary>
@@ -119,6 +132,7 @@ public class QrCode : Control
 
     // QRCode specs mandate a standard 4-symbol-sized space on each side of the data.  We support custom Padding and will ignore this zone when processing
     private int QuietZoneCount => IsQuietZoneEnabled ? 4 : 0;
+
     private int QuietMargin => QuietZoneCount * 2;
 
     /// <summary>
@@ -170,7 +184,7 @@ public class QrCode : Control
         {
             // Error Correction change requires the data to be reprocessed to recalculate the new bit matrix.  This is unavoidable.
             case nameof(ErrorCorrection):
-            // A change in data obviously indicates the need to update the bit matrix    
+            // A change in data obviously indicates the need to update the bit matrix
             case nameof(Data):
                 _encodedQrCode = null;
                 break;
@@ -213,7 +227,6 @@ public class QrCode : Control
 
                         _oldQrCodeGeometry = null;
                         InvalidateVisual();
-
                     });
                 }
 
@@ -694,7 +707,6 @@ public class QrCode : Control
             // Render background over the foreground as the geometry has "cut outs" that allow the foreground to show through
             context.DrawGeometry(Background, null, newGeometry);
         }
-
     }
 
     /// <summary>
@@ -706,14 +718,17 @@ public class QrCode : Control
         /// The lowest level of error correction where up to ~7% of data can be be recovered if lost and uses the least amount of symbols to represent the data
         /// </summary>
         Lowest,
+
         /// <summary>
         /// The standard level of error correction where up to ~15% of data can be be recovered if lost and represents a good compromise between a small size and reliability
         /// </summary>
         Medium,
+
         /// <summary>
         /// A high readability level of error correction where up to ~25% of data can be be recovered if lost but requires a larger footprint to represent the data
         /// </summary>
         Quality,
+
         /// <summary>
         /// The maximum level of error correction where up to ~30% of data can be be recovered if lost and represents the maximum achievable reliability
         /// </summary>
@@ -722,7 +737,7 @@ public class QrCode : Control
 
     /// <summary>
     /// Converts from our EccLevel to the one used by whichever algorithm being used.
-    /// This exists as an abstraction layer for if/when the package or namespace of the actual QR Generator changes so that breaking changes are not introduced  
+    /// This exists as an abstraction layer for if/when the package or namespace of the actual QR Generator changes so that breaking changes are not introduced
     /// </summary>
     /// <param name="eccLevel">The selected ECC Level to convert</param>
     /// <returns>The appropriate ECC Level type used by the generator</returns>

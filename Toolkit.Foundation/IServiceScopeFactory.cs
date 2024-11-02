@@ -1,6 +1,8 @@
-﻿namespace Toolkit.Foundation;
+﻿using Microsoft.Extensions.DependencyInjection;
 
-public interface IServiceScopeFactory<TService>
+namespace Toolkit.Foundation;
+
+public interface IScopeServiceFactory<TService>
 {
-    TService? Create(params object?[] parameters);
+    (IServiceScope, TService) Create(params object?[] parameters);
 }

@@ -1,7 +1,11 @@
-﻿namespace Toolkit.Foundation;
+﻿using Microsoft.Extensions.DependencyInjection;
 
-public class ConfigurationMonitor<TConfiguration>(IConfigurationFile<TConfiguration> file,
-    IConfigurationReader<TConfiguration> reader,
+namespace Toolkit.Foundation;
+
+public class ConfigurationMonitor<TConfiguration>(string section,
+    IConfigurationCache cache,
+    IConfigurationFile<TConfiguration> file, 
+    IServiceProvider serviceProvider,
     IPublisher publisher) :
     IConfigurationMonitor<TConfiguration>
     where TConfiguration :
@@ -11,12 +15,14 @@ public class ConfigurationMonitor<TConfiguration>(IConfigurationFile<TConfigurat
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        async void ChangedHandler(object sender,
+        void ChangedHandler(object sender,
             FileSystemEventArgs args)
         {
-            if (reader.Read() is { } configuration)
+            if (serviceProvider.GetRequiredKeyedService<IConfigurationDescriptor<TConfiguration>>(section) is 
+                IConfigurationDescriptor<TConfiguration> configuration)
             {
-                await publisher.PublishUI(new Changed<TConfiguration>(configuration));
+                cache.Remove(section);
+                publisher.PublishUI(new ChangedEventArgs<TConfiguration>(configuration.Value));
             }
         }
 

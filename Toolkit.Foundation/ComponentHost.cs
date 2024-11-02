@@ -3,26 +3,34 @@ using Microsoft.Extensions.Hosting;
 
 namespace Toolkit.Foundation;
 
-public sealed class ComponentHost(IServiceProvider services,
-    IEnumerable<IInitializer> initializers,
+public class ComponentHost(IServiceProvider services,
+    IEnumerable<IInitialization> initializations,
+    IEnumerable<IAsyncInitialization> asyncInitializations,
     IEnumerable<IHostedService> hostedServices) :
     IComponentHost
 {
     public IServiceProvider Services => services;
 
-    public ComponentConfiguration? Configuration =>
-        Services.GetService<ComponentConfiguration>();
-
     public void Dispose()
     {
+    }
 
+    public TConfiguration? GetConfiguration<TConfiguration>()
+        where TConfiguration : class
+    {
+        return Services.GetService<TConfiguration>();
     }
 
     public async Task StartAsync(CancellationToken cancellationToken = default)
     {
-        foreach (IInitializer initializer in initializers)
+        foreach (IInitialization initialization in initializations)
         {
-            await initializer.Initialize();
+            initialization.Initialize();
+        }
+
+        foreach (IAsyncInitialization initialization in asyncInitializations)
+        {
+            await initialization.Initialize();
         }
 
         foreach (IHostedService service in hostedServices)

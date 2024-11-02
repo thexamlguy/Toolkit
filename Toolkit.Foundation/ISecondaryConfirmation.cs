@@ -2,5 +2,5 @@
 
 public interface ISecondaryConfirmation
 {
-    Task<bool> Confirm();
+    Task<bool> ConfirmSecondary();
 }

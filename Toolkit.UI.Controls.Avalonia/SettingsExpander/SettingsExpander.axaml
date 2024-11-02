@@ -1,11 +1,123 @@
-<ResourceDictionary
+﻿<ResourceDictionary
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="using:Toolkit.UI.Controls.Avalonia"
     xmlns:ui="using:FluentAvalonia.UI.Controls">
-    <Design.PreviewWith>
-        <Border Padding="20" />
-    </Design.PreviewWith>
+    <Thickness x:Key="SettingsExpanderItemBottomFooterMargin">0,4,0,0</Thickness>
+    <ControlTheme x:Key="SettingsExpanderToggleButtonStyle" TargetType="controls:SettingsExpanderToggleButton">
+        <Setter Property="Background" Value="{DynamicResource ExpanderHeaderBackground}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ExpanderHeaderBorderBrush}" />
+        <Setter Property="BorderThickness" Value="{DynamicResource ExpanderHeaderBorderThickness}" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
+        <Setter Property="BackgroundSizing" Value="InnerBorderEdge" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border
+                    Name="Root"
+                    Padding="{TemplateBinding Padding}"
+                    Background="{TemplateBinding Background}"
+                    BackgroundSizing="{TemplateBinding BackgroundSizing}"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    CornerRadius="{TemplateBinding CornerRadius}">
+                    <Border.Transitions>
+                        <Transitions>
+                            <BrushTransition Property="Background" Duration="00:00:00.083" />
+                            <BrushTransition Property="BorderBrush" Duration="00:00:00.083" />
+                        </Transitions>
+                    </Border.Transitions>
+                    <Grid ColumnDefinitions="*,Auto">
+                        <ContentPresenter Content="{TemplateBinding Content}" />
+                        <ui:SymbolIcon
+                            Name="ExpandCollapseChevron"
+                            Grid.Column="1"
+                            Margin="{DynamicResource SettingsExpanderExpandCollapseChevronMargin}"
+                            FontSize="18"
+                            Foreground="{DynamicResource ExpanderChevronForeground}"
+                            IsVisible="{TemplateBinding IsToggleable}"
+                            RenderTransform="none"
+                            Symbol="ChevronDown" />
+                    </Grid>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+
+        <Style Selector="^:allowClick">
+            <Style Selector="^:pointerover /template/ Border#Root">
+                <Setter Property="Background" Value="{DynamicResource ControlFillColorSecondaryBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource ControlStrokeColorDefaultBrush}" />
+            </Style>
+            <Style Selector="^:pressed /template/ Border#Root">
+                <Setter Property="Background" Value="{DynamicResource ControlFillColorTertiaryBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource ControlStrokeColorDefaultBrush}" />
+                <Setter Property="TextElement.Foreground" Value="{DynamicResource TextFillColorSecondaryBrush}" />
+            </Style>
+        </Style>
+
+        <Style Selector="^:disabled /template/ Border#Root">
+            <Setter Property="Background" Value="{DynamicResource ControlFillColorDisabledBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource ControlStrokeColorDefaultBrush}" />
+            <Setter Property="TextElement.Foreground" Value="{DynamicResource TextFillColorDisabledBrush}" />
+        </Style>
+
+        <Style Selector="^:checked">
+            <Style Selector="^ /template/ ui|SymbolIcon#ExpandCollapseChevron">
+                <Setter Property="RenderTransform" Value="rotate(180deg)" />
+            </Style>
+            <Style Selector="^:not(:empty) /template/ Border#Root">
+                <Setter Property="CornerRadius" Value="{Binding Source={StaticResource ControlCornerRadius}, Converter={StaticResource TopCornerRadiusFilterConverter}}" />
+            </Style>
+        </Style>
+    </ControlTheme>
+
+    <ControlTheme x:Key="SettingsExpanderExpanderStyle" TargetType="Expander">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="MinWidth" Value="0" />
+        <Setter Property="MinHeight" Value="{DynamicResource SettingsExpanderMinHeight}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ExpanderContentBorderBrush}" />
+        <Setter Property="BorderThickness" Value="{DynamicResource ExpanderContentDownBorderThickness}" />
+        <Setter Property="CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <StackPanel>
+                    <controls:SettingsExpanderToggleButton
+                        Name="ToggleButton"
+                        MinHeight="{TemplateBinding MinHeight}"
+                        Content="{TemplateBinding Header}"
+                        IsChecked="{TemplateBinding IsExpanded,
+                                                    Mode=TwoWay}"
+                        IsEnabled="{TemplateBinding IsEnabled}"
+                        IsToggleable="{TemplateBinding Tag}"
+                        Theme="{StaticResource SettingsExpanderToggleButtonStyle}" />
+                    <Border
+                        Name="ExpanderContent"
+                        Background="{TemplateBinding Background}"
+                        BackgroundSizing="InnerBorderEdge"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius,
+                                                       Converter={StaticResource BottomCornerRadiusFilterConverter}}"
+                        IsVisible="False">
+                        <ContentPresenter
+                            Name="PART_ContentPresenter"
+                            Margin="{TemplateBinding Padding}"
+                            HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                            Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            IsVisible="{TemplateBinding IsExpanded}" />
+                    </Border>
+                </StackPanel>
+            </ControlTemplate>
+        </Setter>
+        <Style Selector="^:expanded /template/ Border#ExpanderContent">
+            <Setter Property="IsVisible" Value="True" />
+        </Style>
+    </ControlTheme>
+
     <ControlTheme x:Key="{x:Type controls:SettingsExpander}" TargetType="controls:SettingsExpander">
         <Setter Property="Background" Value="{DynamicResource ExpanderBackground}" />
         <Setter Property="BorderBrush" Value="{DynamicResource ExpanderHeaderBorderBrush}" />
@@ -24,29 +136,197 @@
                     Name="Expander"
                     IsExpanded="{TemplateBinding IsExpanded,
                                                  Mode=TwoWay}"
+                    Tag="{TemplateBinding IsExpandable}"
                     Theme="{StaticResource SettingsExpanderExpanderStyle}">
                     <Expander.Header>
                         <controls:SettingsExpanderItem
                             Name="ContentHost"
                             Padding="{DynamicResource SettingsExpanderPadding}"
+                            Action="{TemplateBinding Action}"
                             ActionIconSource="{TemplateBinding ActionIconSource}"
+                            ActionTemplate="{TemplateBinding ActionTemplate}"
                             Background="Transparent"
                             Content="{TemplateBinding Header}"
                             ContentTemplate="{TemplateBinding HeaderTemplate}"
                             Description="{TemplateBinding Description}"
                             Footer="{TemplateBinding Footer}"
                             FooterTemplate="{TemplateBinding FooterTemplate}"
+                            Icon="{TemplateBinding Icon}"
                             IconSource="{TemplateBinding IconSource}"
+                            IconTemplate="{TemplateBinding IconTemplate}"
                             IsClickEnabled="{TemplateBinding IsClickEnabled}" />
                     </Expander.Header>
-
                     <ItemsPresenter ItemsPanel="{TemplateBinding ItemsPanel}" />
                 </Expander>
+            </ControlTemplate>
+        </Setter>
+        <Style Selector="^:empty /template/ ItemsPresenter#ItemsHost">
+            <Setter Property="IsVisible" Value="False" />
+        </Style>
+    </ControlTheme>
+
+    <ControlTheme x:Key="{x:Type controls:SettingsExpanderItem}" TargetType="controls:SettingsExpanderItem">
+        <Setter Property="Background" Value="{DynamicResource ExpanderHeaderBackground}" />
+        <Setter Property="Padding" Value="{DynamicResource SettingsExpanderItemPadding}" />
+        <Setter Property="MinHeight" Value="{DynamicResource SettingsExpanderItemMinHeight}" />
+        <Setter Property="BackgroundSizing" Value="InnerBorderEdge" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border
+                    Name="Root"
+                    Padding="{TemplateBinding Padding}"
+                    Background="{TemplateBinding Background}"
+                    BackgroundSizing="{TemplateBinding BackgroundSizing}"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}">
+                    <Border.Transitions>
+                        <Transitions>
+                            <BrushTransition Property="Background" Duration="00:00:00.083" />
+                            <BrushTransition Property="BorderBrush" Duration="00:00:00.083" />
+                        </Transitions>
+                    </Border.Transitions>
+                    <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+                        <ContentPresenter
+                            Name="IconPresenter"
+                            Grid.Column="0"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch"
+                            Content="{TemplateBinding Icon}"
+                            ContentTemplate="{TemplateBinding IconTemplate}" />
+                        <Viewbox
+                            Name="IconHost"
+                            Grid.Column="0"
+                            Width="{DynamicResource SettingsExpanderItemIconSize}"
+                            Height="{DynamicResource SettingsExpanderItemIconSize}"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            IsVisible="False">
+                            <ContentPresenter Content="{Binding TemplateSettings.Icon, RelativeSource={RelativeSource TemplatedParent}}" />
+                        </Viewbox>
+                        <Grid
+                            Grid.Column="1"
+                            VerticalAlignment="Center"
+                            ColumnDefinitions="*,Auto"
+                            RowDefinitions="Auto,Auto">
+                            <StackPanel
+                                Name="HeaderRegion"
+                                Grid.Row="0"
+                                Grid.Column="0"
+                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                VerticalAlignment="Center">
+                                <ContentPresenter
+                                    Name="ContentPresenter"
+                                    Content="{TemplateBinding Content}"
+                                    ContentTemplate="{TemplateBinding ContentTemplate}"
+                                    IsVisible="False" />
+                                <TextBlock
+                                    Name="DescriptionText"
+                                    Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                    IsVisible="False"
+                                    Text="{TemplateBinding Description}"
+                                    TextWrapping="Wrap"
+                                    Theme="{StaticResource CaptionTextBlockStyle}" />
+                            </StackPanel>
+                            <ContentPresenter
+                                Name="FooterPresenter"
+                                Grid.Row="0"
+                                Grid.Column="1"
+                                Margin="{DynamicResource SettingsExpanderItemFooterMargin}"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Center"
+                                Content="{TemplateBinding Footer}"
+                                ContentTemplate="{TemplateBinding FooterTemplate}"
+                                IsVisible="False" />
+                        </Grid>
+                        <ContentPresenter
+                            Name="ActionPresenter"
+                            Grid.Column="2"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch"
+                            Content="{TemplateBinding Action}"
+                            ContentTemplate="{TemplateBinding ActionTemplate}" />
+                        <Viewbox
+                            Name="ActionIconHost"
+                            Grid.Column="3"
+                            Width="{DynamicResource SettingsExpanderItemActionIconSize}"
+                            Height="{DynamicResource SettingsExpanderItemActionIconSize}"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch"
+                            IsVisible="False">
+                            <ContentPresenter Name="ExpandChevronActionIconContainer" Content="{Binding TemplateSettings.ActionIcon, RelativeSource={RelativeSource TemplatedParent}}" />
+                        </Viewbox>
+                    </Grid>
+                </Border>
             </ControlTemplate>
         </Setter>
 
         <Style Selector="^:empty /template/ ItemsPresenter#ItemsHost">
             <Setter Property="IsVisible" Value="False" />
+        </Style>
+
+        <Style Selector="^:nth-last-child(1) /template/ Border#Root">
+            <Setter Property="CornerRadius" Value="{Binding Source={StaticResource ControlCornerRadius}, Converter={StaticResource BottomCornerRadiusFilterConverter}}" />
+        </Style>
+
+        <Style Selector="^:footer /template/ StackPanel#HeaderRegion">
+            <Setter Property="Grid.RowSpan" Value="1" />
+        </Style>
+
+        <Style Selector="^:footer /template/ ContentPresenter#FooterPresenter">
+            <Setter Property="IsVisible" Value="True" />
+        </Style>
+
+        <Style Selector="^:footerBottom">
+            <Style Selector="^ /template/ ContentPresenter#FooterPresenter">
+                <Setter Property="Grid.Row" Value="1" />
+                <Setter Property="Grid.Column" Value="0" />
+                <Setter Property="HorizontalAlignment" Value="Stretch" />
+                <Setter Property="VerticalAlignment" Value="Top" />
+                <Setter Property="Margin" Value="{DynamicResource SettingsExpanderItemBottomFooterMargin}" />
+            </Style>
+        </Style>
+
+        <Style Selector="^:actionIcon /template/ Viewbox#ActionIconHost">
+            <Setter Property="IsVisible" Value="True" />
+        </Style>
+
+        <Style Selector="^:content /template/ ContentPresenter#ContentPresenter">
+            <Setter Property="IsVisible" Value="True" />
+        </Style>
+
+        <Style Selector="^:description /template/ TextBlock#DescriptionText">
+            <Setter Property="IsVisible" Value="True" />
+        </Style>
+
+        <Style Selector="^:icon">
+            <Style Selector="^ /template/ ContentPresenter#IconPresenter">
+                <Setter Property="IsVisible" Value="True" />
+            </Style>
+        </Style>
+        <Style Selector="^:iconPlaceholder" />
+
+        <Style Selector="^:allowClick">
+            <Style Selector="^:pointerover /template/ Border#Root">
+                <Setter Property="Background" Value="{DynamicResource ControlFillColorSecondaryBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource ControlFillColorSecondaryBrush}" />
+            </Style>
+            <Style Selector="^:pressed /template/ Border#Root">
+                <Setter Property="Background" Value="{DynamicResource ControlFillColorTertiaryBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource ControlStrokeColorDefaultBrush}" />
+                <Setter Property="TextElement.Foreground" Value="{DynamicResource TextFillColorSecondaryBrush}" />
+            </Style>
+        </Style>
+
+        <Style Selector="^:disabled">
+            <Style Selector="^ /template/ Border#Root">
+                <Setter Property="Background" Value="{DynamicResource ControlFillColorDisabledBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource ControlStrokeColorDefaultBrush}" />
+                <Setter Property="TextElement.Foreground" Value="{DynamicResource TextFillColorDisabledBrush}" />
+            </Style>
+
+            <Style Selector="^ /template/ TextBlock#DescriptionText">
+                <Setter Property="TextElement.Foreground" Value="{DynamicResource TextFillColorDisabledBrush}" />
+            </Style>
         </Style>
     </ControlTheme>
 </ResourceDictionary>

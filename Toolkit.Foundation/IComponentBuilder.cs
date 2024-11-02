@@ -4,10 +4,21 @@ namespace Toolkit.Foundation;
 
 public interface IComponentBuilder
 {
-    IComponentBuilder AddConfiguration<TConfiguration>(Action<TConfiguration> configurationDelegate)
-        where TConfiguration : ComponentConfiguration, new();
+    string ConfigurationFile { get; set; }
 
-    IComponentHost Build();
+    string ContentRoot { get; set; }
+
+    IComponentBuilder AddConfiguration<TConfiguration>(Action<TConfiguration> configurationDelegate)
+        where TConfiguration : class, new();
+
+    IComponentBuilder AddConfiguration<TConfiguration>(string section,
+        TConfiguration? configuration = null)
+        where TConfiguration : class, new();
+
+    IComponentBuilder AddConfiguration<TConfiguration>(string section)
+        where TConfiguration : class, new();
 
     IComponentBuilder AddServices(Action<IServiceCollection> configureDelegate);
+
+    IComponentHost Build();
 }

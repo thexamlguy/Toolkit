@@ -78,7 +78,7 @@ public class CarouselView :
             indicatorVisual = ElementComposition.GetElementVisual(indicator);
             touchAreaVisual = ElementComposition.GetElementVisual(container);
             if (touchAreaVisual is not null)
-            {            
+            {
                 compositor = touchAreaVisual.Compositor;
             }
 
@@ -136,7 +136,7 @@ public class CarouselView :
 
     protected override void OnPointerReleased(PointerReleasedEventArgs args)
     {
-        if (isPressed && container is not null 
+        if (isPressed && container is not null
             && items is not null
             && indicatorVisual is not null)
         {
@@ -167,12 +167,12 @@ public class CarouselView :
     }
 
     private void ArrangeItems(int newIndex,
-        int oldIndex = -1, 
+        int oldIndex = -1,
         bool isAnimating = false)
     {
-        if (compositor is not null 
-            && container is not null 
-            && items is not null 
+        if (compositor is not null
+            && container is not null
+            && items is not null
             && indicatorVisual is not null)
         {
             double containerHeight = Bounds.Height;
@@ -237,15 +237,14 @@ public class CarouselView :
 
                 scopedBatch.Completed += () =>
                 {
-                    this.isAnimating = false;                    
+                    this.isAnimating = false;
                     for (int i = 0; i < columnCount; i++)
                     {
                         itemVisuals[(newIndex + i - 2 + columnCount) % columnCount].Offset =
                             new Vector3((float)(offsets[i] - centreOffset), 0, 0);
-
                     }
                 };
-                
+
                 indicatorVisual.StartAnimation("Offset", indicatorAnimation);
                 scopedBatch.Start(animationDuration);
 
@@ -253,6 +252,7 @@ public class CarouselView :
             }
         }
     }
+
     private void OnCollectionChanged(object? sender,
         NotifyCollectionChangedEventArgs args) => ArrangeItems(newIndex);
 

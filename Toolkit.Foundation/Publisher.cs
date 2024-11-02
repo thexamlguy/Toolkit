@@ -3,43 +3,42 @@ using System.Reflection;
 
 namespace Toolkit.Foundation;
 
-public class Publisher(ISubscriptionManager subscriptionManager,
-    IServiceProvider provider,
-    IDispatcher dispatcher) : 
+public class Publisher(IHandlerProvider handlerProvider,
+    IServiceFactory serviceFactory,
+    IServiceProvider serviceProvider,
+    IDispatcher dispatcher) :
     IPublisher
 {
-    public Task Publish<TNotification>(object key,
-        CancellationToken cancellationToken = default)
-        where TNotification :
-        INotification,
-        new() => Publish(new TNotification(), async args => await args(),
-                key, cancellationToken);
+    public void Publish<TMessage>(object? key = null)
+        where TMessage : new() =>
+            Publish(serviceFactory.Create<TMessage>() ?? new TMessage(), async args => await args(), key);
 
-    public Task Publish<TNotification>(TNotification notification,
-        CancellationToken cancellationToken = default)
-        where TNotification :
-        INotification => Publish(notification, async args => await args(),
-                null, cancellationToken);
+    public void Publish<TMessage>(TMessage message)
+        where TMessage : notnull =>
+            Publish(message, async args => await args(), null);
 
-    public Task Publish<TNotification>(TNotification notification,
-        object key,
-        CancellationToken cancellationToken = default)
-        where TNotification :
-        INotification => Publish(notification, 
-            async args => await args(), key, cancellationToken);
+    public void Publish<TMessage>(TMessage message,
+        object? key = null)
+        where TMessage : notnull =>
+            Publish(message, async args => await args(), key);
 
-    public async Task Publish(object notification,
+    public void Publish(object message,
         Func<Func<Task>, Task> marshal,
-        object? key = null,
-        CancellationToken cancellationToken = default)
+        object? key = null)
     {
-        Type notificationType = notification.GetType();
+        Type notificationType = message.GetType();
+        Type handlerType = typeof(NotificationHandlerWrapper<>)
+            .MakeGenericType(notificationType);
 
-        List<object?> handlers = provider.GetServices(typeof(NotificationHandlerWrapper<>)
-            .MakeGenericType(notificationType)).ToList();
+        key = $"{(key is not null ? $"{key}:" : "")}{notificationType}";
 
-        foreach (object? handler in subscriptionManager
-            .GetHandlers(notificationType, key!))
+        List<object?> handlers = [];
+        foreach (object? handler in handlerProvider.Get(key))
+        {
+            handlers.Add(handler);
+        }
+
+        foreach (object? handler in serviceProvider.GetKeyedServices(handlerType, key))
         {
             handlers.Add(handler);
         }
@@ -48,59 +47,42 @@ public class Publisher(ISubscriptionManager subscriptionManager,
         {
             if (handler is not null)
             {
-                Type? handlerType = handler.GetType();
-                MethodInfo? handleMethod = handlerType.GetMethod("Handle",
-                    [notificationType, typeof(CancellationToken)]);
+                MethodInfo? handleMethod = handler.GetType().GetMethod("Handle",
+                    [notificationType]);
 
                 if (handleMethod is not null)
                 {
-                    await marshal(() => (Task)handleMethod.Invoke(handler, new object[]
-                        { notification, cancellationToken })!);
+                    marshal(() => (Task)handleMethod.Invoke(handler, new object[]
+                        { message })!);
                 }
             }
         }
     }
 
-    public Task Publish(object notification,
-        CancellationToken cancellationToken = default) => Publish(notification,
-            async args => await args(),
-                null, cancellationToken);
+    public void Publish(object message) => Publish(message,
+            async args => await args(), null);
 
-    public Task Publish<TNotification>(CancellationToken cancellationToken = default) 
-        where TNotification : 
-        INotification, new() => Publish(new TNotification(),
-            async args => await args(),
-                null, cancellationToken);
+    public void Publish<TMessage>()
+        where TMessage : new() =>
+            Publish(new TMessage(), async args => await args(), null);
 
-    public Task PublishUI<TNotification>(object key,
-        CancellationToken cancellationToken = default)
-        where TNotification :
-        INotification, new() => Publish(new TNotification(), 
-            args =>  dispatcher.InvokeAsync(async () => await args()),
-                key, cancellationToken);
+    public void PublishUI<TMessage>(object? key = null)
+        where TMessage : new() =>
+            Publish(new TMessage(), args => dispatcher.Invoke(async () => await args()), key);
 
-    public Task PublishUI<TNotification>(TNotification notification,
-        CancellationToken cancellationToken = default)
-        where TNotification :
-        INotification => Publish(notification, 
-            args => dispatcher.InvokeAsync(async () => await args()),
-                null, cancellationToken);
+    public void PublishUI<TMessage>(TMessage message)
+        where TMessage : notnull =>
+            Publish(message, args => dispatcher.Invoke(async () => await args()), null);
 
-    public Task PublishUI<TNotification>(TNotification notification,
-        object key,
-        CancellationToken cancellationToken = default)
-        where TNotification :
-        INotification => Publish(notification, 
-            args => dispatcher.InvokeAsync(async () => await args()),
-                key, cancellationToken);
-    public Task PublishUIAsync<TNotification>(CancellationToken cancellationToken = default)
-        where TNotification :
-        INotification, new() => Publish(new TNotification(), 
-            args => dispatcher.InvokeAsync(async () => await args()),
-                null, cancellationToken);
+    public void PublishUI<TMessage>(TMessage message,
+        object? key = null)
+        where TMessage : notnull =>
+            Publish(message, args => dispatcher.Invoke(async () => await args()), key);
 
-    public Task PublishUI(object notification,
-        CancellationToken cancellationToken = default) => Publish(notification, args =>
-            dispatcher.InvokeAsync(async () => await args()),
-                null, cancellationToken);
+    public void PublishUI<TMessage>()
+        where TMessage : new() =>
+            Publish(new TMessage(), args => dispatcher.Invoke(async () => await args()), null);
+
+    public void PublishUI(object message) => Publish(message, args =>
+            dispatcher.Invoke(async () => await args()), null);
 }

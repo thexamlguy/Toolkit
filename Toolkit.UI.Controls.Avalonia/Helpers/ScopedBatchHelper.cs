@@ -1,6 +1,7 @@
 ﻿using Avalonia.Threading;
 
 namespace Toolkit.UI.Controls.Avalonia;
+
 public class ScopedBatchHelper
 {
     private DispatcherTimer? timer;

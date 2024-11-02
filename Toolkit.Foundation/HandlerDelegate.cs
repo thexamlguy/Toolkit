@@ -1,5 +1,4 @@
 ﻿namespace Toolkit.Foundation;
 
-public delegate Task<TResponse> HandlerDelegate<TMessage, TResponse>(TMessage message,
-    CancellationToken cancellationToken)
-    where TMessage : IMessage;
+public delegate Task<TResponse> HandlerDelegate<TRequest, TResponse>(TRequest request,
+    CancellationToken cancellationToken);

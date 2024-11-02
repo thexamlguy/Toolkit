@@ -6,8 +6,8 @@ namespace Toolkit.UI.Avalonia;
 
 internal static class ComparisonLogic
 {
-    internal static bool Evaluate(object leftOperand, 
-        ComparisonConditionType operatorType, 
+    internal static bool Evaluate(object leftOperand,
+        ComparisonConditionType operatorType,
         object? rightOperand)
     {
         bool result = false;
@@ -17,14 +17,13 @@ internal static class ComparisonLogic
             Type leftType = leftOperand.GetType();
 
             if (rightOperand != null)
-            {      
+            {
                 TypeConverter typeConverter = TypeDescriptor.GetConverter(leftType);
                 rightOperand = typeConverter.ConvertFrom(rightOperand);
             }
         }
 
-
-        if (leftOperand is IComparable leftComparableOperand && 
+        if (leftOperand is IComparable leftComparableOperand &&
             rightOperand is IComparable rightComparableOperand)
         {
             return EvaluateComparable(leftComparableOperand, operatorType, rightComparableOperand);
@@ -35,6 +34,7 @@ internal static class ComparisonLogic
             case ComparisonConditionType.Equal:
                 result = Equals(leftOperand, rightOperand);
                 break;
+
             case ComparisonConditionType.NotEqual:
                 result = !Equals(leftOperand, rightOperand);
                 break;
@@ -43,7 +43,7 @@ internal static class ComparisonLogic
     }
 
     private static bool EvaluateComparable(IComparable leftOperand,
-        ComparisonConditionType operatorType, 
+        ComparisonConditionType operatorType,
         IComparable rightOperand)
     {
         object? convertedOperand = null;
@@ -54,11 +54,9 @@ internal static class ComparisonLogic
         }
         catch (FormatException)
         {
-
         }
         catch (InvalidCastException)
         {
-
         }
 
         if (convertedOperand == null)
@@ -74,18 +72,23 @@ internal static class ComparisonLogic
             case ComparisonConditionType.Equal:
                 result = comparison == 0;
                 break;
+
             case ComparisonConditionType.GreaterThan:
                 result = comparison > 0;
                 break;
+
             case ComparisonConditionType.GreaterThanOrEqual:
                 result = comparison >= 0;
                 break;
+
             case ComparisonConditionType.LessThan:
                 result = comparison < 0;
                 break;
+
             case ComparisonConditionType.LessThanOrEqual:
                 result = comparison <= 0;
                 break;
+
             case ComparisonConditionType.NotEqual:
                 result = comparison != 0;
                 break;

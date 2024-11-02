@@ -2,7 +2,7 @@
 
 public interface ISubscriber
 {
-    void Remove(object subscriber);
+    void Subscribe(object subscriber);
 
-    void Add(object subscriber);
+    void Unsubscribe(object subscriber);
 }

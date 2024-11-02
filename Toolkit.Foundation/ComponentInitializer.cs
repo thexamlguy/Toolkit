@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace Toolkit.Foundation;
 
@@ -7,43 +8,45 @@ public class ComponentInitializer(IEnumerable<IComponent> components,
     IComponentHostCollection hosts,
     IComponentScopeCollection scopes,
     IServiceProvider provider) :
-    IInitializer
+    IInitialization
 {
-    public async Task Initialize()
+    public void Initialize()
     {
         foreach (IComponent component in components)
         {
-            IComponentBuilder builder = component.Create();
+            IComponentBuilder builder = component.Configure();
             builder.AddServices(services =>
             {
-                services.AddTransient(_ => 
+                services.AddTransient(_ =>
                     provider.GetRequiredService<IProxyService<IPublisher>>());
 
                 services.AddTransient(_ =>
                     provider.GetRequiredService<IProxyService<IComponentHostCollection>>());
 
-                services.AddScoped(_ => 
-                    provider.GetRequiredService<INavigationContextCollection>());
-                
-                services.AddScoped(_ => 
-                    provider.GetRequiredService<INavigationContextProvider>());
+                services.AddScoped(_ =>
+                    provider.GetRequiredService<INavigationRegionCollection>());
 
-                services.AddScoped(_ => 
+                services.AddScoped(_ =>
+                    provider.GetRequiredService<INavigationRegionProvider>());
+
+                services.AddScoped(_ =>
                     provider.GetRequiredService<IComponentScopeCollection>());
 
-                services.AddTransient(_ => 
+                services.AddTransient(_ =>
                     provider.GetRequiredService<IComponentScopeProvider>());
 
                 services.AddRange(typedServices.Services);
+
+                services.AddSingleton(new NamedComponent(component.GetType().Name));
             });
 
             IComponentHost host = builder.Build();
 
-            scopes.Add(component.GetType().Name,
-                host.Services.GetRequiredService<IServiceProvider>());
+            scopes.Add(new ComponentScopeDescriptor(component.GetType().Name,
+                provider.GetRequiredService<IServiceProvider>()));
 
             hosts.Add(host);
-            await host.StartAsync();
+            host.Start();
         }
     }
 }

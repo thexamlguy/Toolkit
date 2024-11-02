@@ -2,11 +2,5 @@
 
 public interface IPrimaryConfirmation
 {
-    Task<bool> Confirm();
+    Task<bool> ConfirmPrimary();
 }
-
-public interface IConfirmation
-{
-    Task<bool> Confirm();
-}
-

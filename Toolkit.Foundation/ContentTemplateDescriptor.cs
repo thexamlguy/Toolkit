@@ -1,7 +1,7 @@
 ﻿namespace Toolkit.Foundation;
 
 public class ContentTemplateDescriptor(object key,
-    Type viewModelType, 
+    Type viewModelType,
     Type viewType,
     params object[]? parameters) :
     IContentTemplateDescriptor

@@ -1,9 +1,8 @@
-﻿
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Hosting;
 
 namespace Toolkit.Foundation;
 
-public interface IConfigurationMonitor<TConfiguration> : 
+public interface IConfigurationMonitor<TConfiguration> :
     IHostedService
     where TConfiguration :
     class;

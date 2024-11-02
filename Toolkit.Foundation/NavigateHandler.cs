@@ -2,20 +2,39 @@
 
 namespace Toolkit.Foundation;
 
-public class NavigateHandler(IComponentScopeProvider provider) :
-    INotificationHandler<Navigate>
+public class NavigateHandler(NamedComponent scope,
+    IComponentScopeProvider componentScopeProvider) :
+    INotificationHandler<NavigateEventArgs>
 {
-    public async Task Handle(Navigate args, 
-        CancellationToken cancellationToken)
+    public Task Handle(NavigateEventArgs args)
     {
-        if (provider.Get(args.Scope ?? "Default") 
-            is IServiceProvider scope)
+        INavigation? navigation = null;
+        if (args.Scope is "self" || args.Scope is "new")
         {
-            if (scope.GetService<INavigationScope>() is INavigationScope navigationScope)
+            if (args.Sender is IServiceProviderRequired requireServiceProvider)
             {
-                await navigationScope.NavigateAsync(args.Route, args.Sender,
-                    args.Context, args.Navigated, args.Parameters, cancellationToken);
+                if (args.Scope is "self")
+                {
+                    navigation = requireServiceProvider.Provider.GetRequiredService<INavigation>();
+                }
+
+                if (args.Scope is "new")
+                {
+                    IServiceScope serviceScope = requireServiceProvider.Provider.CreateScope();
+                    navigation = serviceScope.ServiceProvider.GetRequiredService<INavigation>();
+                }
             }
         }
+
+        if (navigation is null)
+        {
+            ComponentScopeDescriptor? descriptor = componentScopeProvider.Get(args.Scope ?? scope.Key);
+            navigation = descriptor?.Services?.GetRequiredService<INavigation>();
+        }
+
+        navigation?.Navigate(args.Route, args.Sender,
+                args.Region, args.Navigated, args.Parameters);
+
+        return Task.CompletedTask;
     }
 }

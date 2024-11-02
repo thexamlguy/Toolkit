@@ -3,15 +3,15 @@ using System.Text.Json.Serialization;
 
 namespace Toolkit.Foundation;
 
-public class DictionaryStringObjectJsonConverter : 
+public class DictionaryStringObjectJsonConverter :
     JsonConverter<Dictionary<string, object?>>
 {
     public override bool CanConvert(Type typeToConvert) =>
         typeToConvert == typeof(Dictionary<string, object>) ||
         typeToConvert == typeof(Dictionary<string, object?>);
 
-    public override Dictionary<string, object?> Read(ref Utf8JsonReader reader, 
-        Type typeToConvert, 
+    public override Dictionary<string, object?> Read(ref Utf8JsonReader reader,
+        Type typeToConvert,
         JsonSerializerOptions options)
     {
         Dictionary<string, object?> dictionary = [];
@@ -42,7 +42,7 @@ public class DictionaryStringObjectJsonConverter :
 
     public override void Write(Utf8JsonWriter writer,
         Dictionary<string, object?> value,
-        JsonSerializerOptions options) => 
+        JsonSerializerOptions options) =>
             JsonSerializer.Serialize(writer, (IDictionary<string, object?>)value, options);
 
     private object? ExtractValue(ref Utf8JsonReader reader,
@@ -56,20 +56,26 @@ public class DictionaryStringObjectJsonConverter :
                     return date;
                 }
                 return reader.GetString();
+
             case JsonTokenType.False:
                 return false;
+
             case JsonTokenType.True:
                 return true;
+
             case JsonTokenType.Null:
                 return null;
+
             case JsonTokenType.Number:
                 if (reader.TryGetInt64(out var result))
                 {
                     return result;
                 }
                 return reader.GetDecimal();
+
             case JsonTokenType.StartObject:
                 return Read(ref reader, null!, options);
+
             case JsonTokenType.StartArray:
                 List<object?> list = [];
                 while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
@@ -77,6 +83,7 @@ public class DictionaryStringObjectJsonConverter :
                     list.Add(ExtractValue(ref reader, options));
                 }
                 return list;
+
             default:
                 return default;
         }

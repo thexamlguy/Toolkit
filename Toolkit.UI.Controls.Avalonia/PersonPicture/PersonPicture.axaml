@@ -1,0 +1,95 @@
+<ResourceDictionary
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Toolkit.UI.Controls.Avalonia">
+    <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Light">
+            <StaticResource x:Key="PersonPictureForegroundThemeBrush" ResourceKey="TextOnAccentFillColorSelectedText" />
+            <StaticResource x:Key="PersonPictureEllipseBadgeForegroundThemeBrush" ResourceKey="TextOnAccentFillColorPrimaryBrush" />
+            <StaticResource x:Key="PersonPictureEllipseBadgeFillThemeBrush" ResourceKey="AccentFillColorDefaultBrush" />
+            <StaticResource x:Key="PersonPictureEllipseBadgeStrokeThemeBrush" ResourceKey="ControlFillColorTransparentBrush" />
+            <StaticResource x:Key="PersonPictureEllipseFillThemeBrush" ResourceKey="ControlFillColorDefaultBrush" />
+            <StaticResource x:Key="PersonPictureEllipseFillStrokeBrush" ResourceKey="CardStrokeColorDefaultBrush" />
+        </ResourceDictionary>
+        <ResourceDictionary x:Key="Dark">
+            <StaticResource x:Key="PersonPictureForegroundThemeBrush" ResourceKey="TextOnAccentFillColorSelectedText" />
+            <StaticResource x:Key="PersonPictureEllipseBadgeForegroundThemeBrush" ResourceKey="TextOnAccentFillColorPrimaryBrush" />
+            <StaticResource x:Key="PersonPictureEllipseBadgeFillThemeBrush" ResourceKey="AccentFillColorDefaultBrush" />
+            <StaticResource x:Key="PersonPictureEllipseBadgeStrokeThemeBrush" ResourceKey="ControlFillColorTransparentBrush" />
+            <StaticResource x:Key="PersonPictureEllipseFillThemeBrush" ResourceKey="ControlFillColorDefaultBrush" />
+            <StaticResource x:Key="PersonPictureEllipseFillStrokeBrush" ResourceKey="CardStrokeColorDefaultBrush" />
+        </ResourceDictionary>
+    </ResourceDictionary.ThemeDictionaries>
+    <x:Double x:Key="PersonPictureEllipseBadgeStrokeOpacity">1</x:Double>
+    <x:Double x:Key="PersonPictureEllipseBadgeImageSourceStrokeOpacity">1</x:Double>
+    <x:Double x:Key="PersonPictureEllipseStrokeThickness">1</x:Double>
+    <x:Double x:Key="PersonPictureEllipseBadgeStrokeThickness">2</x:Double>
+    <Thickness x:Key="PersonPictureBadgeGridMargin">0,-4,-4,0</Thickness>
+    <ControlTheme x:Key="{x:Type controls:PersonPicture}" TargetType="controls:PersonPicture">
+        <Setter Property="Foreground" Value="{DynamicResource PersonPictureForegroundThemeBrush}" />
+        <Setter Property="FontFamily" Value="{DynamicResource ContentControlThemeFontFamily}" />
+        <Setter Property="Background" Value="{DynamicResource PersonPictureEllipseFillThemeBrush}" />
+        <Setter Property="FontWeight" Value="600" />
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="Width" Value="100" />
+        <Setter Property="Height" Value="100" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid x:Name="RootGrid">
+                    <Ellipse
+                        Width="{TemplateBinding Width}"
+                        Height="{TemplateBinding Height}"
+                        Fill="{TemplateBinding Background}"
+                        Stroke="{DynamicResource PersonPictureEllipseFillStrokeBrush}"
+                        StrokeThickness="{DynamicResource PersonPictureEllipseStrokeThickness}" />
+                    <TextBlock
+                        x:Name="InitialsTextBlock"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        FontFamily="{TemplateBinding FontFamily}"
+                        FontSize="40"
+                        FontWeight="{TemplateBinding FontWeight}"
+                        Foreground="{TemplateBinding Foreground}"
+                        Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=TemplateSettings.ActualInitials}" />
+                    <Ellipse
+                        x:Name="PersonPictureEllipse"
+                        Width="{TemplateBinding Width}"
+                        Height="{TemplateBinding Height}"
+                        Fill="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=TemplateSettings.ActualImageBrush}"
+                        FlowDirection="LeftToRight" />
+                    <Grid
+                        x:Name="BadgeGrid"
+                        Margin="{DynamicResource PersonPictureBadgeGridMargin}"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
+                        IsVisible="False">
+                        <Ellipse
+                            x:Name="BadgingBackgroundEllipse"
+                            Fill="{DynamicResource PersonPictureEllipseBadgeFillThemeBrush}"
+                            Opacity="{DynamicResource PersonPictureEllipseBadgeStrokeOpacity}"
+                            Stroke="{DynamicResource PersonPictureEllipseBadgeStrokeThemeBrush}"
+                            StrokeThickness="{DynamicResource PersonPictureEllipseBadgeStrokeThickness}" />
+                        <Ellipse
+                            x:Name="BadgingEllipse"
+                            FlowDirection="LeftToRight"
+                            Opacity="0" />
+                        <TextBlock
+                            x:Name="BadgeNumberTextBlock"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            FontFamily="{TemplateBinding FontFamily}"
+                            FontWeight="{TemplateBinding FontWeight}"
+                            Foreground="{DynamicResource PersonPictureEllipseBadgeForegroundThemeBrush}" />
+                        <controls:FontIcon
+                            x:Name="BadgeGlyphIcon"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            FontFamily="{DynamicResource SymbolThemeFontFamily}"
+                            FontWeight="{TemplateBinding FontWeight}"
+                            Foreground="{DynamicResource PersonPictureEllipseBadgeForegroundThemeBrush}" />
+                    </Grid>
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </ControlTheme>
+</ResourceDictionary>

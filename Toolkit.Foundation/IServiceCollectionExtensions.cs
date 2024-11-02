@@ -1,18 +1,19 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.FileProviders;
-using Microsoft.Extensions.FileProviders.Physical;
-using Microsoft.Extensions.Hosting;
-using System;
-using System.Text.Json;
-using Toolkit.Foundation;
 
 namespace Toolkit.Foundation;
 
 public static class IServiceCollectionExtensions
 {
+    public static IServiceCollection AddAsyncInitialization<TInitialization>(this IServiceCollection services)
+        where TInitialization : class,
+        IAsyncInitialization
+    {
+        services.AddTransient<IAsyncInitialization, TInitialization>();
+        return services;
+    }
+
     public static IServiceCollection AddCache<TKey, TValue>(this IServiceCollection services)
-        where TKey : notnull
+            where TKey : notnull
         where TValue : notnull
     {
         services.AddScoped<ICache<TKey, TValue>, Cache<TKey, TValue>>();
@@ -30,168 +31,63 @@ public static class IServiceCollectionExtensions
     }
 
     public static IServiceCollection AddComponent<TComponent>(this IServiceCollection services)
-        where TComponent : class, 
+        where TComponent : class,
         IComponent
     {
         services.AddTransient<IComponent, TComponent>();
         return services;
     }
 
-    public static IServiceCollection AddConfiguration<TConfiguration,
-        TValue>(this IServiceCollection services,
-        Func<TConfiguration, Action<TValue>> changed)
-        where TConfiguration : class
-        where TValue : class, new()
+    public static IServiceCollection AddHandler<THandler>(this IServiceCollection services,
+        string key)
+        where THandler : IHandler
     {
-        services.AddSingleton(new ConfigurationValue<TConfiguration, TValue>(changed));
-        services.AddHandler<ConfigurationChangedHandler<TConfiguration, TValue>>();
-
-        return services;
-    }
-
-    public static IServiceCollection AddConfiguration<TConfiguration>(this IServiceCollection services)
-        where TConfiguration : class => 
-            services.AddConfiguration<TConfiguration>(typeof(TConfiguration).Name, "Settings.json", null);
-
-    public static IServiceCollection AddConfiguration<TConfiguration>(this IServiceCollection services,
-        Action<TConfiguration> configurationDelegate)
-        where TConfiguration : class, new()
-    {
-        TConfiguration configuration = new();
-        configurationDelegate.Invoke(configuration);
-
-        return services.AddConfiguration(typeof(TConfiguration).Name, "Settings.json", configuration);
-    }
-
-    public static IServiceCollection AddConfiguration<TConfiguration>(this IServiceCollection services,
-        TConfiguration configuration)
-        where TConfiguration : class =>
-            services.AddConfiguration(configuration.GetType().Name, "Settings.json", configuration);
-
-    public static IServiceCollection AddConfiguration<TConfiguration>(this IServiceCollection services,
-        object configuration)
-        where TConfiguration : class => 
-            services.AddConfiguration(configuration.GetType().Name,
-                "Settings.json", (TConfiguration?)configuration);
-
-    public static IServiceCollection AddConfiguration<TConfiguration>(this IServiceCollection services,
-        string section,
-        string path = "Settings.json",
-        TConfiguration? configuration = null,
-        Action<JsonSerializerOptions>? serializerDelegate = null)
-        where TConfiguration : class
-    {
-        services.AddSingleton<IConfigurationSource<TConfiguration>>(provider =>
-        {
-            JsonSerializerOptions? defaultSerializer = null;
-            if (serializerDelegate is not null)
-            {
-                defaultSerializer = new JsonSerializerOptions();
-                serializerDelegate.Invoke(defaultSerializer);
-            }
-
-            return new ConfigurationSource<TConfiguration>(provider.GetRequiredService<IConfigurationFile<TConfiguration>>(),
-                section, defaultSerializer);
-        });
-
-        services.AddSingleton<IConfigurationFile<TConfiguration>>(provider =>
-        {
-            IFileInfo? fileInfo = null;
-            if (provider.GetService<IHostEnvironment>() is IHostEnvironment hostEnvironment)
-            {
-                IFileProvider fileProvider = hostEnvironment.ContentRootFileProvider;
-                fileInfo = fileProvider.GetFileInfo(path);
-            }
-
-            fileInfo ??= new PhysicalFileInfo(new FileInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, path)));
-            return new ConfigurationFile<TConfiguration>(fileInfo);
-        });
-
-        services.AddHostedService<ConfigurationMonitor<TConfiguration>>();
-        services.AddSingleton<IConfigurationReader<TConfiguration>, ConfigurationReader<TConfiguration>>();
-        services.AddSingleton<IConfigurationWriter<TConfiguration>, ConfigurationWriter<TConfiguration>>();
-
-        services.AddTransient<IConfigurationFactory<TConfiguration>>(provider => new ConfigurationFactory<TConfiguration>(() =>
-            configuration ?? provider.GetRequiredService<TConfiguration>()));
-
-        services.AddTransient<IInitializer, ConfigurationInitializer<TConfiguration>>();
-        services.AddTransient<IConfigurationInitializer<TConfiguration>, ConfigurationInitializer<TConfiguration>>();
-
-        services.AddTransient<IWritableConfiguration<TConfiguration>, WritableConfiguration<TConfiguration>>();
-
-        services.AddTransient<IConfiguration<TConfiguration>, Configuration<TConfiguration>>();
-        services.AddTransient(provider => provider.GetRequiredService<IConfiguration<TConfiguration>>().Value);
-
-        return services;
-    }
-
-    public static IServiceCollection AddTemplate<TViewModel, TView>(this IServiceCollection services,
-        object? key = null,
-        params object[]? parameters)
-    {
-        Type viewModelType = typeof(TViewModel);
-        Type viewType = typeof(TView);
-
-        key ??= viewModelType.Name.Replace("ViewModel", "");
-
-        services.AddTransient(viewModelType, provider => 
-            provider.GetRequiredService<IServiceFactory>().Create<TViewModel>(parameters)!);
-
-        services.AddTransient(viewType);
-
-        services.AddKeyedTransient(viewModelType, key, (provider, key) =>
-            provider.GetRequiredService<IServiceFactory>().Create<TViewModel>(parameters)!);
-
-        services.AddKeyedTransient(viewType, key);
-
-        services.AddTransient<IContentTemplateDescriptor>(provider => 
-            new ContentTemplateDescriptor(key, viewModelType, viewType, parameters));
-
-        return services;
+        return AddHandler<THandler>(services, ServiceLifetime.Transient, key);
     }
 
     public static IServiceCollection AddHandler<THandler>(this IServiceCollection services,
-        ServiceLifetime lifetime = ServiceLifetime.Transient)
+        ServiceLifetime lifetime = ServiceLifetime.Transient,
+        string? key = null)
         where THandler : IHandler
     {
-        if (typeof(THandler).GetInterfaces() is Type[] contracts)
+        if (typeof(THandler).GetInterfaces() is Type[] handlerTypes)
         {
-            foreach (Type contract in contracts)
+            foreach (Type handlerType in handlerTypes)
             {
-                if (contract.Name == typeof(INotificationHandler<>).Name &&
-                    contract.GetGenericArguments() is { Length: 1 } notificationHandlerArguments)
+                if (handlerType.Name == typeof(INotificationHandler<>).Name &&
+                    handlerType.GetGenericArguments() is { Length: 1 } notificationHandlerArguments)
                 {
                     Type notificationType = notificationHandlerArguments[0];
+                    Type wrapperType = typeof(NotificationHandlerWrapper<>).MakeGenericType(notificationType);
 
-                    Type wrapperType = typeof(NotificationHandlerWrapper<>)
-                        .MakeGenericType(notificationType);
+                    string preferredKey = $"{(key is not null ? $"{key}:" : "")}{notificationType}";
 
-                    services.TryAdd(new ServiceDescriptor(typeof(INotificationHandler<>)
-                        .MakeGenericType(notificationType), typeof(THandler), lifetime));
+                    services.Add(new ServiceDescriptor(typeof(INotificationHandler<>)
+                        .MakeGenericType(notificationType), preferredKey, typeof(THandler), lifetime));
 
-                    services.Add(new ServiceDescriptor(wrapperType, provider => 
-                        provider.GetService<IServiceFactory>()?.Create(wrapperType,
-                            provider.GetRequiredService(typeof(INotificationHandler<>).MakeGenericType(notificationType)),
-                            provider.GetServices(typeof(IPipelineBehavior<>)
-                                .MakeGenericType(notificationType)))!, lifetime));
+                    services.Add(new ServiceDescriptor(wrapperType, preferredKey, (provider, registeredKey) =>
+                            provider.GetService<IServiceFactory>()?.Create(wrapperType,
+                                provider.GetRequiredKeyedService(typeof(INotificationHandler<>).MakeGenericType(notificationType), registeredKey),
+                                provider.GetServices(typeof(IPipelineBehaviour<>)
+                                    .MakeGenericType(notificationType)))!, lifetime));
                 }
 
-                if (contract.Name == typeof(IHandler<,>).Name &&
-                    contract.GetGenericArguments() is { Length: 2 } handlerArguments)
+                if (handlerType.Name == typeof(IHandler<,>).Name &&
+                    handlerType.GetGenericArguments() is { Length: 2 } handlerArguments)
                 {
                     Type requestType = handlerArguments[0];
                     Type responseType = handlerArguments[1];
 
-                    Type wrapperType = typeof(HandlerWrapper<,>)
-                        .MakeGenericType(requestType, responseType);
+                    Type wrapperType = typeof(HandlerWrapper<,>).MakeGenericType(requestType, responseType);
+                    string preferredKey = $"{(key is not null ? $"{key}:" : "")}{wrapperType}";
 
-                    services.TryAdd(new ServiceDescriptor(typeof(THandler), 
+                    services.Add(new ServiceDescriptor(typeof(THandler), preferredKey,
                         typeof(THandler), lifetime));
 
-                    services.Add(new ServiceDescriptor(wrapperType, provider => 
+                    services.Add(new ServiceDescriptor(wrapperType, preferredKey, (provider, actualKey) =>
                         provider.GetService<IServiceFactory>()?.Create(wrapperType,
-                                provider.GetRequiredService<THandler>(),
-                                provider.GetServices(typeof(IPipelineBehavior<,>)
+                                provider.GetRequiredKeyedService<THandler>(preferredKey),
+                                provider.GetServices(typeof(IPipelineBehaviour<,>)
                                     .MakeGenericType(requestType, responseType)))!, lifetime));
                 }
             }
@@ -202,35 +98,14 @@ public static class IServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection AddInitializer<TInitializer>(this IServiceCollection services)
-        where TInitializer : class, 
-        IInitializer
+    public static IServiceCollection AddInitialization<TInitialization>(this IServiceCollection services)
+        where TInitialization : class,
+        IInitialization
     {
-        services.AddTransient<IInitializer, TInitializer>();
+        services.AddTransient<IInitialization, TInitialization>();
         return services;
     }
 
-    public static IServiceCollection AddNavigateHandler<THandler>(this IServiceCollection services)
-        where THandler : INavigateHandler, 
-        IHandler
-    {
-        IEnumerable<Type> contracts = typeof(THandler).GetInterfaces()
-            .Where(x => x.Name == typeof(INavigateHandler<>).Name || x.Name == typeof(INavigateBackHandler<>).Name);
-
-        foreach (Type contract in contracts)
-        {
-            if (contract.GetGenericArguments() is { Length: 1 } arguments)
-            {
-                services.AddTransient<INavigation>(provider => new Navigation
-                {
-                    Type = arguments[0]
-                });
-            }
-        }
-
-        services.AddHandler<THandler>();
-        return services;
-    }
     public static IServiceCollection AddRange(this IServiceCollection services,
         IServiceCollection fromServices)
     {
@@ -240,5 +115,76 @@ public static class IServiceCollectionExtensions
         }
 
         return services;
+    }
+
+    public static IServiceCollection AddTemplate<TViewModel, TView>(this IServiceCollection services,
+        object? key = null,
+        ServiceLifetime serviceLifetime = ServiceLifetime.Transient,
+        params object[]? parameters)
+    {
+        return AddTemplate<TViewModel, TViewModel, TView>(services, key, serviceLifetime, parameters);
+    }
+
+    public static IServiceCollection AddTemplate<TViewModel, TViewModelImplementation, TView>(this IServiceCollection services,
+        object? key = null,
+        ServiceLifetime serviceLifetime = ServiceLifetime.Transient,
+        params object[]? parameters)
+    {
+        Type viewModelType = typeof(TViewModel);
+        Type viewModelImplementationType = typeof(TViewModelImplementation);
+        Type viewType = typeof(TView);
+
+        key ??= viewModelImplementationType.Name.Replace("ViewModel", "");
+
+        if (parameters is { Length: 0 })
+        {
+            services.Add(new ServiceDescriptor(viewModelType, viewModelImplementationType, serviceLifetime));
+        }
+        else
+        {
+            services.Add(new ServiceDescriptor(viewModelType, provider =>
+                provider.GetRequiredService<IServiceFactory>().Create<TViewModelImplementation>(parameters)!, serviceLifetime));
+        }
+
+        services.Add(new ServiceDescriptor(viewType, viewType, serviceLifetime));
+
+        if (parameters is { Length: 0 })
+        {
+            services.Add(new ServiceDescriptor(viewModelType, key, viewModelImplementationType, serviceLifetime));
+        }
+        else
+        {
+            services.Add(new ServiceDescriptor(viewModelType, key, (provider, key) =>
+                provider.GetRequiredService<IServiceFactory>().Create<TViewModelImplementation>(parameters)!, serviceLifetime));
+        }
+
+        services.Add(new ServiceDescriptor(viewType, key, viewType, serviceLifetime));
+
+        services.AddKeyedTransient<IContentTemplateDescriptor>(key, (provider, _) =>
+            new ContentTemplateDescriptor(key, viewModelImplementationType, viewType, parameters));
+
+        return services;
+    }
+
+    public static IServiceCollection AddValueTemplate<TConfiguration, TValue, TViewModel, TView>(this IServiceCollection services,
+        Func<TConfiguration, TValue> readDelegate,
+        Action<TValue?, TConfiguration> writeDelegate,
+        object? key = null,
+        ServiceLifetime serviceLifetime = ServiceLifetime.Transient,
+        params object[]? parameters)
+    {
+        parameters = [readDelegate, writeDelegate, .. parameters ?? Enumerable.Empty<object?>()];
+        return AddTemplate<TViewModel, TViewModel, TView>(services, key, serviceLifetime, parameters);
+    }
+
+    public static IServiceCollection AddValueTemplate<TConfiguration, TValue, TViewModel, TViewModelImplementation, TView>(this IServiceCollection services,
+        Func<TConfiguration, TValue> readDelegate,
+        Action<TValue?, TConfiguration> writeDelegate,
+        object? key = null,
+        ServiceLifetime serviceLifetime = ServiceLifetime.Transient,
+        params object[]? parameters)
+    {
+        parameters = [readDelegate, writeDelegate, .. parameters ?? Enumerable.Empty<object?>()];
+        return AddTemplate<TViewModel, TViewModelImplementation, TView>(services, key, serviceLifetime, parameters);
     }
 }

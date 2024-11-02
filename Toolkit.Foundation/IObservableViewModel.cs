@@ -7,7 +7,7 @@ public interface IObservableViewModel :
 
     public IPublisher Publisher { get; }
 
-    public IServiceFactory ServiceFactory { get; }
+    public IServiceFactory Factory { get; }
 
-    public IServiceProvider ServiceProvider { get; }
+    public IServiceProvider Provider { get; }
 }

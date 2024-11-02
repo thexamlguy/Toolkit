@@ -9,16 +9,16 @@ public class NavigateBackAction :
     AvaloniaObject,
     IAction
 {
-    public static readonly StyledProperty<string> ContextProperty =
-        AvaloniaProperty.Register<NavigateBackAction, string>(nameof(Context));
+    public static readonly StyledProperty<string> RegionProperty =
+        AvaloniaProperty.Register<NavigateBackAction, string>(nameof(Region));
 
     public static readonly StyledProperty<string> ScopeProperty =
         AvaloniaProperty.Register<NavigateBackAction, string>(nameof(Scope));
 
-    public string Context
+    public string Region
     {
-        get => GetValue(ContextProperty);
-        set => SetValue(ContextProperty, value);
+        get => GetValue(RegionProperty);
+        set => SetValue(RegionProperty, value);
     }
 
     public string Scope
@@ -34,8 +34,8 @@ public class NavigateBackAction :
         {
             if (control.DataContext is IObservableViewModel observableViewModel)
             {
-                observableViewModel.Publisher.Publish(new NavigateBack(Context
-                    ?? null, Scope ?? null)).GetAwaiter().GetResult();
+                observableViewModel.Publisher.Publish(new NavigateBackEventArgs(Region
+                    ?? null, Scope ?? null));
             }
         }
 

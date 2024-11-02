@@ -59,7 +59,7 @@ public class SpacedGrid : Grid
         }
     }
 
-    private void OnCollectionChanged(object? sender, 
+    private void OnCollectionChanged(object? sender,
         NotifyCollectionChangedEventArgs args)
     {
         if (args.Action == NotifyCollectionChangedAction.Add || args.Action == NotifyCollectionChangedAction.Replace)

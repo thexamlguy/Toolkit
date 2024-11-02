@@ -4,88 +4,99 @@ using Microsoft.Extensions.Hosting;
 
 namespace Toolkit.Foundation;
 
-public class ComponentBuilder : 
+public class ComponentBuilder :
     IComponentBuilder
 {
     private readonly IHostBuilder hostBuilder;
 
-    private bool configurationRegistered;
+    public string ContentRoot { get; set; } = "Local";
+
+    public string ConfigurationFile { get; set; } = "Settings.json";
 
     private ComponentBuilder()
     {
         hostBuilder = new HostBuilder()
-            .UseContentRoot("Local", true)
-            .ConfigureAppConfiguration(config =>
-            {
-                config.AddJsonFile("Settings.json", true, true);
-            })
             .ConfigureServices((context, services) =>
             {
                 services.AddScoped<IComponentHost, ComponentHost>();
 
                 services.AddScoped<IServiceFactory>(provider =>
-                    new ServiceFactory((type, parameters) =>
-                        ActivatorUtilities.CreateInstance(provider, type, parameters!)));
+                    new ServiceFactory((type, parameters) => ActivatorUtilities.CreateInstance(provider, type,
+                    parameters?.Where(x => x is not null).ToArray()!)));
+
+                services.AddSingleton<IDisposer, Disposer>();
 
                 services.AddScoped<SubscriptionCollection>();
-                services.AddScoped<ISubscriptionManager, SubscriptionManager>();
 
-                services.AddTransient<ISubscriber, Subscriber>();
+                services.AddTransient<IHandlerProvider, HandlerProvider>();
+                services.AddScoped<ISubscriber, Subscriber>();
                 services.AddTransient<IPublisher, Publisher>();
-
                 services.AddTransient<IMediator, Mediator>();
-                services.AddScoped<IDisposer, Disposer>();
 
-                services.AddTransient<INavigationScope, NavigationScope>();
+                services.AddTransient<IValidation, Validation>();
+                services.AddTransient<IValidatorCollection, ValidatorCollection>();
 
-                services.AddTransient<INavigationProvider, NavigationProvider>();
-                services.AddScoped<INavigationContextCollection, NavigationContextCollection>();
-                services.AddTransient<INavigationContextProvider, NavigationContextProvider>();
+                services.AddTransient<IContentFactory, ContentFactory>();
+                services.AddTransient<INavigation, Navigation>();
+
+                services.AddScoped<INavigationRegionCollection, NavigationRegionCollection>();
+                services.AddTransient<INavigationRegionProvider, NavigationRegionProvider>();
 
                 services.AddHandler<NavigateHandler>();
                 services.AddHandler<NavigateBackHandler>();
             });
     }
 
-    public static IComponentBuilder Create() =>
-        new ComponentBuilder();
+    public static IComponentBuilder Create() => new ComponentBuilder();
 
     public IComponentBuilder AddConfiguration<TConfiguration>(Action<TConfiguration> configurationDelegate)
-        where TConfiguration : ComponentConfiguration, new()
+        where TConfiguration :
+        class, new()
     {
-        if (configurationRegistered)
-        {
-            return this;
-        }
-
-        configurationRegistered = true;
         TConfiguration configuration = new();
-
         if (configurationDelegate is not null)
         {
             configurationDelegate(configuration);
         }
 
-        hostBuilder.ConfigureServices(services =>
-        {
-            services.AddConfiguration<ComponentConfiguration>(section: configuration.GetType().Name,
-                configuration: configuration);
+        AddConfiguration(typeof(TConfiguration).Name, configuration);
+        return this;
+    }
 
-            services.AddConfiguration(configuration);
-        });
+    public IComponentBuilder AddConfiguration<TConfiguration>(string section,
+        TConfiguration? configuration = null)
+        where TConfiguration :
+        class, new()
+    {
+        hostBuilder.AddConfiguration(section, ConfigurationFile, configuration);
 
         return this;
     }
 
-    public IComponentHost Build()
+    public IComponentBuilder AddConfiguration<TConfiguration>(string section)
+        where TConfiguration :
+        class, new()
     {
-        IHost host = hostBuilder.Build();
-        return host.Services.GetRequiredService<IComponentHost>();
+        AddConfiguration<TConfiguration>(section, null);
+        return this;
     }
 
     public IComponentBuilder AddServices(Action<IServiceCollection> configureDelegate)
     {
         hostBuilder.ConfigureServices(configureDelegate);
         return this;
+    }
+
+    public IComponentHost Build()
+    {
+        hostBuilder
+            .UseContentRoot(ContentRoot, true)
+            .ConfigureAppConfiguration(config =>
+            {
+                config.AddJsonFile(ConfigurationFile, true, true);
+            });
+
+        IHost host = hostBuilder.Build();
+        return host.Services.GetRequiredService<IComponentHost>();
     }
 }

@@ -2,57 +2,36 @@
 
 public interface IPublisher
 {
-    public Task Publish<TNotification>(object key,
-        CancellationToken cancellationToken = default)
-        where TNotification :
-        INotification,
-        new();
+    void Publish<TMessage>(object? key = null)
+        where TMessage : new();
 
-    public Task Publish<TNotification>(TNotification notification,
-        CancellationToken cancellationToken = default)
-        where TNotification :
-        INotification;
+    void Publish<TMessage>(TMessage message)
+        where TMessage : notnull;
 
-    public Task Publish<TNotification>(TNotification notification,
-        object key,
-        CancellationToken cancellationToken = default)
-        where TNotification :
-        INotification;
+    void Publish<TMessage>(TMessage message,
+        object? key = null)
+        where TMessage : notnull;
 
-    Task PublishUI<TNotification>(TNotification notification,
-        object key,
-        CancellationToken cancellationToken = default)
-        where TNotification :
-        INotification;
-
-    Task PublishUI<TNotification>(object key,
-        CancellationToken cancellationToken = default)
-        where TNotification :
-        INotification,
-        new();
-
-    Task PublishUI<TNotification>(TNotification notification,
-        CancellationToken cancellationToken = default)
-        where TNotification :
-        INotification;
-
-    Task PublishUI(object notification,
-        CancellationToken cancellationToken = default);
-
-    Task Publish(object notification,
+    void Publish(object message,
         Func<Func<Task>, Task> marshal,
-        object? key = null,
-        CancellationToken cancellationToken = default);
+        object? key = null);
 
-    Task PublishUIAsync<TNotification>(CancellationToken cancellationToken = default)
-        where TNotification :
-        INotification,
-        new();
+    void Publish<TMessage>()
+        where TMessage : new();
 
-    Task Publish<TNotification>(CancellationToken cancellationToken = default)
-        where TNotification :
-        INotification,
-        new();
+    void Publish(object message);
 
-    public Task Publish(object notification, CancellationToken cancellationToken = default);
+    void PublishUI<TMessage>(TMessage message,
+        object? key = null) where TMessage : notnull;
+
+    void PublishUI<TMessage>(object? key = null)
+        where TMessage : new();
+
+    void PublishUI<TMessage>(TMessage message)
+        where TMessage : notnull;
+
+    void PublishUI(object message);
+
+    void PublishUI<TMessage>()
+        where TMessage : new();
 }

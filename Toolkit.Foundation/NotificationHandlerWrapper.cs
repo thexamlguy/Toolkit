@@ -1,25 +1,23 @@
 ﻿namespace Toolkit.Foundation;
 
-public class NotificationHandlerWrapper<TNotification>(INotificationHandler<TNotification> handler,
-    IEnumerable<IPipelineBehavior<TNotification>> pipelineBehaviours)
-    where TNotification : INotification
+public class NotificationHandlerWrapper<TMessage>(INotificationHandler<TMessage> handler,
+    IEnumerable<IPipelineBehaviour<TMessage>> pipelineBehaviours)
 {
-    private readonly IEnumerable<IPipelineBehavior<TNotification>> pipelineBehaviours =
+    private readonly IEnumerable<IPipelineBehaviour<TMessage>> pipelineBehaviours =
         pipelineBehaviours.Reverse();
 
-    public async Task Handle(TNotification notification,
-        CancellationToken cancellationToken)
+    public async Task Handle(TMessage message)
     {
-        NotificationHandlerDelegate<TNotification> currentHandler = handler.Handle;
-        foreach (IPipelineBehavior<TNotification> behavior in pipelineBehaviours)
+        NotificationHandlerDelegate<TMessage> currentHandler = handler.Handle;
+        foreach (IPipelineBehaviour<TMessage> behaviour in pipelineBehaviours)
         {
-            NotificationHandlerDelegate<TNotification> previousHandler = currentHandler;
-            currentHandler = async (args, token) =>
+            NotificationHandlerDelegate<TMessage> previousHandler = currentHandler;
+            currentHandler = async (args) =>
             {
-                await behavior.Handle(args, previousHandler, token);
+                await behaviour.Handle(args, previousHandler);
             };
         }
-        
-        await currentHandler(notification, cancellationToken);
+
+        await currentHandler(message);
     }
 }

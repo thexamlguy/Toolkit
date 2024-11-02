@@ -1,132 +1,192 @@
-﻿using Microsoft.Extensions.FileProviders;
+﻿using Json.More;
+using Microsoft.Extensions.FileProviders;
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
 namespace Toolkit.Foundation;
 
 public class ConfigurationSource<TConfiguration>(IConfigurationFile<TConfiguration> configurationFile,
     string section,
+    IConfigurationCache cache,
     JsonSerializerOptions? serializerOptions = null) :
     IConfigurationSource<TConfiguration>
     where TConfiguration :
     class
 {
-    private readonly object lockingObject = new();
-
-    private static readonly Func<JsonSerializerOptions> defaultSerializerOptions = new(() =>
+    private static readonly Func<JsonSerializerOptions> defaultSerializerOptions = () =>
     {
         return new JsonSerializerOptions
         {
             WriteIndented = true,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
             Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
             Converters =
             {
                 new JsonStringEnumConverter(),
-                new DictionaryStringObjectJsonConverter()
+                new DictionaryStringObjectJsonConverter(),
+                new JsonArrayTupleConverter()
             }
         };
-    });
+    };
 
     public void Set(TConfiguration value) => Set((object)value);
 
     public void Set(object value)
     {
-        lock (lockingObject)
+        using (ConfigurationLock.EnterWrite())
         {
             IFileInfo fileInfo = configurationFile.FileInfo;
+            EnsureFileExists(fileInfo.PhysicalPath);
 
-            if (!File.Exists(fileInfo.PhysicalPath))
+            string? content;
+            JsonNode? rootNode;
+
+            using (Stream stream = new FileStream(fileInfo.PhysicalPath!, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite))
+            using (StreamReader reader = new(stream))
             {
-                string? fileDirectoryPath = Path.GetDirectoryName(fileInfo.PhysicalPath);
-                if (!string.IsNullOrEmpty(fileDirectoryPath))
-                {
-                    Directory.CreateDirectory(fileDirectoryPath);
-                }
+                content = reader.ReadToEnd();
+                stream.Seek(0, SeekOrigin.Begin);
 
-                File.WriteAllText(fileInfo.PhysicalPath!, "{}");
+                rootNode = JsonNode.Parse(content);
             }
 
-            static Stream OpenReadWrite(IFileInfo fileInfo)
-            {
-                return fileInfo.PhysicalPath is not null
-                    ? new FileStream(fileInfo.PhysicalPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite)
-                    : fileInfo.CreateReadStream();
-            }
+            JsonNode? valueNode = JsonNode.Parse(JsonSerializer.SerializeToUtf8Bytes(value, serializerOptions ?? defaultSerializerOptions()));
 
-            using Stream stream = OpenReadWrite(fileInfo);
-            using StreamReader? reader = new(stream);
+            ApplyConfigurationUpdates(ref rootNode, valueNode, section);
 
-            string? content = reader.ReadToEnd();
-            using JsonDocument jsonDocument = JsonDocument.Parse(content);
-
-            using Stream stream2 = OpenReadWrite(fileInfo);
-            Utf8JsonWriter writer = new(stream2, new JsonWriterOptions()
-            {
-                Indented = true,
-                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-            });
-
-            writer.WriteStartObject();
-            bool isWritten = false;
-
-            JsonDocument optionsElement = JsonDocument.Parse(JsonSerializer.SerializeToUtf8Bytes(value,
-                serializerOptions ?? defaultSerializerOptions()));
-
-            foreach (JsonProperty element in jsonDocument.RootElement.EnumerateObject())
-            {
-                if (element.Name != section)
-                {
-                    element.WriteTo(writer);
-                    continue;
-                }
-                writer.WritePropertyName(element.Name);
-                optionsElement.WriteTo(writer);
-                isWritten = true;
-            }
-
-            if (!isWritten)
-            {
-                writer.WritePropertyName(section);
-                optionsElement.WriteTo(writer);
-            }
-
-            writer.WriteEndObject();
-            writer.Flush();
-            stream2.SetLength(stream2.Position);
+            using Stream stream2 = new FileStream(fileInfo.PhysicalPath!, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
+            JsonSerializer.Serialize(stream2, rootNode, serializerOptions ?? defaultSerializerOptions());
+            
+            cache.Set(section, value);
         }
     }
 
     public bool TryGet(out TConfiguration? value)
     {
-        lock (lockingObject)
+        if (cache.TryGet(section, out value))
+        {
+            return true;
+        }
+
+        using (ConfigurationLock.EnterRead())
         {
             IFileInfo fileInfo = configurationFile.FileInfo;
 
-            if (File.Exists(fileInfo.PhysicalPath))
+            if (!File.Exists(fileInfo.PhysicalPath))
             {
-                static Stream OpenRead(IFileInfo fileInfo)
+                value = default;
+                return false;
+            }
+
+            using Stream stream = new FileStream(fileInfo.PhysicalPath!, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite);
+            using StreamReader reader = new(stream);
+            string content = reader.ReadToEnd();
+            JsonNode? rootNode = JsonNode.Parse(content);
+
+            string[] segments = section.Split(':');
+            JsonNode? currentNode = rootNode;
+
+            int lastIndex = segments.Length - 1;
+            for (int i = 0; i < lastIndex; i++)
+            {
+                if (currentNode is null)
                 {
-                    return fileInfo.PhysicalPath is not null
-                        ? new FileStream(fileInfo.PhysicalPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite)
-                        : fileInfo.CreateReadStream();
+                    value = default;
+                    return false;
                 }
 
-                using Stream stream = OpenRead(fileInfo);
-                using StreamReader? reader = new(stream);
+                currentNode = currentNode[segments[i]];
+            }
 
-                string? content = reader.ReadToEnd();
-
-                using JsonDocument jsonDocument = JsonDocument.Parse(content);
-                if (jsonDocument.RootElement.TryGetProperty(section, out JsonElement sectionValue))
-                {
-                    value = JsonSerializer.Deserialize<TConfiguration>(sectionValue.ToString(), serializerOptions ?? defaultSerializerOptions());
-                    return true;
-                }
+            if (currentNode != null && currentNode[segments[lastIndex]] is JsonNode sectionNode)
+            {
+                value = JsonSerializer.Deserialize<TConfiguration>(sectionNode, serializerOptions ?? defaultSerializerOptions());
+                cache.Set(section, value);
+                return true;
             }
 
             value = default;
             return false;
         }
+    }
+
+    private void ApplyConfigurationUpdates(ref JsonNode? rootNode, JsonNode? valueNode, string section)
+    {
+        string[] segments = section.Split(':');
+        JsonNode? currentNode = rootNode;
+        int lastIndex = segments.Length - 1;
+
+        for (int i = 0; i < lastIndex; i++)
+        {
+            if (currentNode is null)
+            {
+                return;
+            }
+
+            string currentKey = segments[i];
+            if (currentNode[currentKey] is null)
+            {
+                currentNode[currentKey] = new JsonObject();
+            }
+
+            currentNode = currentNode[currentKey];
+        }
+
+        if (currentNode is not null)
+        {
+            string lastKey = segments[lastIndex];
+            if (valueNode is JsonArray)
+            {
+                currentNode[lastKey] = valueNode;
+            }
+            else
+            {
+                currentNode[lastKey] = MergeNodes(currentNode[lastKey], valueNode);
+            }
+        }
+    }
+
+    private JsonNode? MergeNodes(JsonNode? existingNode, JsonNode? newNode)
+    {
+        if (existingNode is JsonObject existingObject && newNode is JsonObject newObject)
+        {
+            foreach (KeyValuePair<string, JsonNode?> property in newObject)
+            {
+                existingObject[property.Key] = MergeNodes(existingObject[property.Key], CloneNode(property.Value));
+            }
+            return existingObject;
+        }
+
+        return newNode;
+    }
+
+    private JsonNode? CloneNode(JsonNode? node)
+    {
+        if (node is null)
+        {
+            return null;
+        }
+
+        string serialized = JsonSerializer.Serialize(node, serializerOptions ?? defaultSerializerOptions());
+        return JsonNode.Parse(serialized);
+    }
+
+
+    private void EnsureFileExists(string? filePath)
+    {
+        if (filePath == null || File.Exists(filePath))
+        {
+            return;
+        }
+
+        string? directoryPath = Path.GetDirectoryName(filePath);
+        if (!string.IsNullOrEmpty(directoryPath))
+        {
+            Directory.CreateDirectory(directoryPath);
+        }
+
+        File.WriteAllText(filePath, "{}");
     }
 }

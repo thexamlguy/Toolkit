@@ -1,33 +1,56 @@
 ﻿using Avalonia;
+using Avalonia.Controls.Templates;
 
 namespace Toolkit.UI.Controls.Avalonia;
 
-public class SettingsExpander : FluentAvalonia.UI.Controls.SettingsExpander
+public class SettingsExpander :
+    FluentAvalonia.UI.Controls.SettingsExpander
 {
-    protected override Type StyleKeyOverride => 
-        typeof(SettingsExpander);
+    public static readonly StyledProperty<object> ActionProperty =
+        AvaloniaProperty.Register<SettingsExpander, object>(nameof(Action));
 
-    public new static readonly StyledProperty<object> DescriptionProperty =
-        AvaloniaProperty.Register<SettingsExpander, object>(nameof(Description));
+    public static readonly StyledProperty<IDataTemplate> ActionTemplateProperty =
+        AvaloniaProperty.Register<SettingsExpander, IDataTemplate>(nameof(ActionTemplate));
 
-    public new object Description
+    public static readonly StyledProperty<object> IconProperty =
+        AvaloniaProperty.Register<SettingsExpander, object>(nameof(Icon));
+
+    public static readonly StyledProperty<IDataTemplate> IconTemplateProperty =
+        AvaloniaProperty.Register<SettingsExpander, IDataTemplate>(nameof(IconTemplate));
+
+    public static readonly StyledProperty<bool> IsExpandableProperty =
+        AvaloniaProperty.Register<SettingsExpander, bool>(nameof(IsExpandable));
+
+    public object Action
     {
-        get => GetValue(DescriptionProperty);
-        set => SetValue(DescriptionProperty, value);
+        get => GetValue(ActionProperty);
+        set => SetValue(ActionProperty, value);
     }
-}
 
-public class SettingsExpanderItem : FluentAvalonia.UI.Controls.SettingsExpanderItem
-{
+    public IDataTemplate ActionTemplate
+    {
+        get => GetValue(ActionTemplateProperty);
+        set => SetValue(ActionTemplateProperty, value);
+    }
+
+    public object Icon
+    {
+        get => GetValue(IconProperty);
+        set => SetValue(IconProperty, value);
+    }
+
+    public IDataTemplate IconTemplate
+    {
+        get => GetValue(IconTemplateProperty);
+        set => SetValue(IconTemplateProperty, value);
+    }
+
+    public bool IsExpandable
+    {
+        get => GetValue(IsExpandableProperty);
+        set => SetValue(IsExpandableProperty, value);
+    }
+
     protected override Type StyleKeyOverride =>
-        typeof(SettingsExpanderItem);
-
-    public new static readonly StyledProperty<object> DescriptionProperty =
-        AvaloniaProperty.Register<SettingsExpanderItem, object>(nameof(Description));
-
-    public new object Description
-    {
-        get => GetValue(DescriptionProperty);
-        set => SetValue(DescriptionProperty, value);
-    }
+        typeof(SettingsExpander);
 }

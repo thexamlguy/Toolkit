@@ -2,18 +2,24 @@
 
 namespace Toolkit.Foundation;
 
-public class AppService(IEnumerable<IInitializer> initializers,
+public class AppService(IEnumerable<IInitialization> initializations,
+    IEnumerable<IAsyncInitialization> asyncInitializations,
     IPublisher publisher) :
     IHostedService
 {
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        foreach (IInitializer initializer in initializers)
+        foreach (IInitialization initialization in initializations)
         {
-            await initializer.Initialize();
+            initialization.Initialize();
         }
 
-        await publisher.Publish<Started>(cancellationToken);
+        foreach (IAsyncInitialization initialization in asyncInitializations)
+        {
+            await initialization.Initialize();
+        }
+
+        publisher.Publish<StartedEventArgs>();
     }
 
     public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;

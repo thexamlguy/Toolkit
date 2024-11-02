@@ -2,8 +2,9 @@
 using Avalonia.Xaml.Interactivity;
 
 namespace Toolkit.UI.Avalonia;
-public class ComparisonCondition : 
-    AvaloniaObject, 
+
+public class ComparisonCondition :
+    AvaloniaObject,
     ICondition
 {
     public static readonly StyledProperty<object> LeftOperandProperty =

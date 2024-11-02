@@ -1,15 +1,15 @@
 ﻿namespace Toolkit.Foundation;
 
-public class ConfigurationInitializer<TConfiguration>(IPublisher publisher,
-    IConfigurationReader<TConfiguration> reader, 
+public class ConfigurationInitializer<TConfiguration>(IConfigurationReader<TConfiguration> reader,
     IConfigurationWriter<TConfiguration> writer,
-    IConfigurationFactory<TConfiguration> factory) :
+    IConfigurationFactory<TConfiguration> factory,
+    IPublisher publisher) :
     IConfigurationInitializer<TConfiguration>,
-    IInitializer
+    IInitialization
     where TConfiguration :
     class
 {
-    public async Task Initialize()
+    public void Initialize()
     {
         if (!reader.TryRead(out TConfiguration? configuration))
         {
@@ -20,6 +20,6 @@ public class ConfigurationInitializer<TConfiguration>(IPublisher publisher,
             }
         }
 
-        await publisher.PublishUI(new Changed<TConfiguration>(configuration));
+        publisher.PublishUI(new ActivatedEventArgs<TConfiguration>(configuration));
     }
 }

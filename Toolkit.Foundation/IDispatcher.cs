@@ -2,5 +2,5 @@
 
 public interface IDispatcher
 {
-    Task InvokeAsync(Action action);
+    Task Invoke(Action action);
 }
