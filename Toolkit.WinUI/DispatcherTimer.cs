@@ -22,13 +22,9 @@ public class DispatcherTimer :
     private void OnTick(object? sender, EventArgs args) =>
         actionDelegate?.Invoke();
 
-    public void Start()
-    {
+    public void Start() => 
         timer.Start();
-    }
 
-    public void Stop()
-    {
+    public void Stop() => 
         timer.Stop();
-    }
 }
