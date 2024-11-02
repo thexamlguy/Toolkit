@@ -1,0 +1,17 @@
+﻿﻿SetWindowsHookEx
+GetModuleHandle
+CallNextHookEx
+GetPhysicalCursorPos
+FindWindowEx
+FindWindow
+GetWindowRect
+DestroyWindow
+DefWindowProcW
+CreateWindowExW
+RegisterClassW
+GetSystemMetrics
+MonitorFromWindow
+RegisterWindowMessage
+GetDpiForWindow
+SetWindowPos
+SHCreateShellItemArrayFromDataObject
