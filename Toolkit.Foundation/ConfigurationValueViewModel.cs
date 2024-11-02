@@ -19,7 +19,7 @@ public partial class ConfigurationValueViewModel<TConfiguration, TValue>(IServic
     {
         if (args.Sender is TConfiguration configuration)
         {
-           // await Task.Run(() => Value = read(configuration));
+            await Task.Run(() => Value = read(configuration));
         }
     }
 
@@ -96,7 +96,7 @@ public partial class ConfigurationValueViewModel<TConfiguration, TValue, TItem> 
     {
         if (args.Sender is TConfiguration configuration)
         {
-           // await Task.Run(() => Value = read(configuration));
+            await Task.Run(() => Value = read(configuration));
         }
     }
 

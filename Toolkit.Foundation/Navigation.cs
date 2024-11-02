@@ -8,7 +8,7 @@ public class Navigation(IServiceProvider provider,
     IPublisher publisher) :
     INavigation
 {
-    public async void Navigate(string route,
+    public void Navigate(string route,
         object? sender = null,
         object? region = null,
         EventHandler? navigated = null,

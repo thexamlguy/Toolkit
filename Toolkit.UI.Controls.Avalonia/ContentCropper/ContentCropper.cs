@@ -533,8 +533,8 @@ public class ContentCropper : ContentControl
         double centreX,
         double centreY)
     {
-        int width = (int)border.Width;
-        int height = (int)border.Height;
+        int width = (int?)border?.Width ?? 0;
+        int height = (int?)border?.Height ?? 0;
 
         double x = Math.Max(centreX - width / 2, 0);
         double y = Math.Max(centreY - height / 2, 0);
