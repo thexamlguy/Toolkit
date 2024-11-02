@@ -1,57 +1,21 @@
-﻿using Windows.Win32;
+﻿using System.Drawing;
+using Windows.Win32;
 using Windows.Win32.UI.WindowsAndMessaging;
 using Windows.Win32.Foundation;
 using System.Diagnostics.CodeAnalysis;
-using System.Drawing;
+using Toolkit.Foundation;
 
 namespace Toolkit.Windows;
 
-public record PointerPressed(PointerLocation Location, PointerButton Button = PointerButton.Left);
 
-public record PointerDragReleased(PointerLocation Location, PointerButton Button = PointerButton.Left);
-
-public record PointerReleased(PointerLocation Location, PointerButton Button = PointerButton.Left);
-
-public record PointerLocation(int X, int Y);
-
-public record PointerMoved(PointerLocation Location);
-
-internal enum WndProcMessages
+public class PointerMonitor(IPublisher publisher) : 
+    IPointerMonitor
 {
-    WM_LBUTTONUP = 0x0202,
-    WM_MBUTTONUP = 0x0208,
-    WM_RBUTTONUP = 0x0205,
-    WM_MOUSEMOVE = 0x0200,
-    WM_SETTINGCHANGE = 0x001A,
-    WM_MBUTTONDOWN = 0x0207,
-    WM_LBUTTONDOWN = 0x0201,
-    WM_RBUTTONDOWN = 0x0204
-}
-
-public enum PointerButton
-{
-    Left,
-    Middle,
-    Right
-}
-
-public record PointerDrag(PointerLocation Location);
-
-
-public class PointerMonitor : IPointerMonitor
-{
-    private readonly IMessenger messenger;
     private bool isDisposed;
+    private bool isPointerDrag;
     private bool isPointerPressed;
     private HOOKPROC? mouseEventDelegate;
     private UnhookWindowsHookExSafeHandle? mouseHandle;
-    private bool isPointerDrag;
-
-    public PointerMonitor(IMessenger messenger)
-    {
-        this.messenger = messenger;
-    }
-
     ~PointerMonitor()
     {
         Dispose(false);
@@ -63,11 +27,8 @@ public class PointerMonitor : IPointerMonitor
         GC.SuppressFinalize(this);
     }
 
-    public unsafe Task Initialize()
-    {
+    public unsafe void Initialize() => 
         InitializeHook();
-        return Task.CompletedTask;
-    }
 
     protected virtual void Dispose(bool disposing)
     {
@@ -83,27 +44,6 @@ public class PointerMonitor : IPointerMonitor
         mouseEventDelegate = new HOOKPROC(MouseProc);
         mouseHandle = PInvoke.SetWindowsHookEx(WINDOWS_HOOK_ID.WH_MOUSE_LL, mouseEventDelegate,
             PInvoke.GetModuleHandle("user32.dll"), 0);
-    }
-
-    private unsafe bool TryGetPointer(out Point point)
-    {
-        fixed (Point* lpPointLocal = &point)
-        {
-            return PInvoke.GetPhysicalCursorPos(lpPointLocal);
-        }
-    }
-
-    private bool TryGetPointerLocation([MaybeNullWhen(false)] out PointerLocation location)
-    {
-        if (TryGetPointer(out Point point))
-        {
-            location = new PointerLocation(point.X, point.Y);
-            return true;
-
-        }
-
-        location = null;
-        return false;
     }
 
     private LRESULT MouseProc(int nCode, WPARAM wParam, LPARAM lParam)
@@ -160,16 +100,16 @@ public class PointerMonitor : IPointerMonitor
                 isPointerDrag = true;
             }
 
-            messenger.Send(new PointerDrag(location));
+            publisher.Publish(new PointerDragEventArgs(location));
         }
 
-        messenger.Send(new PointerMoved(location));
+        publisher.Publish(new PointerMovedEventArgs(location));
     }
 
     private void SendPointerPressed(PointerLocation location, PointerButton button)
     {
         isPointerPressed = true;
-        messenger.Send(new PointerPressed(location, button));
+        publisher.Publish(new PointerPressedEventArgs(location, button));
     }
 
     private void SendPointerReleased(PointerLocation location, PointerButton button)
@@ -179,11 +119,32 @@ public class PointerMonitor : IPointerMonitor
             if (isPointerDrag)
             {
                 isPointerDrag = false;
-                messenger.Send(new PointerDragReleased(location, button));
+                publisher.Publish(new PointerDragReleasedEventArgs(location, button));
             }
 
             isPointerPressed = false;
-            messenger.Send(new PointerReleased(location, button));
+            publisher.Publish(new PointerReleasedEventArgs(location, button));
         }
+    }
+
+    private unsafe bool TryGetPointer(out Point point)
+    {
+        fixed (Point* lpPointLocal = &point)
+        {
+            return PInvoke.GetPhysicalCursorPos(lpPointLocal);
+        }
+    }
+
+    private bool TryGetPointerLocation([MaybeNullWhen(false)] out PointerLocation location)
+    {
+        if (TryGetPointer(out Point point))
+        {
+            location = new PointerLocation(point.X, point.Y);
+            return true;
+
+        }
+
+        location = null;
+        return false;
     }
 }

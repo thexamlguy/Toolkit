@@ -1,5 +1,7 @@
-﻿namespace Toolkit.Windows;
+﻿using Toolkit.Foundation;
 
-public interface IPointerMonitor : 
-    IInitializer, 
+namespace Toolkit.Windows;
+
+public interface IPointerMonitor :
+    IInitialization, 
     IDisposable;
