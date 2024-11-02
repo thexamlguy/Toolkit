@@ -1,26 +1,46 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net9.0-windows10.0.19041.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-	<ResolveComReferenceSilent>True</ResolveComReferenceSilent>
-	<Platforms>AnyCPU;x64;x86</Platforms>
-	  <WindowsSdkPackageVersion>10.0.19041.41</WindowsSdkPackageVersion>
+	<PropertyGroup>
+		<TargetFramework>net9.0-windows10.0.19041.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+		<ResolveComReferenceSilent>True</ResolveComReferenceSilent>
+		<Platforms>AnyCPU;x64;x86</Platforms>
+		<WindowsSdkPackageVersion>10.0.19041.41</WindowsSdkPackageVersion>
+	</PropertyGroup>
 
-  </PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.106">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="WindowsShortcutFactory" Version="1.0.1" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.106">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-	  <PackageReference Include="WindowsShortcutFactory" Version="1.0.1" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Toolkit.Foundation\Toolkit.Foundation.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Toolkit.Foundation\Toolkit.Foundation.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<COMReference Include="UIA">
+			<WrapperTool>tlbimp</WrapperTool>
+			<VersionMinor>0</VersionMinor>
+			<VersionMajor>1</VersionMajor>
+			<Guid>930299ce-9965-4dec-b0f4-a54848d4b667</Guid>
+			<Lcid>0</Lcid>
+			<Isolated>false</Isolated>
+			<EmbedInteropTypes>true</EmbedInteropTypes>
+		</COMReference>
+		<COMReference Include="UIAutomationClient">
+			<VersionMinor>0</VersionMinor>
+			<VersionMajor>1</VersionMajor>
+			<Guid>944de083-8fb8-45cf-bcb7-c477acb2f897</Guid>
+			<Lcid>0</Lcid>
+			<WrapperTool>tlbimp</WrapperTool>
+			<Isolated>false</Isolated>
+			<EmbedInteropTypes>true</EmbedInteropTypes>
+		</COMReference>
+	</ItemGroup>
 
 </Project>

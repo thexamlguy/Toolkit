@@ -29,7 +29,7 @@ public class Screen
         }
         else
         {
-            var monitorData = GetMonitorData(monitorHandle);
+            MonitorData monitorData = GetMonitorData(monitorHandle);
 
             Bounds = new Rect(monitorData.MonitorRect.left, monitorData.MonitorRect.top,
                 monitorData.MonitorRect.right - monitorData.MonitorRect.left,
@@ -95,7 +95,7 @@ public class Screen
             return SystemInformationHelper.WorkingArea;
         }
 
-        var monitorData = GetMonitorData(_monitorHandle);
+        MonitorData monitorData = GetMonitorData(_monitorHandle);
         return new Rect(monitorData.WorkAreaRect.left, monitorData.WorkAreaRect.top, monitorData.WorkAreaRect.right - monitorData.WorkAreaRect.left, monitorData.WorkAreaRect.bottom - monitorData.WorkAreaRect.top);
     }
 

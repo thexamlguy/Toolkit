@@ -9,7 +9,7 @@ public class WindowHelper
 {
     public static void BringToForeground(HWND handle)
     {
-        if (TryGetBoundsUnsafe(handle, out var bounds))
+        if (TryGetBoundsUnsafe(handle, out RECT bounds))
         {
             PInvoke.SetWindowPos(handle, new HWND(), bounds.left, bounds.top, bounds.right - 
                 bounds.left, bounds.bottom - bounds.top, SET_WINDOW_POS_FLAGS.SWP_SHOWWINDOW | SET_WINDOW_POS_FLAGS.SWP_NOACTIVATE);
@@ -28,7 +28,7 @@ public class WindowHelper
     public static bool TryGetBounds(IntPtr handle,
         [MaybeNullWhen(false)] out Rect rect)
     {
-        if (TryGetBoundsUnsafe(handle, out var unsafeRect))
+        if (TryGetBoundsUnsafe(handle, out RECT unsafeRect))
         {
             rect = new Rect(unsafeRect.left, unsafeRect.top, unsafeRect.right - unsafeRect.left, unsafeRect.bottom - unsafeRect.top);
 

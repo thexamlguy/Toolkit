@@ -21,7 +21,7 @@ public class WndProcMonitor(IPublisher publisher) :
 
     private unsafe void InitializeWndProc()
     {
-        var windowName = Guid.NewGuid().ToString();
+        string windowName = Guid.NewGuid().ToString();
         handler = Wndproc;
 
         WNDCLASSW wndProcWindow;

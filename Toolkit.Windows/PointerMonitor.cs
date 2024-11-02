@@ -50,8 +50,7 @@ public class PointerMonitor(IPublisher publisher) :
     {
         if (nCode >= 0)
         {
-
-            if (TryGetPointerLocation(out var location))
+            if (TryGetPointerLocation(out PointerLocation? location))
             {
                 switch ((uint)wParam.Value)
                 {

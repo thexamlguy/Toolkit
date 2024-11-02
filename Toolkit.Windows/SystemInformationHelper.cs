@@ -22,7 +22,7 @@ internal static class SystemInformationHelper
 
     private static Rect GetWorkingArea()
     {
-        var rect = new RECT();
+        RECT rect = new RECT();
 
         SystemParametersInfo(SPI_GETWORKAREA, 0, ref rect, 0);
         return new Rect(rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);

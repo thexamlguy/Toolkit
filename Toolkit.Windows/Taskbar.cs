@@ -23,13 +23,13 @@ public class Taskbar(ISubscriber subscriber,
 
     public TaskbarState GetCurrentState()
     {
-        var handle = GetHandle();
-        var state = new TaskbarState
+        nint handle = GetHandle();
+        TaskbarState state = new TaskbarState
         {
             Screen = Screen.FromHandle(handle)
         };
 
-        var appBarData = PInvoke.GetAppBarData(handle);
+        PInvoke.AppBarData appBarData = PInvoke.GetAppBarData(handle);
         PInvoke.GetAppBarPosition(ref appBarData);
 
         state.Rect = appBarData.rect.ToRect();
@@ -65,7 +65,7 @@ public class Taskbar(ISubscriber subscriber,
     public Task Handle(PointerMovedEventArgs args)
     {
         nint taskbarHandle = GetHandle();
-        if (WindowHelper.TryGetBounds(taskbarHandle, out var rect))
+        if (WindowHelper.TryGetBounds(taskbarHandle, out Rect? rect))
         {
             if (args.Location.IsWithinBounds(rect))
             {
