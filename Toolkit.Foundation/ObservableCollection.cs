@@ -25,7 +25,8 @@ public partial class ObservableCollection<TViewModel> :
     IRecipient<InsertEventArgs<TViewModel>>,
     IRecipient<MoveEventArgs<TViewModel>>,
     IRecipient<MoveToEventArgs<TViewModel>>,
-    IRecipient<ReplaceEventArgs<TViewModel>>
+    IRecipient<ReplaceEventArgs<TViewModel>>,
+    IActivation
     where TViewModel : notnull,
     IDisposable
 {
@@ -56,6 +57,7 @@ public partial class ObservableCollection<TViewModel> :
         Provider = provider;
         Factory = factory;
         Disposer = disposer;
+        Messenger = messenger;
 
         dispatcher = Provider.GetRequiredService<IDispatcher>();
         collection.CollectionChanged += OnCollectionChanged;
@@ -70,6 +72,7 @@ public partial class ObservableCollection<TViewModel> :
         Provider = provider;
         Factory = factory;
         Disposer = disposer;
+        Messenger = messenger;
 
         dispatcher = Provider.GetRequiredService<IDispatcher>();
         collection.CollectionChanged += OnCollectionChanged;
@@ -84,10 +87,15 @@ public partial class ObservableCollection<TViewModel> :
     public IServiceFactory Factory { get; private set; }
 
     bool IList.IsFixedSize => false;
+
     bool ICollection<TViewModel>.IsReadOnly => false;
+
     bool IList.IsReadOnly => false;
+
     bool ICollection.IsSynchronized => false;
+
     public new IMessenger Messenger { get; private set; }
+
     public IServiceProvider Provider { get; private set; }
 
     object ICollection.SyncRoot => this;

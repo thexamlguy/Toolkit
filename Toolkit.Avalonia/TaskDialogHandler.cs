@@ -23,8 +23,6 @@ public class TaskDialogHandler(ITopLevelProvider topLevelProvider) :
                     dialog.Closing -= HandleClosing;
                     if (dialog.DataContext is object content)
                     {
-                        bool cancelled = false;
-
                         if (args.Result is TaskDialogResult result)
                         {
                             if (result is TaskDialogResult.OK && content is 
@@ -34,21 +32,11 @@ public class TaskDialogHandler(ITopLevelProvider topLevelProvider) :
                                 if (!await primaryConfirmation.ConfirmPrimary())
                                 {
                                     args.Cancel = true;
-                                    cancelled = true;
-
                                     dialog.Closing += HandleClosing;
                                 }
 
                                 deferral.Complete();
                             }
-                        }
-
-                        if (!cancelled)
-                        {
-                            //if (content is IDeactivating deactivating)
-                            //{
-                            //    await deactivating.OnDeactivating();
-                            //}
                         }
                     }
                 }

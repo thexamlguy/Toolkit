@@ -14,29 +14,29 @@ public class ContentControlHandler :
             if (args.Template is Control control)
             {
                 TaskCompletionSource taskCompletionSource = new();
-                async void HandleLoaded(object? sender, RoutedEventArgs args)
+                void HandleLoaded(object? sender, RoutedEventArgs args)
                 {
                     control.Loaded -= HandleLoaded;
                     if (control.DataContext is object content)
                     {
-                        //if (content is IActivated activated)
-                        //{
-                        //    await activated.OnActivated();
-                        //}
+                        if (content is IActivation activation)
+                        {
+                            activation.IsActive = true;
+                        }
                     }
 
                     taskCompletionSource.SetResult();
                 }
 
-                async void HandleUnloaded(object? sender, RoutedEventArgs args)
+                void HandleUnloaded(object? sender, RoutedEventArgs args)
                 {
                     control.Unloaded -= HandleLoaded;
                     if (control.DataContext is object content)
                     {
-                        //if (content is IDeactivated deactivated)
-                        //{
-                        //    await deactivated.OnDeactivated();
-                        //}
+                        if (content is IActivation activation)
+                        {
+                            activation.IsActive = false;
+                        }
 
                         if (content is IDisposable disposable)
                         {

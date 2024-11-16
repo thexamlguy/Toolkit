@@ -20,22 +20,22 @@ public class FrameHandler(ITransientNavigationStore<Frame> navigationStore) :
             {
                 void Navigated(Control sender)
                 {
-                    async void HandleNavigatedTo(object? _, NavigationEventArgs __)
+                    void HandleNavigatedTo(object? _, NavigationEventArgs __)
                     {
                         async void HandleNavigatingFrom(object? _, NavigatingCancelEventArgs args)
                         {
                             sender.RemoveHandler(Frame.NavigatingFromEvent, HandleNavigatingFrom);
                             control.Unloaded -= HandleUnloaded;
 
-                            async void HandleNavigatedFrom(object? _, NavigationEventArgs args)
+                            void HandleNavigatedFrom(object? _, NavigationEventArgs args)
                             {
                                 sender.RemoveHandler(Frame.NavigatedFromEvent, HandleNavigatedFrom);
                                 if (sender.DataContext is object content)
                                 {
-                                    //if (content is IDeactivated deactivated)
-                                    //{
-                                    //    await deactivated.OnDeactivated();
-                                    //}
+                                    if (content is IActivation activation)
+                                    {
+                                        activation.IsActive = false;
+                                    }
 
                                     if (content is IDisposable disposable)
                                     {
@@ -58,27 +58,19 @@ public class FrameHandler(ITransientNavigationStore<Frame> navigationStore) :
                                 {
                                     args.Cancel = true;
                                 }
-
-                                if (!args.Cancel)
-                                {
-                                    //if (content is IDeactivating deactivating)
-                                    //{
-                                    //    await deactivating.OnDeactivating();
-                                    //}
-                                }
                             }
                         }
 
                         sender.AddHandler(Frame.NavigatingFromEvent, HandleNavigatingFrom);
                         if (sender.DataContext is object content)
                         {
-                            //if (content is IActivated activated)
-                            //{
-                            //    await activated.OnActivated();
-                            //}
+                            if (content is IActivation activation)
+                            {
+                                activation.IsActive = true;
+                            }
                         }
 
-                        async void HandleUnloaded(object? _, RoutedEventArgs __)
+                        void HandleUnloaded(object? _, RoutedEventArgs __)
                         {
                             sender.RemoveHandler(Frame.NavigatedToEvent, HandleNavigatedTo);
                             sender.RemoveHandler(Frame.NavigatingFromEvent, HandleNavigatingFrom);
@@ -87,10 +79,10 @@ public class FrameHandler(ITransientNavigationStore<Frame> navigationStore) :
 
                             if (control.DataContext is object content)
                             {
-                                //if (content is IDeactivated deactivated)
-                                //{
-                                //    await deactivated.OnDeactivated();
-                                //}
+                                if (content is IActivation activation)
+                                {
+                                    activation.IsActive = true;
+                                }
 
                                 if (content is IDisposable disposable)
                                 {

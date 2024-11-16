@@ -86,10 +86,10 @@ public class ContentDialogHandler :
                 dialog.Opened -= HandleOpened;
                 if (dialog.DataContext is object content)
                 {
-                    //if (content is IActivated activated)
-                    //{
-                    //    activated.OnActivated();
-                    //}
+                    if (content is IActivation activation)
+                    {
+                        activation.IsActive = true;
+                    }
                 }
             }
 
@@ -99,10 +99,10 @@ public class ContentDialogHandler :
                 dialog.Closed -= HandleClosed;
                 if (dialog.DataContext is object content)
                 {
-                    //if (content is IDeactivated deactivated)
-                    //{
-                    //    deactivated.OnDeactivated();
-                    //}
+                    if (content is IActivation activation)
+                    {
+                        activation.IsActive = false;
+                    }
                 }
             }
 

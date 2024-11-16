@@ -25,38 +25,38 @@ public class ContentTemplate :
                 {
                     if (provider.GetRequiredKeyedService(descriptor.TemplateType, descriptor.Key) is Control control)
                     {
-                        async void HandleLoaded(object? sender, RoutedEventArgs args)
+                        void HandleLoaded(object? sender, RoutedEventArgs args)
                         {
                             control.Loaded -= HandleLoaded;
                             if (control.DataContext is object content)
                             {
-                                //if (content is IActivated activated)
-                                //{
-                                //    await activated.OnActivated();
-                                //}
+                                if (content is IActivation activation)
+                                {
+                                    activation.IsActive = true;
+                                }
                             }
                         }
 
-                        async void HandleDataContextChanged(object? sender, EventArgs args)
+                        void HandleDataContextChanged(object? sender, EventArgs args)
                         {
                             if (control.DataContext is object content)
                             {
-                                //if (content is IActivated activated)
-                                //{
-                                //    await activated.OnActivated();
-                                //}
+                                if (content is IActivation activation)
+                                {
+                                    activation.IsActive = true;
+                                }
                             }
                         }
 
-                        async void HandleUnloaded(object? sender, RoutedEventArgs args)
+                        void HandleUnloaded(object? sender, RoutedEventArgs args)
                         {
                             control.Unloaded -= HandleUnloaded;
                             if (control.DataContext is object content)
                             {
-                                //if (content is IDeactivated deactivated)
-                                //{
-                                //    await deactivated.OnDeactivated();
-                                //}
+                                if (content is IActivation activation)
+                                {
+                                    activation.IsActive = false;
+                                }
                             }
                         }
 
@@ -87,38 +87,38 @@ public class ContentTemplate :
                 {
                     if (provider.GetRequiredKeyedService(descriptor.TemplateType, descriptor.Key) is Control control)
                     {
-                        async void HandleLoaded(object? sender, RoutedEventArgs args)
+                        void HandleLoaded(object? sender, RoutedEventArgs args)
                         {
                             control.Loaded -= HandleLoaded;
                             if (control.DataContext is object content)
                             {
-                                //if (content is IActivated activated)
-                                //{
-                                //    await activated.OnActivated();
-                                //}
+                                if (content is IActivation activation)
+                                {
+                                    activation.IsActive = true;
+                                }
                             }
                         }
 
-                        async void HandleDataContextChanged(object? sender, EventArgs args)
+                        void HandleDataContextChanged(object? sender, EventArgs args)
                         {
                             if (control.DataContext is object content)
                             {
-                                //if (content is IActivated activated)
-                                //{
-                                //    await activated.OnActivated();
-                                //}
+                                if (content is IActivation activation)
+                                {
+                                    activation.IsActive = true;
+                                }
                             }
                         }
 
-                        async void HandleUnloaded(object? sender, RoutedEventArgs args)
+                        void HandleUnloaded(object? sender, RoutedEventArgs args)
                         {
                             control.Unloaded -= HandleUnloaded;
                             if (control.DataContext is object content)
                             {
-                                //if (content is IDeactivated deactivated)
-                                //{
-                                //    await deactivated.OnDeactivated();
-                                //}
+                                if (content is IActivation activation)
+                                {
+                                    activation.IsActive = false;
+                                }
                             }
                         }
 
