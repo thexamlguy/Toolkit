@@ -1,14 +1,13 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 
 namespace Toolkit.Foundation;
 
 public partial class CommandValueViewModel<TValue>(IServiceProvider provider,
     IServiceFactory factory,
-    IMediator mediator,
-    IPublisher publisher,
-    ISubscriber subscriber,
+    IMessenger messenger,
     IDisposer disposer) :
-    Observable<TValue>(provider, factory, mediator, publisher, subscriber, disposer) 
+    Observable<TValue>(provider, factory, messenger, disposer) 
     where TValue : notnull
 {
     public IRelayCommand InvokeCommand =>

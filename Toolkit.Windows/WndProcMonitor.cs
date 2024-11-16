@@ -1,4 +1,4 @@
-﻿using Toolkit.Foundation;
+﻿using CommunityToolkit.Mvvm.Messaging;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
@@ -6,16 +6,16 @@ using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace Toolkit.Windows;
 
-public class WndProcMonitor(IPublisher publisher) : 
+public class WndProcMonitor(IMessenger messenger) : 
     IWndProcMonitor
 {
     private WNDPROC? handler;
-    private readonly IPublisher publisher = publisher;
 
     public IntPtr Handle { get; private set; }
 
     public void Dispose()
     {
+        GC.SuppressFinalize(this);
         PInvoke.DestroyWindow((HWND)Handle);
     }
 
@@ -54,7 +54,7 @@ public class WndProcMonitor(IPublisher publisher) :
 
     private LRESULT Wndproc(HWND param0, uint param1, WPARAM param2, LPARAM param3)
     {
-        publisher.Publish(new WndProcEventArgs(param1, (uint)param2.Value, (uint)param3.Value));
+        messenger.Send(new WndProcEventArgs(param1, (uint)param2.Value, (uint)param3.Value));
         return PInvoke.DefWindowProc(param0, param1, param2, param3);
     }
 

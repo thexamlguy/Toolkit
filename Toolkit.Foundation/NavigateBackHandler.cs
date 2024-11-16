@@ -3,9 +3,9 @@
 namespace Toolkit.Foundation;
 
 public class NavigateBackHandler(IComponentScopeProvider provider) :
-    INotificationHandler<NavigateBackEventArgs>
+    IHandler<NavigateBackEventArgs>
 {
-    public Task Handle(NavigateBackEventArgs args)
+    public void Handle(NavigateBackEventArgs args)
     {
         if (provider.Get(args.Scope ?? "Root")
             is ComponentScopeDescriptor descriptor)
@@ -16,7 +16,5 @@ public class NavigateBackHandler(IComponentScopeProvider provider) :
                 navigationScope.Back(args.Context);
             }
         }
-
-        return Task.CompletedTask;
     }
 }

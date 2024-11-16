@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+﻿using CommunityToolkit.Mvvm.Messaging;
 using Toolkit.Foundation;
 using UIAutomationClient;
 
@@ -10,7 +10,7 @@ public class TaskbarButtonMonitor :
     private readonly IDispatcherTimer dispatcherTimer;
     private readonly IDispatcherTimerFactory dispatcherTimerFactory;
     private readonly IDisposer disposer;
-    private readonly IPublisher publisher;
+    private readonly IMessenger messenger;
     private readonly IServiceFactory serviceFactory;
     private readonly Dictionary<string, TaskbarButton> taskbarButtons = [];
     private readonly ITaskbarList taskbarList;
@@ -20,13 +20,13 @@ public class TaskbarButtonMonitor :
     private IntPtr taskListHandle;
 
     public TaskbarButtonMonitor(ITaskbarList taskbarList,
-        IPublisher publisher,
+        IMessenger messenger,
         IDispatcherTimerFactory dispatcherTimerFactory,
         IServiceFactory serviceFactory,
         IDisposer disposer)
     {
         this.taskbarList = taskbarList;
-        this.publisher = publisher;
+        this.messenger = messenger;
         this.dispatcherTimerFactory = dispatcherTimerFactory;
         this.serviceFactory = serviceFactory;
         this.disposer = disposer;
@@ -121,10 +121,8 @@ public class TaskbarButtonMonitor :
             string key = buttonToRemove.Key;
             TaskbarButton button = buttonToRemove.Value;
 
-            Debug.WriteLine($"{key} button removed");
-
             taskbarButtons.Remove(key);
-            publisher.Publish(new TaskbarButtonRemovedEventArgs(button));
+            messenger.Send(new TaskbarButtonRemovedEventArgs(button));
 
             button.Dispose();
         }
@@ -141,17 +139,13 @@ public class TaskbarButtonMonitor :
 
             if (taskbarButtons.TryGetValue(name, out TaskbarButton? taskbarButton))
             {
-                Debug.WriteLine($"{name} button updated");
-
                 taskbarButtons[name].Rect = rect;
-                publisher.Publish(new TaskbarButtonUpdatedEventArgs(taskbarButtons[name]));
+                messenger.Send(new TaskbarButtonUpdatedEventArgs(taskbarButtons[name]));
             }
             else
             {
-                Debug.WriteLine($"{name} button added");
-
                 taskbarButtons.Add(name, serviceFactory.Create<TaskbarButton>(name, rect));
-                publisher.Publish(new TaskbarButtonCreatedEventArgs(taskbarButtons[name]));
+                messenger.Send(new TaskbarButtonCreatedEventArgs(taskbarButtons[name]));
             }
         }
     }

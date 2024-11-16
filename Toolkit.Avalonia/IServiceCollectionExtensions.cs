@@ -26,19 +26,20 @@ public static class IServiceCollectionExtensions
         services.AddTransient<IContentTemplate, ContentTemplate>();
         services.AddTransient<INavigationRegion, NavigationRegion>();
 
-        services.AddHandler<WriteClipboardHandler>();
-        services.AddHandler<SelectFoldersHandler>();
-        services.AddHandler<SelectFilesHandler>();
+        services.AddAsyncHandler<WriteEventArgs<Clipboard<object>>, WriteClipboardHandler>();
+        services.AddAsyncHandler<SelectionEventArgs<FolderFilter>, IReadOnlyCollection<string>?, SelectFoldersHandler>();
+        services.AddAsyncHandler<SelectionEventArgs<FileFilter>, IReadOnlyCollection<string>?, SelectFilesHandler>();
 
-        services.AddHandler<ClassicDesktopStyleApplicationHandler>(nameof(IClassicDesktopStyleApplicationLifetime));
-        services.AddHandler<SingleViewApplicationHandler>(nameof(ISingleViewApplicationLifetime));
-        services.AddHandler<ContentControlHandler>(nameof(ContentControl));
+        services.AddHandler<NavigateEventArgs<IClassicDesktopStyleApplicationLifetime>, ClassicDesktopStyleApplicationHandler>(nameof(IClassicDesktopStyleApplicationLifetime));
+        services.AddHandler<NavigateEventArgs<ISingleViewApplicationLifetime>, SingleViewApplicationHandler>(nameof(ISingleViewApplicationLifetime));
 
-        services.AddHandler<FrameHandler>(nameof(Frame));
+        services.AddHandler<NavigateEventArgs<ContentControl>, ContentControlHandler>(nameof(ContentControl));
+
+        services.AddHandler<NavigateEventArgs<Frame>, FrameHandler>(nameof(Frame));
         services.TryAddSingleton<ITransientNavigationStore<Frame>, TransientNavigationStore<Frame>>();
 
-        services.AddHandler<ContentDialogHandler>(nameof(ContentDialog));
-        services.AddHandler<TaskDialogHandler>(nameof(TaskDialog));
+        services.AddHandler<NavigateEventArgs<ContentDialog>, ContentDialogHandler>(nameof(ContentDialog));
+        services.AddHandler<NavigateEventArgs<TaskDialog>, TaskDialogHandler>(nameof(TaskDialog));
 
         services.AddScoped<INavigationRegionCollection, NavigationRegionCollection>(provider => new NavigationRegionCollection
         {
@@ -64,18 +65,17 @@ public static class IServiceCollectionExtensions
 
                 services.AddTransient<INavigationRegion, NavigationRegion>();
 
-                services.AddHandler<WriteClipboardHandler>();
-                services.AddHandler<SelectFoldersHandler>();
-                services.AddHandler<SelectFilesHandler>();
+                services.AddAsyncHandler<WriteEventArgs<Clipboard<object>>, WriteClipboardHandler>();
+                services.AddAsyncHandler<SelectionEventArgs<FolderFilter>, IReadOnlyCollection<string>?, SelectFoldersHandler>();
+                services.AddAsyncHandler<SelectionEventArgs<FileFilter>, IReadOnlyCollection<string>?, SelectFilesHandler>();
 
-                services.AddHandler<ContentControlHandler>(nameof(ContentControl));
+                services.AddHandler<NavigateEventArgs<ContentControl>, ContentControlHandler>(nameof(ContentControl));
 
-                services.AddHandler<FrameHandler>(nameof(Frame));
+                services.AddHandler<NavigateEventArgs<Frame>, FrameHandler>(nameof(Frame));
+                services.TryAddSingleton<ITransientNavigationStore<Frame>, TransientNavigationStore<Frame>>();
 
-                services.TryAddSingleton(provider.GetRequiredService<ITransientNavigationStore<Frame>>());
-
-                services.AddHandler<ContentDialogHandler>(nameof(ContentDialog));
-                services.AddHandler<TaskDialogHandler>(nameof(TaskDialog));
+                services.AddHandler<NavigateEventArgs<ContentDialog>, ContentDialogHandler>(nameof(ContentDialog));
+                services.AddHandler<NavigateEventArgs<TaskDialog>, TaskDialogHandler>(nameof(TaskDialog));
             })));
 
         return services;

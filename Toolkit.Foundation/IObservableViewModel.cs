@@ -1,11 +1,13 @@
-﻿namespace Toolkit.Foundation;
+﻿using CommunityToolkit.Mvvm.Messaging;
+
+namespace Toolkit.Foundation;
 
 public interface IObservableViewModel :
     IDisposable
 {
     public IDisposer Disposer { get; }
 
-    public IPublisher Publisher { get; }
+    public IMessenger Messenger { get; }
 
     public IServiceFactory Factory { get; }
 

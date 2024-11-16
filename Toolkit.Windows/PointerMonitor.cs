@@ -1,13 +1,13 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using CommunityToolkit.Mvvm.Messaging;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
-using Toolkit.Foundation;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace Toolkit.Windows;
 
-public class PointerMonitor(IPublisher publisher) : 
+public class PointerMonitor(IMessenger messenger) : 
     IPointerMonitor
 {
     private bool isDisposed;
@@ -99,16 +99,16 @@ public class PointerMonitor(IPublisher publisher) :
                 isPointerDrag = true;
             }
 
-            publisher.Publish(new PointerDragEventArgs(location));
+            messenger.Send(new PointerDragEventArgs(location));
         }
 
-        publisher.Publish(new PointerMovedEventArgs(location));
+        messenger.Send(new PointerMovedEventArgs(location));
     }
 
     private void SendPointerPressed(PointerLocation location, PointerButton button)
     {
         isPointerPressed = true;
-        publisher.Publish(new PointerPressedEventArgs(location, button));
+        messenger.Send(new PointerPressedEventArgs(location, button));
     }
 
     private void SendPointerReleased(PointerLocation location, PointerButton button)
@@ -118,11 +118,11 @@ public class PointerMonitor(IPublisher publisher) :
             if (isPointerDrag)
             {
                 isPointerDrag = false;
-                publisher.Publish(new PointerDragReleasedEventArgs(location, button));
+                messenger.Send(new PointerDragReleasedEventArgs(location, button));
             }
 
             isPointerPressed = false;
-            publisher.Publish(new PointerReleasedEventArgs(location, button));
+            messenger.Send(new PointerReleasedEventArgs(location, button));
         }
     }
 

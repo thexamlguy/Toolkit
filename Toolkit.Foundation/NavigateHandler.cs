@@ -4,9 +4,9 @@ namespace Toolkit.Foundation;
 
 public class NavigateHandler(NamedComponent scope,
     IComponentScopeProvider componentScopeProvider) :
-    INotificationHandler<NavigateEventArgs>
+    IHandler<NavigateEventArgs>
 {
-    public Task Handle(NavigateEventArgs args)
+    public void Handle(NavigateEventArgs args)
     {
         INavigation? navigation = null;
         if (args.Scope is "self" || args.Scope is "new")
@@ -34,7 +34,5 @@ public class NavigateHandler(NamedComponent scope,
 
         navigation?.Navigate(args.Route, args.Sender,
                 args.Region, args.Navigated, args.Parameters);
-
-        return Task.CompletedTask;
     }
 }

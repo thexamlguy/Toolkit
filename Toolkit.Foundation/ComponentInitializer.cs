@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using CommunityToolkit.Mvvm.Messaging;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace Toolkit.Foundation;
@@ -18,7 +19,7 @@ public class ComponentInitializer(IEnumerable<IComponent> components,
             builder.AddServices(services =>
             {
                 services.AddTransient(_ =>
-                    provider.GetRequiredService<IProxyService<IPublisher>>());
+                    provider.GetRequiredService<IProxyService<IMessenger>>());
 
                 services.AddTransient(_ =>
                     provider.GetRequiredService<IProxyService<IComponentHostCollection>>());

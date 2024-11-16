@@ -6,9 +6,9 @@ using Toolkit.UI.Controls.Avalonia;
 namespace Toolkit.Avalonia;
 
 public class TaskDialogHandler(ITopLevelProvider topLevelProvider) :
-    INotificationHandler<NavigateEventArgs<TaskDialog>>
+    IHandler<NavigateEventArgs<TaskDialog>>
 {
-    public async Task Handle(NavigateEventArgs<TaskDialog> args)
+    public async void Handle(NavigateEventArgs<TaskDialog> args)
     {
         if (args.Template is TaskDialog dialog)
         {
@@ -45,10 +45,10 @@ public class TaskDialogHandler(ITopLevelProvider topLevelProvider) :
 
                         if (!cancelled)
                         {
-                            if (content is IDeactivating deactivating)
-                            {
-                                await deactivating.OnDeactivating();
-                            }
+                            //if (content is IDeactivating deactivating)
+                            //{
+                            //    await deactivating.OnDeactivating();
+                            //}
                         }
                     }
                 }

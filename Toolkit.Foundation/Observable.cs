@@ -1,55 +1,30 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
 
 namespace Toolkit.Foundation;
 
 public partial class Observable(IServiceProvider provider,
     IServiceFactory factory,
-    IMediator mediator,
-    IPublisher publisher,
-    ISubscriber subscriber,
+    IMessenger messenger,
     IDisposer disposer) :
-    ObservableObject,
+    ObservableRecipient,
     IObservableViewModel,
     IActivityIndicator,
-    IInitialization,
-    IActivated,
-    IDeactivating,
-    IDeactivated,
     IDisposable,
     IServiceProviderRequired,
     IServiceFactoryRequired,
-    IMediatorRequired,
-    IPublisherRequired,
+    IMessengerRequired,
     IDisposerRequired
 {
     private readonly Dictionary<string, object> trackedProperties = [];
-
-    [ObservableProperty]
-    private bool isActivated;
-
-    [ObservableProperty]
-    private bool isActive;
-
-    [ObservableProperty]
-    private bool isInitialized;
 
     public IDisposer Disposer { get; } = disposer;
 
     public IServiceFactory Factory { get; } = factory;
 
-    public IMediator Mediator { get; } = mediator;
-
     public IServiceProvider Provider { get; } = provider;
 
-    public IPublisher Publisher { get; } = publisher;
-
-    public ISubscriber Subscriber { get; } = subscriber;
-
-    public virtual Task OnActivated()
-    {
-        IsActivated = true;
-        return Task.CompletedTask;
-    }
+    public IMessenger Messenger { get; } = messenger;
 
     public void Commit()
     {
@@ -59,35 +34,10 @@ public partial class Observable(IServiceProvider provider,
         }
     }
 
-    public virtual Task OnDeactivated()
-    {
-        IsActivated = false;
-        return Task.CompletedTask;
-    }
-
-    public virtual Task OnDeactivating() =>
-        Task.CompletedTask;
-
     public virtual void Dispose()
     {
         GC.SuppressFinalize(this);
         Disposer.Dispose(this);
-    }
-
-    public virtual void OnInitialize()
-    {
-    }
-
-    public virtual void Initialize()
-    {
-        if (IsInitialized)
-        {
-            return;
-        }
-
-        IsInitialized = true;
-        Subscriber.Subscribe(this);
-        OnInitialize();
     }
 
     public void Revert()
@@ -116,11 +66,9 @@ public partial class Observable<TValue> :
 
     public Observable(IServiceProvider provider,
         IServiceFactory factory,
-        IMediator mediator,
-        IPublisher publisher,
-        ISubscriber subscriber,
+        IMessenger messenger,
         IDisposer disposer,
-        TValue? value = default) : base(provider, factory, mediator, publisher, subscriber, disposer)
+        TValue? value = default) : base(provider, factory, messenger, disposer)
     {
         Value = value;
     }
@@ -143,12 +91,10 @@ public partial class Observable<TKey, TValue> :
 
     public Observable(IServiceProvider provider,
         IServiceFactory factory,
-        IMediator mediator,
-        IPublisher publisher,
-        ISubscriber subscriber,
+        IMessenger messenger,
         IDisposer disposer,
         TKey key,
-        TValue? value = default) : base(provider, factory, mediator, publisher, subscriber, disposer)
+        TValue? value = default) : base(provider, factory, messenger, disposer)
     {
         Key = key;
         Value = value;

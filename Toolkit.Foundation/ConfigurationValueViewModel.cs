@@ -1,39 +1,39 @@
 ﻿
+using CommunityToolkit.Mvvm.Messaging;
+
 namespace Toolkit.Foundation;
 
 public partial class ConfigurationValueViewModel<TConfiguration, TValue>(IServiceProvider provider,
     IServiceFactory factory,
-    IMediator mediator,
-    IPublisher publisher,
-    ISubscriber subscriber,
+    IMessenger messenger,
     IDisposer disposer,
     TConfiguration configuration,
     IWritableConfiguration<TConfiguration> writer,
     Func<TConfiguration, TValue?> read,
     Action<TValue?, TConfiguration> write) :
-    Observable<TValue>(provider, factory, mediator, publisher, subscriber, disposer),
-    INotificationHandler<ChangedEventArgs<TConfiguration>>
+    Observable<TValue>(provider, factory, messenger, disposer),
+    IHandler<ChangedEventArgs<TConfiguration>>
     where TConfiguration : class
 {
-    public async Task Handle(ChangedEventArgs<TConfiguration> args)
+    public void Handle(ChangedEventArgs<TConfiguration> args)
     {
         if (args.Sender is TConfiguration configuration)
         {
-            await Task.Run(() => Value = read(configuration));
+            Value = read(configuration);
         }
     }
 
-    public override async Task OnActivated()
+    protected override void OnActivated()
     {
-        await Task.Run(() => Value = read(configuration));
-        await base.OnActivated();
+        Value = read(configuration);
+        base.OnActivated();
     }
 
-    protected override async void OnChanged(TValue? value)
+    protected override void OnChanged(TValue? value)
     {
-        if (IsActivated)
+        if (IsActive)
         {
-            await Task.Run(() => writer.Write(args => write(value, args)));
+            writer.Write(args => write(value, args));
         }
 
         base.OnChanged(value);
@@ -42,7 +42,7 @@ public partial class ConfigurationValueViewModel<TConfiguration, TValue>(IServic
 
 public partial class ConfigurationValueViewModel<TConfiguration, TValue, TItem> :
     ObservableCollection<TValue, TItem>,
-    INotificationHandler<ChangedEventArgs<TConfiguration>>
+    IHandler<ChangedEventArgs<TConfiguration>>
     where TConfiguration : class
     where TItem : notnull,
     IDisposable
@@ -51,17 +51,16 @@ public partial class ConfigurationValueViewModel<TConfiguration, TValue, TItem> 
     private readonly Func<TConfiguration, TValue?> read;
     private readonly Action<TValue?, TConfiguration> write;
     private readonly IWritableConfiguration<TConfiguration> writer;
+
     public ConfigurationValueViewModel(IServiceProvider provider, 
-        IServiceFactory factory, 
-        IMediator mediator, 
-        IPublisher publisher,
-        ISubscriber subscriber,
+        IServiceFactory factory,
+        IMessenger messenger,
         IDisposer disposer,
         TConfiguration configuration,
         IWritableConfiguration<TConfiguration> writer,
         Func<TConfiguration, TValue?> read,
         Action<TValue?, TConfiguration> write,
-        TValue? value = default) : base(provider, factory, mediator, publisher, subscriber, disposer, value)
+        TValue? value = default) : base(provider, factory, messenger, disposer, value)
     {
         this.configuration = configuration;
         this.writer = writer;
@@ -73,16 +72,14 @@ public partial class ConfigurationValueViewModel<TConfiguration, TValue, TItem> 
 
     public ConfigurationValueViewModel(IServiceProvider provider, 
         IServiceFactory factory,
-        IMediator mediator,
-        IPublisher publisher, 
-        ISubscriber subscriber, 
+        IMessenger messenger,
         IDisposer disposer, 
         IEnumerable<TItem> items,
         TConfiguration configuration,
         IWritableConfiguration<TConfiguration> writer,
         Func<TConfiguration, TValue?> read,
         Action<TValue?, TConfiguration> write,
-        TValue? value = default) : base(provider, factory, mediator, publisher, subscriber, disposer, items, value)
+        TValue? value = default) : base(provider, factory, messenger, disposer, items, value)
     {
         this.configuration = configuration;
         this.writer = writer;
@@ -92,25 +89,25 @@ public partial class ConfigurationValueViewModel<TConfiguration, TValue, TItem> 
         Value = value;
     }
 
-    public async Task Handle(ChangedEventArgs<TConfiguration> args)
+    public void Handle(ChangedEventArgs<TConfiguration> args)
     {
         if (args.Sender is TConfiguration configuration)
         {
-            await Task.Run(() => Value = read(configuration));
+            Value = read(configuration);
         }
     }
 
-    public override async Task OnActivated()
+    protected override void OnActivated()
     {
-        await Task.Run(() => Value = read(configuration));
-        await base.OnActivated();
+        Value = read(configuration);
+        base.OnActivated();
     }
 
-    protected override async void OnChanged(TValue? value)
+    protected override void OnChanged(TValue? value)
     {
-        if (IsActivated)
+        if (IsActive)
         {
-            await Task.Run(() => writer.Write(args => write(value, args)));
+            writer.Write(args => write(value, args));
         }
 
         base.OnChanged(value);

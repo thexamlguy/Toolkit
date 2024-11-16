@@ -6,9 +6,9 @@ using Toolkit.Foundation;
 namespace Toolkit.Avalonia;
 
 public class ClassicDesktopStyleApplicationHandler :
-    INotificationHandler<NavigateEventArgs<IClassicDesktopStyleApplicationLifetime>>
+    IHandler<NavigateEventArgs<IClassicDesktopStyleApplicationLifetime>>
 {
-    public Task Handle(NavigateEventArgs<IClassicDesktopStyleApplicationLifetime> args)
+    public void Handle(NavigateEventArgs<IClassicDesktopStyleApplicationLifetime> args)
     {
         if (Application.Current?.ApplicationLifetime is
             IClassicDesktopStyleApplicationLifetime lifeTime)
@@ -19,7 +19,5 @@ public class ClassicDesktopStyleApplicationHandler :
                 window.DataContext = args.Content;
             }
         }
-
-        return Task.CompletedTask;
     }
 }

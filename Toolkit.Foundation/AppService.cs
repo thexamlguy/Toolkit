@@ -1,10 +1,11 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using CommunityToolkit.Mvvm.Messaging;
+using Microsoft.Extensions.Hosting;
 
 namespace Toolkit.Foundation;
 
 public class AppService(IEnumerable<IInitialization> initializations,
     IEnumerable<IAsyncInitialization> asyncInitializations,
-    IPublisher publisher) :
+    IMessenger messenger) :
     IHostedService
 {
     public async Task StartAsync(CancellationToken cancellationToken)
@@ -18,8 +19,8 @@ public class AppService(IEnumerable<IInitialization> initializations,
         {
             await initialization.Initialize();
         }
-
-        publisher.Publish<StartedEventArgs>();
+        
+        messenger.Send<StartedEventArgs>();
     }
 
     public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;

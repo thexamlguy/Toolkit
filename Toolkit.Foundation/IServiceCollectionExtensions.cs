@@ -38,61 +38,59 @@ public static class IServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection AddHandler<THandler>(this IServiceCollection services,
-        string key)
-        where THandler : IHandler
+    public static IServiceCollection AddHandler<TMessage, TResponse, THandler>(this IServiceCollection services,
+        ServiceLifetime lifetime = ServiceLifetime.Transient)
+        where THandler : class, IHandler<TMessage, TResponse>
+        where TMessage : class
     {
-        return AddHandler<THandler>(services, ServiceLifetime.Transient, key);
+        services.Add(new ServiceDescriptor(typeof(THandler), typeof(THandler), lifetime));
+        services.AddInitialization<HandlerInitialization<TMessage, TResponse, THandler>>();
+
+        return services;
     }
 
-    public static IServiceCollection AddHandler<THandler>(this IServiceCollection services,
+    public static IServiceCollection AddAsyncHandler<TMessage, TResponse, THandler>(this IServiceCollection services,
+        ServiceLifetime lifetime = ServiceLifetime.Transient)
+        where THandler : class, IAsyncHandler<TMessage, TResponse>
+        where TMessage : class
+    {
+        services.Add(new ServiceDescriptor(typeof(THandler), typeof(THandler), lifetime));
+        services.AddInitialization<AsyncHandlerInitialization<TMessage, TResponse, THandler>>();
+
+        return services;
+    }
+
+    public static IServiceCollection AddAsyncHandler<TMessage, THandler>(this IServiceCollection services,
+        ServiceLifetime lifetime = ServiceLifetime.Transient)
+        where THandler : class, IAsyncHandler<TMessage>
+        where TMessage : class
+    {
+        services.Add(new ServiceDescriptor(typeof(THandler), typeof(THandler), lifetime));
+        services.AddInitialization<AsyncHandlerInitialization<TMessage, THandler>>();
+
+        return services;
+    }
+
+    public static IServiceCollection AddHandler<TMessage, THandler>(this IServiceCollection services,
+        string key)
+        where THandler : class, IHandler<TMessage>
+        where TMessage : class => AddHandler<TMessage, THandler>(services, ServiceLifetime.Transient, key);
+
+    public static IServiceCollection AddHandler<TMessage, THandler>(this IServiceCollection services,
         ServiceLifetime lifetime = ServiceLifetime.Transient,
         string? key = null)
-        where THandler : IHandler
+        where THandler : class, IHandler<TMessage>
+        where TMessage : class
     {
-        if (typeof(THandler).GetInterfaces() is Type[] handlerTypes)
+        if (key is { Length: > 0})
         {
-            foreach (Type handlerType in handlerTypes)
-            {
-                if (handlerType.Name == typeof(INotificationHandler<>).Name &&
-                    handlerType.GetGenericArguments() is { Length: 1 } notificationHandlerArguments)
-                {
-                    Type notificationType = notificationHandlerArguments[0];
-                    Type wrapperType = typeof(NotificationHandlerWrapper<>).MakeGenericType(notificationType);
-
-                    string preferredKey = $"{(key is not null ? $"{key}:" : "")}{notificationType}";
-
-                    services.Add(new ServiceDescriptor(typeof(INotificationHandler<>)
-                        .MakeGenericType(notificationType), preferredKey, typeof(THandler), lifetime));
-
-                    services.Add(new ServiceDescriptor(wrapperType, preferredKey, (provider, registeredKey) =>
-                            provider.GetService<IServiceFactory>()?.Create(wrapperType,
-                                provider.GetRequiredKeyedService(typeof(INotificationHandler<>).MakeGenericType(notificationType), registeredKey),
-                                provider.GetServices(typeof(IPipelineBehaviour<>)
-                                    .MakeGenericType(notificationType)))!, lifetime));
-                }
-
-                if (handlerType.Name == typeof(IHandler<,>).Name &&
-                    handlerType.GetGenericArguments() is { Length: 2 } handlerArguments)
-                {
-                    Type requestType = handlerArguments[0];
-                    Type responseType = handlerArguments[1];
-
-                    Type wrapperType = typeof(HandlerWrapper<,>).MakeGenericType(requestType, responseType);
-                    string preferredKey = $"{(key is not null ? $"{key}:" : "")}{wrapperType}";
-
-                    services.Add(new ServiceDescriptor(typeof(THandler), preferredKey,
-                        typeof(THandler), lifetime));
-
-                    services.Add(new ServiceDescriptor(wrapperType, preferredKey, (provider, actualKey) =>
-                        provider.GetService<IServiceFactory>()?.Create(wrapperType,
-                                provider.GetRequiredKeyedService<THandler>(preferredKey),
-                                provider.GetServices(typeof(IPipelineBehaviour<,>)
-                                    .MakeGenericType(requestType, responseType)))!, lifetime));
-                }
-            }
-
-            return services;
+            services.Add(new ServiceDescriptor(typeof(THandler), key, typeof(THandler), lifetime));
+            services.AddInitialization<HandlerInitialization<TMessage, THandler>>(key);
+        }
+        else
+        {
+            services.Add(new ServiceDescriptor(typeof(THandler), typeof(THandler), lifetime));
+            services.AddInitialization<HandlerInitialization<TMessage, THandler>>();
         }
 
         return services;
@@ -103,6 +101,15 @@ public static class IServiceCollectionExtensions
         IInitialization
     {
         services.AddTransient<IInitialization, TInitialization>();
+        return services;
+    }
+
+    public static IServiceCollection AddInitialization<TInitialization>(this IServiceCollection services, 
+        params object[] parameters)
+        where TInitialization : class,
+        IInitialization
+    {
+        services.AddTransient<IInitialization>(provider => provider.GetRequiredService<IServiceFactory>().Create<TInitialization>(parameters));
         return services;
     }
 

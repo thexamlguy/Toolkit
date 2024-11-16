@@ -1,9 +1,10 @@
 ﻿namespace Toolkit.Foundation;
 
 public class WriteClipboardHandler(IClipboardWriter clipboardWriter) :
-    INotificationHandler<WriteEventArgs<Clipboard<object>>>
+    IAsyncHandler<WriteEventArgs<Clipboard<object>>>
 {
-    public async Task Handle(WriteEventArgs<Clipboard<object>> args)
+    public async Task Handle(WriteEventArgs<Clipboard<object>> args,
+        CancellationToken cancellationToken = default)
     {
         if (args.Sender is Clipboard<object> clipboard)
         {

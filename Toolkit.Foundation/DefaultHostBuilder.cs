@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -20,19 +20,20 @@ public class DefaultHostBuilder :
                     ComponentHostCollection>();
 
                 services.AddSingleton<IDisposer, Disposer>();
+                services.AddSingleton<IMessenger, WeakReferenceMessenger>(_ => WeakReferenceMessenger.Default);
 
-                services.AddScoped<SubscriptionCollection>();
+                //services.AddScoped<SubscriptionCollection>();
 
-                services.AddTransient<IHandlerProvider, HandlerProvider>();
-                services.AddScoped<ISubscriber, Subscriber>();
-                services.AddTransient<IPublisher, Publisher>();
-                services.AddTransient<IMediator, Mediator>();
+                //services.AddTransient<IHandlerProvider, HandlerProvider>();
+                //services.AddScoped<ISubscriber, Subscriber>();
+                //services.AddTransient<IPublisher, Publisher>();
+                //services.AddTransient<IMediator, Mediator>();
 
                 services.AddTransient<IValidation, Validation>();
                 services.AddTransient<IValidatorCollection, ValidatorCollection>();
 
-                services.AddScoped<IProxyService<IPublisher>>(provider =>
-                    new ProxyService<IPublisher>(provider.GetRequiredService<IPublisher>()));
+                services.AddScoped<IProxyService<IMessenger>>(provider =>
+                    new ProxyService<IMessenger>(provider.GetRequiredService<IMessenger>()));
 
                 services.AddScoped<IProxyService<INavigationRegionProvider>>(provider =>
                     new ProxyService<INavigationRegionProvider>(provider.GetRequiredService<INavigationRegionProvider>()));
@@ -56,10 +57,10 @@ public class DefaultHostBuilder :
                 services.AddTransient<IComponentFactory, ComponentFactory>();
                 services.AddTransient<IComponentScopeProvider, ComponentScopeProvider>();
 
-                services.AddHandler<NavigateHandler>();
-                services.AddHandler<NavigateBackHandler>();
+                //services.AddHandler<NavigateHandler>();
+                //services.AddHandler<NavigateBackHandler>();
 
-                services.AddInitialization<ComponentInitializer>();
+                //services.AddInitialization<ComponentInitializer>();
                 services.AddHostedService<AppService>();
             });
     }

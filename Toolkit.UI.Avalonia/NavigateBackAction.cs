@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Controls.Primitives;
 using Avalonia.Xaml.Interactivity;
+using CommunityToolkit.Mvvm.Messaging;
 using Toolkit.Foundation;
 
 namespace Toolkit.UI.Avalonia;
@@ -34,7 +35,7 @@ public class NavigateBackAction :
         {
             if (control.DataContext is IObservableViewModel observableViewModel)
             {
-                observableViewModel.Publisher.Publish(new NavigateBackEventArgs(Region
+                observableViewModel.Messenger.Send(new NavigateBackEventArgs(Region
                     ?? null, Scope ?? null));
             }
         }

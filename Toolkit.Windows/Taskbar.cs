@@ -1,23 +1,25 @@
-﻿using Toolkit.Foundation;
+﻿using CommunityToolkit.Mvvm.Messaging;
+using Toolkit.Foundation;
 using Windows.Win32;
 
 namespace Toolkit.Windows;
 
-public class Taskbar(ISubscriber subscriber,
-    IPublisher publisher,
+public class Taskbar(IMessenger messenger,
     IDisposer disposer) :
     ITaskbar,
-    INotificationHandler<WndProcEventArgs>,
-    INotificationHandler<PointerReleasedEventArgs>,
-    INotificationHandler<PointerMovedEventArgs>,
-    INotificationHandler<PointerDragEventArgs>
+    IRecipient<WndProcEventArgs>,
+    IRecipient<PointerReleasedEventArgs>,
+    IRecipient<PointerMovedEventArgs>,
+    IRecipient<PointerDragEventArgs>
 {
     private bool isDrag;
     private bool isWithinBounds;
 
     public void Dispose()
     {
+        messenger.UnregisterAll(this);
         disposer.Dispose(this);
+
         GC.SuppressFinalize(this);
     }
 
@@ -40,29 +42,25 @@ public class Taskbar(ISubscriber subscriber,
 
     public IntPtr GetHandle() => WindowHelper.Find("Shell_TrayWnd");
 
-    public Task Handle(WndProcEventArgs args)
+    public void Receive(WndProcEventArgs args)
     {
         if (args.Message == PInvoke.WM_TASKBARCREATED ||
             args.Message == (int)WndProcMessages.WM_SETTINGCHANGE &&
             (int)args.WParam == PInvoke.SPI_SETWORKAREA)
         {
-            publisher.Publish<TaskbarChangedEventArgs>();
+            messenger.Send<TaskbarChangedEventArgs>();
         }
-
-        return Task.CompletedTask;
     }
 
-    public Task Handle(PointerReleasedEventArgs args)
+    public void Receive(PointerReleasedEventArgs args)
     {
         if (isDrag)
         {
             isDrag = false;
         }
-
-        return Task.CompletedTask;
     }
 
-    public Task Handle(PointerMovedEventArgs args)
+    public void Receive(PointerMovedEventArgs args)
     {
         nint taskbarHandle = GetHandle();
         if (WindowHelper.TryGetBounds(taskbarHandle, out Rect? rect))
@@ -71,11 +69,11 @@ public class Taskbar(ISubscriber subscriber,
             {
                 if (isWithinBounds)
                 {
-                    return Task.CompletedTask;
+                    return;
                 }
 
                 isWithinBounds = true;
-                publisher.Publish<TaskbarEnteredEventArgs>();
+                messenger.Send<TaskbarEnteredEventArgs>();
             }
             else
             {
@@ -83,21 +81,19 @@ public class Taskbar(ISubscriber subscriber,
                 isWithinBounds = false;
             }
         }
-
-        return Task.CompletedTask;
     }
 
-    public Task Handle(PointerDragEventArgs args)
+    public void Receive(PointerDragEventArgs args)
     {
         if (isWithinBounds)
         {
             if (isDrag)
             {
-                publisher.Publish<TaskbarDragOverEventArgs>();
+                messenger.Send<TaskbarDragOverEventArgs>();
             }
             else
             {
-                publisher.Publish<TaskbarDragEnterEventArgs>();
+                messenger.Send<TaskbarDragEnterEventArgs>();
             }
 
             isDrag = true;
@@ -106,9 +102,7 @@ public class Taskbar(ISubscriber subscriber,
         {
             isDrag = false;
         }
-
-        return Task.CompletedTask;
     }
 
-    public void Initialize() => subscriber.Subscribe(this);
+    public void Initialize() => messenger.RegisterAll(this);
 }

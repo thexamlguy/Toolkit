@@ -2,6 +2,7 @@
 using Avalonia.Controls;
 using Avalonia.Metadata;
 using Avalonia.Xaml.Interactivity;
+using CommunityToolkit.Mvvm.Messaging;
 using System.Collections.Immutable;
 using Toolkit.Foundation;
 
@@ -63,7 +64,7 @@ public class NavigateAction :
                 ImmutableDictionary<string, object>? parameters = Parameters is { Count: > 0 } ? Parameters.ToImmutableDictionary(x => x.Key, x => x.Value) :
                     ImmutableDictionary<string, object>.Empty;
 
-                observableViewModel.Publisher.Publish(new NavigateEventArgs(Route, Region == this ? content : Region, Scope ?? null,
+                observableViewModel.Messenger.Send(new NavigateEventArgs(Route, Region == this ? content : Region, Scope ?? null,
                     content.DataContext, Navigated, parameters));
             }
         }

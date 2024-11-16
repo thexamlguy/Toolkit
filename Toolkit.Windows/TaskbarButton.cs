@@ -1,31 +1,31 @@
-﻿using Toolkit.Foundation;
+﻿using CommunityToolkit.Mvvm.Messaging;
+using Toolkit.Foundation;
 
 namespace Toolkit.Windows;
 
 public class TaskbarButton : 
     ITaskbarButton,
-    INotificationHandler<PointerReleasedEventArgs>,
-    INotificationHandler<PointerMovedEventArgs>,
-    INotificationHandler<PointerDragEventArgs>
+    IRecipient<PointerReleasedEventArgs>,
+    IRecipient<PointerMovedEventArgs>,
+    IRecipient<PointerDragEventArgs>
 {
-    private readonly IPublisher publisher;
+    private readonly IMessenger messenger;
     private readonly IDisposer disposer;
     private bool isWithinBounds;
     private bool isDrag;
 
     public TaskbarButton(string name,
         Rect rect,
-        IPublisher publisher,
-        ISubscriber subscriber,
+        IMessenger messenger,
         IDisposer disposer)
     {
-        this.publisher = publisher;
+        this.messenger = messenger;
         this.disposer = disposer;
 
         Name = name;
         Rect = rect;
 
-        subscriber.Subscribe(this);
+        messenger.RegisterAll(this);
     }
 
     public Rect Rect { get; internal set; }
@@ -34,36 +34,36 @@ public class TaskbarButton :
 
     public void Dispose()
     {
+        messenger.UnregisterAll(this);
         disposer.Dispose(this);
+
         GC.SuppressFinalize(this);
     }
 
-    public Task Handle(PointerReleasedEventArgs args)
+    public void Receive(PointerReleasedEventArgs args)
     {
         if (!isDrag && isWithinBounds)
         {
-            publisher.Publish(new TaskbarButtonInvokedEventArgs(this));
+            messenger.Send(new TaskbarButtonInvokedEventArgs(this));
         }
 
         if (isDrag)
         {
             isDrag = false;
         }
-
-        return Task.CompletedTask;
     }
 
-    public Task Handle(PointerDragEventArgs args)
+    public void Receive(PointerDragEventArgs args)
     {
         if (isWithinBounds)
         {
             if (isDrag)
             {
-                publisher.Publish(new TaskbarButtonDragOverEventArgs(this));
+                messenger.Send(new TaskbarButtonDragOverEventArgs(this));
             }
             else
             {
-                publisher.Publish(new TaskbarButtonDragEnterEventArgs(this));
+                messenger.Send(new TaskbarButtonDragEnterEventArgs(this));
             }
 
             isDrag = true;
@@ -72,28 +72,24 @@ public class TaskbarButton :
         {
             isDrag = false;
         }
-
-        return Task.CompletedTask;
     }
 
-    public Task Handle(PointerMovedEventArgs args)
+    public void Receive(PointerMovedEventArgs args)
     {
         if (args.Location.IsWithinBounds(Rect))
         {
             if (isWithinBounds)
             {
-                return Task.CompletedTask;
+                return;
             }
 
             isWithinBounds = true;
-            publisher.Publish(new TaskbarButtonEnteredEventArgs(this));
+            messenger.Send(new TaskbarButtonEnteredEventArgs(this));
         }
         else
         {
             isDrag = false;
             isWithinBounds = false;
         }
-
-        return Task.CompletedTask;
     }
 }

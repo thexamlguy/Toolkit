@@ -1,9 +1,11 @@
-﻿namespace Toolkit.Foundation;
+﻿using CommunityToolkit.Mvvm.Messaging;
+
+namespace Toolkit.Foundation;
 
 public class ConfigurationInitializer<TConfiguration>(IConfigurationReader<TConfiguration> reader,
     IConfigurationWriter<TConfiguration> writer,
     IConfigurationFactory<TConfiguration> factory,
-    IPublisher publisher) :
+    IMessenger messenger) :
     IConfigurationInitializer<TConfiguration>,
     IInitialization
     where TConfiguration :
@@ -20,6 +22,6 @@ public class ConfigurationInitializer<TConfiguration>(IConfigurationReader<TConf
             }
         }
 
-        publisher.PublishUI(new ActivatedEventArgs<TConfiguration>(configuration));
+        messenger.Send(new ActivatedEventArgs<TConfiguration>(configuration));
     }
 }

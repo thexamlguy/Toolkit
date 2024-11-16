@@ -2,12 +2,14 @@
 
 public interface IHandler;
 
-public interface IHandler<in TRequest, TResponse> :
+public interface IHandler<TMessage> :
     IHandler
 {
-    Task<TResponse> Handle(TRequest args,
-        CancellationToken cancellationToken);
+    void Handle(TMessage args);
 }
 
-public interface IHandler<in TRequest> :
-    IHandler<TRequest, Unit>;
+public interface IHandler<TMessage, TResponse> :
+    IHandler
+{
+    TResponse Handle(TMessage args);
+}

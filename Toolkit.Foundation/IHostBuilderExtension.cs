@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using CommunityToolkit.Mvvm.Messaging;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.FileProviders;
@@ -163,7 +164,7 @@ public static class IHostBuilderExtension
                     new ConfigurationInitializer<TConfiguration>(provider.GetRequiredKeyedService<IConfigurationReader<TConfiguration>>(section),
                         provider.GetRequiredKeyedService<IConfigurationWriter<TConfiguration>>(section),
                         provider.GetRequiredKeyedService<IConfigurationFactory<TConfiguration>>(section),
-                        provider.GetRequiredService<IPublisher>()));
+                        provider.GetRequiredService<IMessenger>()));
 
                 services.AddTransient<IConfigurationInitializer<TConfiguration>, ConfigurationInitializer<TConfiguration>>(provider =>
                     provider.GetRequiredService<IServiceFactory>().Create<ConfigurationInitializer<TConfiguration>>(section));
@@ -188,7 +189,7 @@ public static class IHostBuilderExtension
                         provider.GetRequiredKeyedService<IConfigurationCache>(section),
                         provider.GetRequiredKeyedService<IConfigurationFile<TConfiguration>>(section),
                         provider.GetRequiredService<IServiceProvider>(), 
-                        provider.GetRequiredService<IPublisher>()));
+                        provider.GetRequiredService<IMessenger>()));
             }
         });
 

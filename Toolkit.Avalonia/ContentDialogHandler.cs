@@ -5,9 +5,9 @@ using Toolkit.UI.Controls.Avalonia;
 namespace Toolkit.Avalonia;
 
 public class ContentDialogHandler :
-    INotificationHandler<NavigateEventArgs<ContentDialog>>
+    IHandler<NavigateEventArgs<ContentDialog>>
 {
-    public async Task Handle(NavigateEventArgs<ContentDialog> args)
+    public async void Handle(NavigateEventArgs<ContentDialog> args)
     {
         if (args.Template is ContentDialog dialog)
         {
@@ -76,41 +76,33 @@ public class ContentDialogHandler :
 
                             deferral.Complete();
                         }
-
-                        if (!cancelled)
-                        {
-                            if (content is IDeactivating deactivating)
-                            {
-                                await deactivating.OnDeactivating();
-                            }
-                        }
                     }
                 }
             }
 
-            async void HandleOpened(FluentAvalonia.UI.Controls.ContentDialog sender,
+            void HandleOpened(FluentAvalonia.UI.Controls.ContentDialog sender,
                 EventArgs args)
             {
                 dialog.Opened -= HandleOpened;
                 if (dialog.DataContext is object content)
                 {
-                    if (content is IActivated activated)
-                    {
-                        await activated.OnActivated();
-                    }
+                    //if (content is IActivated activated)
+                    //{
+                    //    activated.OnActivated();
+                    //}
                 }
             }
 
-            async void HandleClosed(FluentAvalonia.UI.Controls.ContentDialog sender,
+            void HandleClosed(FluentAvalonia.UI.Controls.ContentDialog sender,
                 FluentAvalonia.UI.Controls.ContentDialogClosedEventArgs args)
             {
                 dialog.Closed -= HandleClosed;
                 if (dialog.DataContext is object content)
                 {
-                    if (content is IDeactivated deactivated)
-                    {
-                        await deactivated.OnDeactivated();
-                    }
+                    //if (content is IDeactivated deactivated)
+                    //{
+                    //    deactivated.OnDeactivated();
+                    //}
                 }
             }
 

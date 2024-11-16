@@ -1,11 +1,12 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using CommunityToolkit.Mvvm.Messaging;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Toolkit.Foundation;
 
 public class Navigation(IServiceProvider provider,
     INavigationRegionProvider navigationRegionProvider,
     IContentFactory contentFactory,
-    IPublisher publisher) :
+    IMessenger messenger) :
     INavigation
 {
     public void Navigate(string route,
@@ -71,7 +72,7 @@ public class Navigation(IServiceProvider provider,
                             if (Activator.CreateInstance(navigateEventType, [region, template, content, sender, parameters])
                                 is object navigateEvent)
                             {
-                                publisher.Publish(navigateEvent, navigationType.Name);
+                                messenger.Send(navigateEvent, navigationType.Name);
                                 if (currentSegmentIndex == segmentCount)
                                 {
                                     navigated?.Invoke(this, EventArgs.Empty);
@@ -97,7 +98,7 @@ public class Navigation(IServiceProvider provider,
             Type navigateType = typeof(NavigateBackEventArgs<>).MakeGenericType(navigationType);
             if (Activator.CreateInstance(navigateType, [region]) is object navigate)
             {
-                publisher.Publish(navigate, navigationType.Name);
+                messenger.Send(navigate, navigationType.Name);
             }
         }
     }

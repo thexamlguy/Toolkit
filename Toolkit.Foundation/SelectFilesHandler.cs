@@ -1,7 +1,7 @@
 ﻿namespace Toolkit.Foundation;
 
 public class SelectFilesHandler(IFileProvider fileProvider) :
-    IHandler<SelectionEventArgs<FileFilter>, IReadOnlyCollection<string>?>
+    IAsyncHandler<SelectionEventArgs<FileFilter>, IReadOnlyCollection<string>?>
 {
     public async Task<IReadOnlyCollection<string>?> Handle(SelectionEventArgs<FileFilter> args,
         CancellationToken cancellationToken)

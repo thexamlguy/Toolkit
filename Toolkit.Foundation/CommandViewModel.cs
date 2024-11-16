@@ -1,14 +1,13 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 
 namespace Toolkit.Foundation;
 
 public partial class CommandViewModel(IServiceProvider provider,
     IServiceFactory factory,
-    IMediator mediator,
-    IPublisher publisher,
-    ISubscriber subscriber,
+    IMessenger messenger,
     IDisposer disposer) :
-    Observable(provider, factory, mediator, publisher, subscriber, disposer)
+    Observable(provider, factory, messenger, disposer)
 {
     public IRelayCommand InvokeCommand =>
         new AsyncRelayCommand(InvokeAsync);

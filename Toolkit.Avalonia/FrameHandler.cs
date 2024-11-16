@@ -8,10 +8,10 @@ using Toolkit.UI.Controls.Avalonia;
 namespace Toolkit.Avalonia;
 
 public class FrameHandler(ITransientNavigationStore<Frame> navigationStore) :
-    INotificationHandler<NavigateEventArgs<Frame>>,
-    INotificationHandler<NavigateBackEventArgs<Frame>>
+    IHandler<NavigateEventArgs<Frame>>,
+    IHandler<NavigateBackEventArgs<Frame>>
 {
-    public Task Handle(NavigateEventArgs<Frame> args)
+    public void Handle(NavigateEventArgs<Frame> args)
     {
         if (args.Region is Frame frame)
         {
@@ -32,10 +32,10 @@ public class FrameHandler(ITransientNavigationStore<Frame> navigationStore) :
                                 sender.RemoveHandler(Frame.NavigatedFromEvent, HandleNavigatedFrom);
                                 if (sender.DataContext is object content)
                                 {
-                                    if (content is IDeactivated deactivated)
-                                    {
-                                        await deactivated.OnDeactivated();
-                                    }
+                                    //if (content is IDeactivated deactivated)
+                                    //{
+                                    //    await deactivated.OnDeactivated();
+                                    //}
 
                                     if (content is IDisposable disposable)
                                     {
@@ -61,10 +61,10 @@ public class FrameHandler(ITransientNavigationStore<Frame> navigationStore) :
 
                                 if (!args.Cancel)
                                 {
-                                    if (content is IDeactivating deactivating)
-                                    {
-                                        await deactivating.OnDeactivating();
-                                    }
+                                    //if (content is IDeactivating deactivating)
+                                    //{
+                                    //    await deactivating.OnDeactivating();
+                                    //}
                                 }
                             }
                         }
@@ -72,10 +72,10 @@ public class FrameHandler(ITransientNavigationStore<Frame> navigationStore) :
                         sender.AddHandler(Frame.NavigatingFromEvent, HandleNavigatingFrom);
                         if (sender.DataContext is object content)
                         {
-                            if (content is IActivated activated)
-                            {
-                                await activated.OnActivated();
-                            }
+                            //if (content is IActivated activated)
+                            //{
+                            //    await activated.OnActivated();
+                            //}
                         }
 
                         async void HandleUnloaded(object? _, RoutedEventArgs __)
@@ -87,10 +87,10 @@ public class FrameHandler(ITransientNavigationStore<Frame> navigationStore) :
 
                             if (control.DataContext is object content)
                             {
-                                if (content is IDeactivated deactivated)
-                                {
-                                    await deactivated.OnDeactivated();
-                                }
+                                //if (content is IDeactivated deactivated)
+                                //{
+                                //    await deactivated.OnDeactivated();
+                                //}
 
                                 if (content is IDisposable disposable)
                                 {
@@ -206,17 +206,13 @@ public class FrameHandler(ITransientNavigationStore<Frame> navigationStore) :
                 }
             }
         }
-
-        return Task.CompletedTask;
     }
 
-    public Task Handle(NavigateBackEventArgs<Frame> args)
+    public void Handle(NavigateBackEventArgs<Frame> args)
     {
         if (args.Context is Frame frame)
         {
             frame.GoBack();
         }
-
-        return Task.CompletedTask;
     }
 }

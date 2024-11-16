@@ -1,5 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections;
 using System.Collections.Specialized;
@@ -8,12 +8,8 @@ using System.Reactive.Disposables;
 namespace Toolkit.Foundation;
 
 public partial class ObservableCollection<TViewModel> :
-    ObservableObject,
+    ObservableRecipient,
     IObservableCollectionViewModel<TViewModel>,
-    IInitialization,
-    IActivated,
-    IDeactivating,
-    IDeactivated,
     IList<TViewModel>,
     IList,
     IReadOnlyList<TViewModel>,
@@ -21,25 +17,21 @@ public partial class ObservableCollection<TViewModel> :
     ICollectionSynchronization<TViewModel>,
     IServiceProviderRequired,
     IServiceFactoryRequired,
-    IMediatorRequired,
-    IPublisherRequired,
+    IMessengerRequired,
     IDisposerRequired,
-    INotificationHandler<RemoveEventArgs<TViewModel>>,
-    INotificationHandler<RemoveAtEventArgs<TViewModel>>,
-    INotificationHandler<CreateEventArgs<TViewModel>>,
-    INotificationHandler<InsertEventArgs<TViewModel>>,
-    INotificationHandler<MoveEventArgs<TViewModel>>,
-    INotificationHandler<MoveToEventArgs<TViewModel>>,
-    INotificationHandler<ReplaceEventArgs<TViewModel>>,
-    INotificationHandler<SelectionEventArgs<TViewModel>>
+    IRecipient<RemoveEventArgs<TViewModel>>,
+    IRecipient<RemoveAtEventArgs<TViewModel>>,
+    IRecipient<CreateEventArgs<TViewModel>>,
+    IRecipient<InsertEventArgs<TViewModel>>,
+    IRecipient<MoveEventArgs<TViewModel>>,
+    IRecipient<MoveToEventArgs<TViewModel>>,
+    IRecipient<ReplaceEventArgs<TViewModel>>
     where TViewModel : notnull,
     IDisposable
 {
     private readonly System.Collections.ObjectModel.ObservableCollection<TViewModel> collection = [];
 
     private readonly IDispatcher dispatcher;
-
-    private readonly Queue<object> pendingEvents = [];
 
     private readonly Dictionary<string, object> trackedProperties = [];
 
@@ -49,28 +41,20 @@ public partial class ObservableCollection<TViewModel> :
     private Func<TViewModel>? defaultSelectionFactory;
 
     [ObservableProperty]
-    private bool isActivated;
+    private bool initialized;
 
     private bool isClearing;
-
-    [ObservableProperty]
-    private bool isInitialized;
 
     [ObservableProperty]
     private TViewModel? selectedItem;
 
     public ObservableCollection(IServiceProvider provider,
         IServiceFactory factory,
-        IMediator mediator,
-        IPublisher publisher,
-        ISubscriber subscriber,
-        IDisposer disposer)
+        IMessenger messenger,
+        IDisposer disposer) : base(messenger)
     {
         Provider = provider;
         Factory = factory;
-        Mediator = mediator;
-        Publisher = publisher;
-        Subscriber = subscriber;
         Disposer = disposer;
 
         dispatcher = Provider.GetRequiredService<IDispatcher>();
@@ -79,17 +63,12 @@ public partial class ObservableCollection<TViewModel> :
 
     public ObservableCollection(IServiceProvider provider,
         IServiceFactory factory,
-        IMediator mediator,
-        IPublisher publisher,
-        ISubscriber subscriber,
+        IMessenger messenger,
         IDisposer disposer,
-        IEnumerable<TViewModel> items)
+        IEnumerable<TViewModel> items) : base(messenger)
     {
         Provider = provider;
         Factory = factory;
-        Mediator = mediator;
-        Publisher = publisher;
-        Subscriber = subscriber;
         Disposer = disposer;
 
         dispatcher = Provider.GetRequiredService<IDispatcher>();
@@ -105,20 +84,11 @@ public partial class ObservableCollection<TViewModel> :
     public IServiceFactory Factory { get; private set; }
 
     bool IList.IsFixedSize => false;
-
     bool ICollection<TViewModel>.IsReadOnly => false;
-
     bool IList.IsReadOnly => false;
-
     bool ICollection.IsSynchronized => false;
-
-    public IMediator Mediator { get; }
-
+    public new IMessenger Messenger { get; private set; }
     public IServiceProvider Provider { get; private set; }
-
-    public IPublisher Publisher { get; private set; }
-
-    public ISubscriber Subscriber { get; }
 
     object ICollection.SyncRoot => this;
 
@@ -145,29 +115,6 @@ public partial class ObservableCollection<TViewModel> :
 
             this[index] = item!;
         }
-    }
-
-    public void Activate(Func<ActivationBuilder> activateDelegate,
-        bool reset = false)
-    {
-        if (reset)
-        {
-            Clear();
-        }
-
-        ActivationBuilder builder = activateDelegate.Invoke();
-        Publisher.Publish(builder.Value, builder.Key);
-    }
-
-    public void Activate(bool reset = false)
-    {
-        if (reset)
-        {
-            Clear();
-        }
-
-        ActivationBuilder builder = ActivationBuilder();
-        Publisher.PublishUI(builder.Value, builder.Key);
     }
 
     public TViewModel Add<T>(params object?[] parameters)
@@ -289,151 +236,12 @@ public partial class ObservableCollection<TViewModel> :
     IEnumerator IEnumerable.GetEnumerator() =>
         ((IEnumerable)collection).GetEnumerator();
 
-    public Task Handle(RemoveEventArgs<TViewModel> args)
-    {
-        if (IsActivated)
-        {
-            foreach (TViewModel item in this.ToList())
-            {
-                if (args.Sender is not null && args.Sender.Equals(item))
-                {
-                    Remove(item);
-                }
-            }
-        }
-        else
-        {
-            pendingEvents.Enqueue(args);
-        }
-
-        return Task.CompletedTask;
-    }
-
-    public Task Handle(CreateEventArgs<TViewModel> args)
-    {
-        if (IsActivated)
-        {
-            if (args.Sender is TViewModel item)
-            {
-                Add(item);
-            }
-        }
-        else
-        {
-            pendingEvents.Enqueue(args);
-        }
-
-        return Task.CompletedTask;
-    }
-
-    public Task Handle(InsertEventArgs<TViewModel> args)
-    {
-        if (IsActivated)
-        {
-            if (args.Sender is TViewModel item)
-            {
-                Insert(args.Index, item);
-            }
-        }
-        else
-        {
-            pendingEvents.Enqueue(args);
-        }
-
-        return Task.CompletedTask;
-    }
-
-    public Task Handle(MoveToEventArgs<TViewModel> args)
-    {
-        if (IsActivated)
-        {
-            Move(args.OldIndex, args.NewIndex);
-        }
-        else
-        {
-            pendingEvents.Enqueue(args);
-        }
-
-        return Task.CompletedTask;
-    }
-
-    public Task Handle(MoveEventArgs<TViewModel> args)
-    {
-        if (IsActivated)
-        {
-            if (args.Sender is TViewModel item)
-            {
-                Move(args.Index, item);
-            }
-        }
-        else
-        {
-            pendingEvents.Enqueue(args);
-        }
-
-        return Task.CompletedTask;
-    }
-
-    public Task Handle(ReplaceEventArgs<TViewModel> args)
-    {
-        if (IsActivated)
-        {
-            if (args.Sender is TViewModel item)
-            {
-                Replace(args.Index, item);
-            }
-        }
-        else
-        {
-            pendingEvents.Enqueue(args);
-        }
-
-        return Task.CompletedTask;
-    }
-
-    public Task Handle(RemoveAtEventArgs<TViewModel> args)
-    {
-        if (IsActivated)
-        {
-            int index = args.Index;
-            if (index >= 0 && index <= Count - 1)
-            {
-                RemoveAt(index);
-            }
-        }
-        else
-        {
-            pendingEvents.Enqueue(args);
-        }
-
-        return Task.CompletedTask;
-    }
-
-    public Task Handle(SelectionEventArgs<TViewModel> args) =>
-        Task.CompletedTask;
-
     public int IndexOf(TViewModel item) =>
         collection.IndexOf(item);
 
     int IList.IndexOf(object? value) =>
         IsCompatibleObject(value) ?
         IndexOf((TViewModel)value!) : -1;
-
-    [RelayCommand]
-    public virtual void Initialize()
-    {
-        if (IsInitialized)
-        {
-            return;
-        }
-
-        IsInitialized = true;
-        Subscriber.Subscribe(this);
-
-        OnInitialize();
-
-        Activate();
-    }
 
     public TViewModel Insert<T>(int index = 0,
         params object?[] parameters)
@@ -519,29 +327,65 @@ public partial class ObservableCollection<TViewModel> :
         return true;
     }
 
-    public virtual Task OnActivated()
-    {
-        IsActivated = true;
-        while (pendingEvents.Count > 0)
-        {
-            object current = pendingEvents.Dequeue();
-            Handle((dynamic)current);
-        }
-
-        return Task.CompletedTask;
-    }
-
-    public virtual Task OnDeactivated()
-    {
-        IsActivated = false;
-        return Task.CompletedTask;
-    }
-
-    public virtual Task OnDeactivating() =>
-        Task.CompletedTask;
-
     public virtual void OnInitialize()
     {
+    }
+
+    public void Receive(RemoveEventArgs<TViewModel> args)
+    {
+        foreach (TViewModel item in this.ToList())
+        {
+            if (args.Sender is not null && args.Sender.Equals(item))
+            {
+                Remove(item);
+            }
+        }
+    }
+
+    public void Receive(CreateEventArgs<TViewModel> args)
+    {
+        if (args.Sender is TViewModel item)
+        {
+            Add(item);
+        }
+    }
+
+    public void Receive(InsertEventArgs<TViewModel> args)
+    {
+        if (args.Sender is TViewModel item)
+        {
+            Insert(args.Index, item);
+        }
+    }
+
+    public void Receive(MoveToEventArgs<TViewModel> args)
+    {
+        Move(args.OldIndex, args.NewIndex);
+    }
+
+    public void Receive(MoveEventArgs<TViewModel> args)
+    {
+        if (args.Sender is TViewModel item)
+        {
+            Move(args.Index, item);
+        }
+    }
+
+    public void Receive(ReplaceEventArgs<TViewModel> args)
+    {
+        if (args.Sender is TViewModel item)
+        {
+            Replace(args.Index, item);
+        }
+    }
+
+    public void Receive(RemoveAtEventArgs<TViewModel> args)
+    {
+        int index = args.Index;
+        if (index >= 0 && index <= Count - 1)
+        {
+            RemoveAt(index);
+        }
     }
 
     public bool Remove(TViewModel item)
@@ -637,7 +481,7 @@ public partial class ObservableCollection<TViewModel> :
         }
     }
 
-    public void SetSource(IList<TViewModel> source,                                                                                                                                                                                       Func<TViewModel>? defaultSelectionFactory)
+    public void SetSource(IList<TViewModel> source, Func<TViewModel>? defaultSelectionFactory)
     {
         foreach (TViewModel item in source)
         {
@@ -666,9 +510,6 @@ public partial class ObservableCollection<TViewModel> :
         }
     }
 
-    protected virtual ActivationBuilder ActivationBuilder() =>
-        new(new ActivationEventArgs<TViewModel>());
-
     protected virtual void ClearItems() =>
         collection.Clear();
 
@@ -692,10 +533,6 @@ public partial class ObservableCollection<TViewModel> :
         collection.Insert(index > Count ? Count : index, item);
     }
 
-    protected virtual void OnSelectedItemChanged()
-    {
-    }
-
     protected virtual void RemoveItem(int index) =>
         collection.RemoveAt(index);
 
@@ -711,18 +548,6 @@ public partial class ObservableCollection<TViewModel> :
         CollectionChanged?.Invoke(this, args);
     }
 
-    partial void OnIsActivatedChanged(bool value)
-    {
-        if (value)
-        {
-            while (pendingEvents.Count > 0)
-            {
-                object current = pendingEvents.Dequeue();
-                Handle((dynamic)current);
-            }
-        }
-    }
-
     partial void OnSelectedItemChanged(TViewModel? oldValue, TViewModel? newValue)
     {
         if (oldValue is ISelectable oldSelection)
@@ -735,8 +560,7 @@ public partial class ObservableCollection<TViewModel> :
             newSelection.IsSelected = true;
         }
 
-        Publisher.Publish(Selection.As(SelectedItem));
-        OnSelectedItemChanged();
+        Messenger.Send(Selection.As(SelectedItem));
     }
 
     private void SourceCollectionChanged(object? sender,
@@ -785,6 +609,7 @@ public partial class ObservableCollection<TViewModel> :
                 break;
         }
     }
+
     private void UpdateSelection(TViewModel item)
     {
         if (item is ISelectable newSelection)
@@ -809,32 +634,27 @@ public partial class ObservableCollection<TValue, TViewModel> :
     [ObservableProperty]
     private TValue? value;
 
-    public ObservableCollection(IServiceProvider provider, 
+    public ObservableCollection(IServiceProvider provider,
         IServiceFactory factory,
-        IMediator mediator,
-        IPublisher publisher, 
-        ISubscriber subscriber,
+        IMessenger messenger,
         IDisposer disposer,
-        TValue? value = default) : base(provider, factory, mediator, publisher, subscriber, disposer)
+        TValue? value = default) : base(provider, factory, messenger, disposer)
     {
         Value = value;
     }
 
     public ObservableCollection(IServiceProvider provider,
-        IServiceFactory factory, 
-        IMediator mediator,
-        IPublisher publisher,
-        ISubscriber subscriber, 
-        IDisposer disposer, 
+        IServiceFactory factory,
+        IMessenger messenger,
+        IDisposer disposer,
         IEnumerable<TViewModel> items,
-        TValue? value = default) : base(provider, factory, mediator, publisher, subscriber, disposer, items)
+        TValue? value = default) : base(provider, factory, messenger, disposer, items)
     {
         Value = value;
     }
 
     protected virtual void OnChanged(TValue? value)
     {
-
     }
 
     partial void OnValueChanged(TValue? value) => OnChanged(value);
@@ -852,12 +672,10 @@ public partial class ObservableCollection<TViewModel, TKey, TValue> :
 
     public ObservableCollection(IServiceProvider provider,
         IServiceFactory factory,
-        IMediator mediator,
-        IPublisher publisher,
-        ISubscriber subscriber,
+        IMessenger messenger,
         IDisposer disposer,
         TKey key,
-        TValue? value = default) : base(provider, factory, mediator, publisher, subscriber, disposer)
+        TValue? value = default) : base(provider, factory, messenger, disposer)
     {
         Key = key;
         Value = value;
@@ -865,13 +683,11 @@ public partial class ObservableCollection<TViewModel, TKey, TValue> :
 
     public ObservableCollection(IServiceProvider provider,
         IServiceFactory factory,
-        IMediator mediator,
-        IPublisher publisher,
-        ISubscriber subscriber,
+        IMessenger messenger,
         IDisposer disposer,
         IEnumerable<TViewModel> items,
         TKey key,
-        TValue? value = default) : base(provider, factory, mediator, publisher, subscriber, disposer, items)
+        TValue? value = default) : base(provider, factory, messenger, disposer, items)
     {
         Key = key;
         Value = value;
@@ -883,20 +699,18 @@ public class ObservableCollection :
 {
     public ObservableCollection(IServiceProvider provider,
         IServiceFactory factory,
-        IMediator mediator,
-        IPublisher publisher,
-        ISubscriber subscriber,
-        IDisposer disposer) : base(provider, factory, mediator, publisher, subscriber, disposer)
+        IMessenger messenger,
+        IDisposer disposer) : base(provider, factory, messenger, disposer)
     {
+
     }
 
     public ObservableCollection(IServiceProvider provider,
         IServiceFactory factory,
-        IMediator mediator,
-        IPublisher publisher,
-        ISubscriber subscriber,
+        IMessenger messenger,
         IDisposer disposer,
-        IEnumerable<IDisposable> items) : base(provider, factory, mediator, publisher, subscriber, disposer, items)
+        IEnumerable<IDisposable> items) : base(provider, factory, messenger, disposer, items)
     {
+
     }
 }

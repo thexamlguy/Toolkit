@@ -26,12 +26,12 @@ public class ComponentBuilder :
 
                 services.AddSingleton<IDisposer, Disposer>();
 
-                services.AddScoped<SubscriptionCollection>();
+                //services.AddScoped<SubscriptionCollection>();
 
-                services.AddTransient<IHandlerProvider, HandlerProvider>();
-                services.AddScoped<ISubscriber, Subscriber>();
-                services.AddTransient<IPublisher, Publisher>();
-                services.AddTransient<IMediator, Mediator>();
+                //services.AddTransient<IHandlerProvider, HandlerProvider>();
+                //services.AddScoped<ISubscriber, Subscriber>();
+                //services.AddTransient<IPublisher, Publisher>();
+                //services.AddTransient<IMediator, Mediator>();
 
                 services.AddTransient<IValidation, Validation>();
                 services.AddTransient<IValidatorCollection, ValidatorCollection>();
@@ -42,8 +42,8 @@ public class ComponentBuilder :
                 services.AddScoped<INavigationRegionCollection, NavigationRegionCollection>();
                 services.AddTransient<INavigationRegionProvider, NavigationRegionProvider>();
 
-                services.AddHandler<NavigateHandler>();
-                services.AddHandler<NavigateBackHandler>();
+                //services.AddHandler<NavigateHandler>();
+                //services.AddHandler<NavigateBackHandler>();
             });
     }
 

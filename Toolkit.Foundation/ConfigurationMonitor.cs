@@ -1,12 +1,13 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using CommunityToolkit.Mvvm.Messaging;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Toolkit.Foundation;
 
 public class ConfigurationMonitor<TConfiguration>(string section,
     IConfigurationCache cache,
     IConfigurationFile<TConfiguration> file, 
-    IServiceProvider serviceProvider,
-    IPublisher publisher) :
+    IServiceProvider provider,
+    IMessenger messenger) :
     IConfigurationMonitor<TConfiguration>
     where TConfiguration :
     class
@@ -18,11 +19,11 @@ public class ConfigurationMonitor<TConfiguration>(string section,
         void ChangedHandler(object sender,
             FileSystemEventArgs args)
         {
-            if (serviceProvider.GetRequiredKeyedService<IConfigurationDescriptor<TConfiguration>>(section) is 
+            if (provider.GetRequiredKeyedService<IConfigurationDescriptor<TConfiguration>>(section) is 
                 IConfigurationDescriptor<TConfiguration> configuration)
             {
                 cache.Remove(section);
-                publisher.PublishUI(new ChangedEventArgs<TConfiguration>(configuration.Value));
+                messenger.Send(new ChangedEventArgs<TConfiguration>(configuration.Value));
             }
         }
 

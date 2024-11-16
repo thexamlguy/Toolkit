@@ -5,9 +5,9 @@ using Toolkit.Foundation;
 namespace Toolkit.Avalonia;
 
 public class ContentControlHandler :
-    INotificationHandler<NavigateEventArgs<ContentControl>>
+    IHandler<NavigateEventArgs<ContentControl>>
 {
-    public async Task Handle(NavigateEventArgs<ContentControl> args)
+    public void Handle(NavigateEventArgs<ContentControl> args)
     {
         if (args.Region is ContentControl contentControl)
         {
@@ -19,10 +19,10 @@ public class ContentControlHandler :
                     control.Loaded -= HandleLoaded;
                     if (control.DataContext is object content)
                     {
-                        if (content is IActivated activated)
-                        {
-                            await activated.OnActivated();
-                        }
+                        //if (content is IActivated activated)
+                        //{
+                        //    await activated.OnActivated();
+                        //}
                     }
 
                     taskCompletionSource.SetResult();
@@ -33,10 +33,10 @@ public class ContentControlHandler :
                     control.Unloaded -= HandleLoaded;
                     if (control.DataContext is object content)
                     {
-                        if (content is IDeactivated deactivated)
-                        {
-                            await deactivated.OnDeactivated();
-                        }
+                        //if (content is IDeactivated deactivated)
+                        //{
+                        //    await deactivated.OnDeactivated();
+                        //}
 
                         if (content is IDisposable disposable)
                         {
@@ -52,8 +52,6 @@ public class ContentControlHandler :
 
                 contentControl.Content = null;
                 contentControl.Content = control;
-
-                await taskCompletionSource.Task;
             }
         }
     }

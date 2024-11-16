@@ -30,10 +30,10 @@ public class ContentTemplate :
                             control.Loaded -= HandleLoaded;
                             if (control.DataContext is object content)
                             {
-                                if (content is IActivated activated)
-                                {
-                                    await activated.OnActivated();
-                                }
+                                //if (content is IActivated activated)
+                                //{
+                                //    await activated.OnActivated();
+                                //}
                             }
                         }
 
@@ -41,10 +41,10 @@ public class ContentTemplate :
                         {
                             if (control.DataContext is object content)
                             {
-                                if (content is IActivated activated)
-                                {
-                                    await activated.OnActivated();
-                                }
+                                //if (content is IActivated activated)
+                                //{
+                                //    await activated.OnActivated();
+                                //}
                             }
                         }
 
@@ -53,10 +53,10 @@ public class ContentTemplate :
                             control.Unloaded -= HandleUnloaded;
                             if (control.DataContext is object content)
                             {
-                                if (content is IDeactivated deactivated)
-                                {
-                                    await deactivated.OnDeactivated();
-                                }
+                                //if (content is IDeactivated deactivated)
+                                //{
+                                //    await deactivated.OnDeactivated();
+                                //}
                             }
                         }
 
@@ -92,10 +92,10 @@ public class ContentTemplate :
                             control.Loaded -= HandleLoaded;
                             if (control.DataContext is object content)
                             {
-                                if (content is IActivated activated)
-                                {
-                                    await activated.OnActivated();
-                                }
+                                //if (content is IActivated activated)
+                                //{
+                                //    await activated.OnActivated();
+                                //}
                             }
                         }
 
@@ -103,10 +103,10 @@ public class ContentTemplate :
                         {
                             if (control.DataContext is object content)
                             {
-                                if (content is IActivated activated)
-                                {
-                                    await activated.OnActivated();
-                                }
+                                //if (content is IActivated activated)
+                                //{
+                                //    await activated.OnActivated();
+                                //}
                             }
                         }
 
@@ -115,10 +115,10 @@ public class ContentTemplate :
                             control.Unloaded -= HandleUnloaded;
                             if (control.DataContext is object content)
                             {
-                                if (content is IDeactivated deactivated)
-                                {
-                                    await deactivated.OnDeactivated();
-                                }
+                                //if (content is IDeactivated deactivated)
+                                //{
+                                //    await deactivated.OnDeactivated();
+                                //}
                             }
                         }
 
