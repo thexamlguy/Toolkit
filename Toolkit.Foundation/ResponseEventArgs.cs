@@ -5,5 +5,5 @@ namespace Toolkit.Foundation;
 public class ResponseEventArgs<TMessage, TResponse> :
     RequestMessage<TResponse>
 {
-    public TMessage? Message { get; set; }
+    public required TMessage Message { get; set; }
 }

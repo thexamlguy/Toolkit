@@ -7,6 +7,10 @@ namespace Toolkit.Windows;
 
 public class WindowHelper
 {
+    public static IntPtr GetHandle(string windowName) => PInvoke.FindWindow(windowName, null);
+
+    public static uint GetDpi(IntPtr handle) => PInvoke.GetDpiForWindow((HWND)handle);
+
     public static void BringToForeground(HWND handle)
     {
         if (TryGetBoundsUnsafe(handle, out RECT bounds))

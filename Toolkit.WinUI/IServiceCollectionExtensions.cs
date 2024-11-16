@@ -9,6 +9,7 @@ public static class IServiceCollectionExtensions
     {
         services.AddTransient<IDispatcher, WinUIDispatcher>();
         services.AddTransient<IDispatcherTimerFactory, DispatcherTimerFactory>();
+        services.AddSingleton<IWindowRegistry, WindowRegistry>();
 
         services.AddTransient((Func<IServiceProvider, IProxyServiceCollection<IComponentBuilder>>)(provider =>
             new ProxyServiceCollection<IComponentBuilder>(services =>

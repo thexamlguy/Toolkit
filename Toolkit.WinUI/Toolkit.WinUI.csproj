@@ -23,6 +23,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Toolkit.Foundation\Toolkit.Foundation.csproj" />
+		<ProjectReference Include="..\Toolkit.Windows\Toolkit.Windows.csproj" />
 	</ItemGroup>
 
 </Project>

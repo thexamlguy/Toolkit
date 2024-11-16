@@ -2,6 +2,10 @@
 
 namespace Toolkit.Windows;
 
-public interface IWndProcMonitor :
+public interface IWndProc :
     IInitialization, 
-    IDisposable;
+    IDisposable
+{
+
+    IntPtr Handle { get; }
+}

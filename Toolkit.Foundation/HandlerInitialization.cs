@@ -11,7 +11,15 @@ public class HandlerInitialization<TMessage, TResponse, THandler>(IServiceProvid
             (provider, args) => args.Reply(provider.GetRequiredService<THandler>().Handle(args.Message)));
 }
 
-public class HandlerInitialization<TMessage, THandler>(string key, IServiceProvider provider) :
+public class HandlerInitialization<TMessage, THandler>(IServiceProvider provider) :
+    IInitialization where THandler : class, IHandler<TMessage>
+        where TMessage : class
+{
+    public void Initialize() => WeakReferenceMessenger.Default.Register<IServiceProvider, TMessage>(provider,
+        (provider, args) => provider.GetRequiredService<THandler>().Handle(args));
+}
+
+public class HandlerKeyedInitialization<TMessage, THandler>(string key, IServiceProvider provider) :
     IInitialization where THandler : class, IHandler<TMessage>
         where TMessage : class
 {

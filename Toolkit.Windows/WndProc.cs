@@ -6,8 +6,8 @@ using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace Toolkit.Windows;
 
-public class WndProcMonitor(IMessenger messenger) : 
-    IWndProcMonitor
+public class WndProc(IMessenger messenger) : 
+    IWndProc
 {
     private WNDPROC? handler;
 

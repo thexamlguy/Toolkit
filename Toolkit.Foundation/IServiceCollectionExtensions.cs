@@ -4,6 +4,28 @@ namespace Toolkit.Foundation;
 
 public static class IServiceCollectionExtensions
 {
+    public static IServiceCollection AddAsyncHandler<TMessage, TResponse, THandler>(this IServiceCollection services,
+        ServiceLifetime lifetime = ServiceLifetime.Transient)
+        where THandler : class, IAsyncHandler<TMessage, TResponse>
+        where TMessage : class
+    {
+        services.Add(new ServiceDescriptor(typeof(THandler), typeof(THandler), lifetime));
+        services.AddInitialization<AsyncHandlerInitialization<TMessage, TResponse, THandler>>();
+
+        return services;
+    }
+
+    public static IServiceCollection AddAsyncHandler<TMessage, THandler>(this IServiceCollection services,
+        ServiceLifetime lifetime = ServiceLifetime.Transient)
+        where THandler : class, IAsyncHandler<TMessage>
+        where TMessage : class
+    {
+        services.Add(new ServiceDescriptor(typeof(THandler), typeof(THandler), lifetime));
+        services.AddInitialization<AsyncHandlerInitialization<TMessage, THandler>>();
+
+        return services;
+    }
+
     public static IServiceCollection AddAsyncInitialization<TInitialization>(this IServiceCollection services)
         where TInitialization : class,
         IAsyncInitialization
@@ -49,28 +71,6 @@ public static class IServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection AddAsyncHandler<TMessage, TResponse, THandler>(this IServiceCollection services,
-        ServiceLifetime lifetime = ServiceLifetime.Transient)
-        where THandler : class, IAsyncHandler<TMessage, TResponse>
-        where TMessage : class
-    {
-        services.Add(new ServiceDescriptor(typeof(THandler), typeof(THandler), lifetime));
-        services.AddInitialization<AsyncHandlerInitialization<TMessage, TResponse, THandler>>();
-
-        return services;
-    }
-
-    public static IServiceCollection AddAsyncHandler<TMessage, THandler>(this IServiceCollection services,
-        ServiceLifetime lifetime = ServiceLifetime.Transient)
-        where THandler : class, IAsyncHandler<TMessage>
-        where TMessage : class
-    {
-        services.Add(new ServiceDescriptor(typeof(THandler), typeof(THandler), lifetime));
-        services.AddInitialization<AsyncHandlerInitialization<TMessage, THandler>>();
-
-        return services;
-    }
-
     public static IServiceCollection AddHandler<TMessage, THandler>(this IServiceCollection services,
         string key)
         where THandler : class, IHandler<TMessage>
@@ -85,7 +85,7 @@ public static class IServiceCollectionExtensions
         if (key is { Length: > 0})
         {
             services.Add(new ServiceDescriptor(typeof(THandler), key, typeof(THandler), lifetime));
-            services.AddInitialization<HandlerInitialization<TMessage, THandler>>(key);
+            services.AddInitialization<HandlerKeyedInitialization<TMessage, THandler>>(key);
         }
         else
         {
@@ -93,6 +93,18 @@ public static class IServiceCollectionExtensions
             services.AddInitialization<HandlerInitialization<TMessage, THandler>>();
         }
 
+        return services;
+    }
+
+    public static IServiceCollection AddInitialization<TInitialization, TInitializationImplementation>(this IServiceCollection services,
+        ServiceLifetime lifetime = ServiceLifetime.Transient)
+        where TInitialization : class,
+        IInitialization
+        where TInitializationImplementation : class,
+        TInitialization
+    {
+        services.Add(new ServiceDescriptor(typeof(TInitialization), typeof(TInitializationImplementation), lifetime));
+        services.AddTransient<IInitialization>(provider => provider.GetRequiredService<TInitialization>());
         return services;
     }
 
