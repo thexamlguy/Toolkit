@@ -6,7 +6,7 @@
 		<Platforms>AnyCPU;x64;x86</Platforms>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="Avalonia" Version="11.2.0" />
+		<PackageReference Include="Avalonia" Version="11.2.1" />
 		<PackageReference Include="Avalonia.Xaml.Behaviors" Version="11.2.0" />
 	</ItemGroup>
 	<ItemGroup>
