@@ -7,8 +7,8 @@ using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace Toolkit.Windows;
 
-public class PointerMonitor(IMessenger messenger) : 
-    IPointerMonitor
+public class Pointer(IMessenger messenger) : 
+    IPointer
 {
     private bool isDisposed;
     private bool isPointerDrag;
@@ -16,7 +16,7 @@ public class PointerMonitor(IMessenger messenger) :
     private HOOKPROC? mouseEventDelegate;
     private UnhookWindowsHookExSafeHandle? mouseHandle;
 
-    ~PointerMonitor()
+    ~Pointer()
     {
         Dispose(false);
     }
@@ -126,9 +126,9 @@ public class PointerMonitor(IMessenger messenger) :
         }
     }
 
-    private unsafe bool TryGetPointer(out Point point)
+    private unsafe bool TryGetPointer(out System.Drawing.Point point)
     {
-        fixed (Point* lpPointLocal = &point)
+        fixed (System.Drawing.Point* lpPointLocal = &point)
         {
             return PInvoke.GetPhysicalCursorPos(lpPointLocal);
         }
@@ -136,7 +136,7 @@ public class PointerMonitor(IMessenger messenger) :
 
     private bool TryGetPointerLocation([MaybeNullWhen(false)] out PointerLocation location)
     {
-        if (TryGetPointer(out Point point))
+        if (TryGetPointer(out System.Drawing.Point point))
         {
             location = new PointerLocation(point.X, point.Y);
             return true;

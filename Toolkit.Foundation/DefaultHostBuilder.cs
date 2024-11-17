@@ -20,14 +20,8 @@ public class DefaultHostBuilder :
                     ComponentHostCollection>();
 
                 services.AddSingleton<IDisposer, Disposer>();
-                services.AddSingleton<IMessenger, WeakReferenceMessenger>(_ => WeakReferenceMessenger.Default);
+                services.AddSingleton<IMessenger, StrongReferenceMessenger>(_ => StrongReferenceMessenger.Default);
 
-                //services.AddScoped<SubscriptionCollection>();
-
-                //services.AddTransient<IHandlerProvider, HandlerProvider>();
-                //services.AddScoped<ISubscriber, Subscriber>();
-                //services.AddTransient<IPublisher, Publisher>();
-                //services.AddTransient<IMediator, Mediator>();
 
                 services.AddTransient<IValidation, Validation>();
                 services.AddTransient<IValidatorCollection, ValidatorCollection>();
@@ -57,10 +51,10 @@ public class DefaultHostBuilder :
                 services.AddTransient<IComponentFactory, ComponentFactory>();
                 services.AddTransient<IComponentScopeProvider, ComponentScopeProvider>();
 
-                //services.AddHandler<NavigateHandler>();
-                //services.AddHandler<NavigateBackHandler>();
+                services.AddHandler<NavigateEventArgs, NavigateHandler>();
+                services.AddHandler<NavigateBackEventArgs, NavigateBackHandler>();
 
-                //services.AddInitialization<ComponentInitializer>();
+                services.AddInitialization<ComponentInitializer>();
                 services.AddHostedService<AppService>();
             });
     }

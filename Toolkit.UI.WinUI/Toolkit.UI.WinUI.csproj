@@ -23,5 +23,6 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\Toolkit.Windows\Toolkit.Windows.csproj" />
+	  <ProjectReference Include="..\Toolkit.WinUI\Toolkit.WinUI.csproj" />
 	</ItemGroup>
 </Project>

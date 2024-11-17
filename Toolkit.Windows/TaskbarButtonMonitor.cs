@@ -49,7 +49,7 @@ public class TaskbarButtonMonitor :
         taskListHandle = taskbarList.GetHandle();
         taskListElement = clientUIAutomation.ElementFromHandle(taskListHandle);
 
-        if (WindowHelper.TryGetBounds(taskListHandle, out Rect? rect))
+        if (WindowHelper.TryGetWindowBounds(taskListHandle, out Rect? rect))
         {
             taskbarRectCache = rect;
         }
@@ -60,7 +60,7 @@ public class TaskbarButtonMonitor :
 
     private bool CheckDirtyTaskbarRegion()
     {
-        if (WindowHelper.TryGetBounds(taskListHandle, out Rect? rect))
+        if (WindowHelper.TryGetWindowBounds(taskListHandle, out Rect? rect))
         {
             if (taskbarRectCache?.Width != rect.Width ||
                 taskbarRectCache?.Height != rect.Height)

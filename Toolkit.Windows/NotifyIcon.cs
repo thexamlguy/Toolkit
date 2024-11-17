@@ -1,11 +1,12 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
+using System.Drawing;
 using System.Runtime.InteropServices;
 using Toolkit.Foundation;
+using Windows.Win32;
 
 namespace Toolkit.Windows;
 
-
-public partial class NotifyIcon(IWndProc wndProc,
+public class NotifyIcon(IWndProc wndProc,
     IMessenger messenger) :
     INotifyIcon,
     IRecipient<WndProcEventArgs>
@@ -16,11 +17,6 @@ public partial class NotifyIcon(IWndProc wndProc,
     private readonly Lock notifyLock = new();
     private bool isDisposed;
     private NotifyIconData notifyIconData;
-
-    ~NotifyIcon()
-    {
-        Dispose(false);
-    }
 
     private enum NotifyIconBalloonType
     {
@@ -66,6 +62,14 @@ public partial class NotifyIcon(IWndProc wndProc,
         GC.SuppressFinalize(this);
     }
 
+    public unsafe PointerLocation GetPointerPosition()
+    {
+        Point point = new();
+        _ = PInvoke.GetCursorPos(&point);
+
+        return new PointerLocation(point.X, point.Y);
+    }
+
     public void Initialize()
     {
         messenger.RegisterAll(this);
@@ -79,15 +83,18 @@ public partial class NotifyIcon(IWndProc wndProc,
             switch (message.LParam)
             {
                 case (uint)WndProcMessages.WM_LBUTTONUP:
-                    messenger.Send(new NotifyIconInvokedEventArgs(PointerButton.Left));
+                    messenger.Send(new NotifyIconInvokedEventArgs(PointerButton.Left,
+                        GetPointerPosition()));
                     break;
 
                 case (uint)WndProcMessages.WM_MBUTTONUP:
-                    messenger.Send(new NotifyIconInvokedEventArgs(PointerButton.Middle));
+                    messenger.Send(new NotifyIconInvokedEventArgs(PointerButton.Middle,
+                        GetPointerPosition()));
                     break;
 
                 case (uint)WndProcMessages.WM_RBUTTONUP:
-                    messenger.Send(new NotifyIconInvokedEventArgs(PointerButton.Right));
+                    messenger.Send(new NotifyIconInvokedEventArgs(PointerButton.Right,
+                        GetPointerPosition()));
                     break;
             }
         }

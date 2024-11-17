@@ -5,8 +5,8 @@ public class TaskbarList(ITaskbar taskbar) :
 {
     public IntPtr GetHandle()
     {
-        nint rebarHandle = WindowHelper.Find("ReBarWindow32", taskbar.GetHandle());
-        nint taskHandle = WindowHelper.Find("MSTaskSwWClass", rebarHandle);
-        return WindowHelper.Find("MSTaskListWClass", taskHandle);
+        nint rebarHandle = WindowHelper.FindWindow("ReBarWindow32", taskbar.GetHandle());
+        nint taskHandle = WindowHelper.FindWindow("MSTaskSwWClass", rebarHandle);
+        return WindowHelper.FindWindow("MSTaskListWClass", taskHandle);
     }
 }

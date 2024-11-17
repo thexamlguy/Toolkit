@@ -1,3 +1,4 @@
 ﻿namespace Toolkit.Windows;
 
-public record NotifyIconInvokedEventArgs(PointerButton PointerButton);
+public record NotifyIconInvokedEventArgs(PointerButton Button, 
+    PointerLocation Location);

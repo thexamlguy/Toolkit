@@ -40,7 +40,7 @@ public class Taskbar(IMessenger messenger,
         return state;
     }
 
-    public IntPtr GetHandle() => WindowHelper.Find("Shell_TrayWnd");
+    public IntPtr GetHandle() => WindowHelper.FindWindow("Shell_TrayWnd");
 
     public void Receive(WndProcEventArgs args)
     {
@@ -63,7 +63,7 @@ public class Taskbar(IMessenger messenger,
     public void Receive(PointerMovedEventArgs args)
     {
         nint taskbarHandle = GetHandle();
-        if (WindowHelper.TryGetBounds(taskbarHandle, out Rect? rect))
+        if (WindowHelper.TryGetWindowBounds(taskbarHandle, out Rect? rect))
         {
             if (args.Location.IsWithinBounds(rect))
             {

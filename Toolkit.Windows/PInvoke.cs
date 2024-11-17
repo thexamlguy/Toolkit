@@ -59,4 +59,9 @@ public static partial class PInvoke
 
     public static void GetAppBarPosition(ref AppBarData appBarData) => 
         SHAppBarMessage(AppBarMessage.GetTaskbarPos, ref appBarData);
+
+    internal static bool SetWindowSubclass(HWND value1, Func<HWND, uint, WPARAM, LPARAM, nuint, nuint, LRESULT> value2, int v1, nuint v2)
+    {
+        throw new NotImplementedException();
+    }
 }

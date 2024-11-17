@@ -11,6 +11,8 @@ public static class IServiceCollectionExtensions
         services.AddTransient<IDispatcherTimerFactory, DispatcherTimerFactory>();
         services.AddSingleton<IWindowRegistry, WindowRegistry>();
 
+        services.AddTransient<IContentTemplate, ContentTemplate>();
+
         services.AddTransient((Func<IServiceProvider, IProxyServiceCollection<IComponentBuilder>>)(provider =>
             new ProxyServiceCollection<IComponentBuilder>(services =>
             {
