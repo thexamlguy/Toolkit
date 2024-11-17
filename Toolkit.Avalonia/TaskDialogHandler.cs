@@ -6,9 +6,9 @@ using Toolkit.UI.Controls.Avalonia;
 namespace Toolkit.Avalonia;
 
 public class TaskDialogHandler(ITopLevelProvider topLevelProvider) :
-    IHandler<NavigateEventArgs<TaskDialog>>
+    IHandler<NavigateTemplateEventArgs>
 {
-    public async void Handle(NavigateEventArgs<TaskDialog> args)
+    public async void Handle(NavigateTemplateEventArgs args)
     {
         if (args.Template is TaskDialog dialog)
         {

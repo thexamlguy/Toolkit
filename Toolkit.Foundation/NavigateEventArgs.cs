@@ -7,7 +7,8 @@ public record NavigateEventArgs(string Route,
     EventHandler? Navigated = null,
     IDictionary<string, object>? Parameters = null);
 
-public record NavigateEventArgs<TNavigation>(object Region,
+
+public record NavigateTemplateEventArgs(object Region,
     object Template,
     object Content,
     object? Sender = null,

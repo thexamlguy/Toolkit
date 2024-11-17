@@ -24,7 +24,7 @@ public partial class Observable(IServiceProvider provider,
 
     public IServiceProvider Provider { get; } = provider;
 
-    public IMessenger Messenger { get; } = messenger;
+    public new IMessenger Messenger { get; } = messenger;
 
     public void Commit()
     {

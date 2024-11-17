@@ -6,9 +6,9 @@ using Toolkit.Foundation;
 namespace Toolkit.Avalonia;
 
 public class SingleViewApplicationHandler :
-    IHandler<NavigateEventArgs<ISingleViewApplicationLifetime>>
+    IHandler<NavigateTemplateEventArgs>
 {
-    public void Handle(NavigateEventArgs<ISingleViewApplicationLifetime> args)
+    public void Handle(NavigateTemplateEventArgs args)
     {
         if (Application.Current?.ApplicationLifetime is
             ISingleViewApplicationLifetime lifeTime)

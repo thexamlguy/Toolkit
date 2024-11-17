@@ -3,6 +3,6 @@
     public interface IContentFactory
     {
         object? Create(IContentTemplateDescriptor descriptor,
-            object[] parameters);
+            object?[] parameters);
     }
 }

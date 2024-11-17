@@ -8,10 +8,10 @@ using Toolkit.UI.Controls.Avalonia;
 namespace Toolkit.Avalonia;
 
 public class FrameHandler(ITransientNavigationStore<Frame> navigationStore) :
-    IHandler<NavigateEventArgs<Frame>>,
+    IHandler<NavigateTemplateEventArgs>,
     IHandler<NavigateBackEventArgs<Frame>>
 {
-    public void Handle(NavigateEventArgs<Frame> args)
+    public void Handle(NavigateTemplateEventArgs args)
     {
         if (args.Region is Frame frame)
         {

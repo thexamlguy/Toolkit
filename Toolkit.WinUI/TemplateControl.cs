@@ -23,56 +23,52 @@ public class TemplateControl :
 
         if (DataContext is IObservableViewModel observableViewModel)
         {
-            if (observableViewModel.Provider is IServiceProvider provider)
+            if (observableViewModel.Provider is IServiceProvider provider &&
+                provider.GetRequiredKeyedService<IContentTemplateDescriptor>(DataContext.GetType().Name.Replace("ViewModel", ""))
+                    is IContentTemplateDescriptor descriptor &&
+                    provider.GetRequiredKeyedService(descriptor.TemplateType, descriptor.Key)
+                    is FrameworkElement control)
             {
-                if (provider.GetRequiredKeyedService<IContentTemplateDescriptor>(DataContext.GetType().Name.Replace("ViewModel", ""))
-                    is IContentTemplateDescriptor descriptor)
+                void HandleLoaded(object? sender, RoutedEventArgs args)
                 {
-                    if (provider.GetRequiredKeyedService(descriptor.TemplateType, descriptor.Key)
-                        is FrameworkElement control)
+                    control.Loaded -= HandleLoaded;
+                    if (control.DataContext is object content)
                     {
-                        void HandleLoaded(object? sender, RoutedEventArgs args)
+                        if (content is IActivation activation)
                         {
-                            control.Loaded -= HandleLoaded;
-                            if (control.DataContext is object content)
-                            {
-                                if (content is IActivation activation)
-                                {
-                                    activation.IsActive = true;
-                                }
-                            }
+                            activation.IsActive = true;
                         }
-
-                        void HandleDataContextChanged(FrameworkElement? sender, DataContextChangedEventArgs args)
-                        {
-                            if (control.DataContext is object content)
-                            {
-                                if (content is IActivation activation)
-                                {
-                                    activation.IsActive = true;
-                                }
-                            }
-                        }
-
-                        void HandleUnloaded(object? sender, RoutedEventArgs args)
-                        {
-                            control.Unloaded -= HandleUnloaded;
-                            if (control.DataContext is object content)
-                            {
-                                if (content is IActivation activation)
-                                {
-                                    activation.IsActive = false;
-                                }
-                            }
-                        }
-
-                        control.Loaded += HandleLoaded;
-                        control.Unloaded += HandleUnloaded;
-                        control.DataContextChanged += HandleDataContextChanged;
-
-                        Content = control;
                     }
                 }
+
+                void HandleDataContextChanged(FrameworkElement? sender, DataContextChangedEventArgs args)
+                {
+                    if (control.DataContext is object content)
+                    {
+                        if (content is IActivation activation)
+                        {
+                            activation.IsActive = true;
+                        }
+                    }
+                }
+
+                void HandleUnloaded(object? sender, RoutedEventArgs args)
+                {
+                    control.Unloaded -= HandleUnloaded;
+                    if (control.DataContext is object content)
+                    {
+                        if (content is IActivation activation)
+                        {
+                            activation.IsActive = false;
+                        }
+                    }
+                }
+
+                control.Loaded += HandleLoaded;
+                control.Unloaded += HandleUnloaded;
+                control.DataContextChanged += HandleDataContextChanged;
+
+                Content = control;
             }
         }
     }

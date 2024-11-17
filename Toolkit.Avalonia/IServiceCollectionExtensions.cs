@@ -30,16 +30,16 @@ public static class IServiceCollectionExtensions
         services.AddAsyncHandler<SelectionEventArgs<FolderFilter>, IReadOnlyCollection<string>?, SelectFoldersHandler>();
         services.AddAsyncHandler<SelectionEventArgs<FileFilter>, IReadOnlyCollection<string>?, SelectFilesHandler>();
 
-        services.AddHandler<NavigateEventArgs<IClassicDesktopStyleApplicationLifetime>, ClassicDesktopStyleApplicationHandler>(nameof(IClassicDesktopStyleApplicationLifetime));
-        services.AddHandler<NavigateEventArgs<ISingleViewApplicationLifetime>, SingleViewApplicationHandler>(nameof(ISingleViewApplicationLifetime));
+        services.AddHandler<NavigateTemplateEventArgs, ClassicDesktopStyleApplicationHandler>(nameof(IClassicDesktopStyleApplicationLifetime));
+        services.AddHandler<NavigateTemplateEventArgs, SingleViewApplicationHandler>(nameof(ISingleViewApplicationLifetime));
 
-        services.AddHandler<NavigateEventArgs<ContentControl>, ContentControlHandler>(nameof(ContentControl));
+        services.AddHandler<NavigateTemplateEventArgs, ContentControlHandler>(nameof(ContentControl));
 
-        services.AddHandler<NavigateEventArgs<Frame>, FrameHandler>(nameof(Frame));
+        services.AddHandler<NavigateTemplateEventArgs, FrameHandler>(nameof(Frame));
         services.TryAddSingleton<ITransientNavigationStore<Frame>, TransientNavigationStore<Frame>>();
 
-        services.AddHandler<NavigateEventArgs<ContentDialog>, ContentDialogHandler>(nameof(ContentDialog));
-        services.AddHandler<NavigateEventArgs<TaskDialog>, TaskDialogHandler>(nameof(TaskDialog));
+        services.AddHandler<NavigateTemplateEventArgs, ContentDialogHandler>(nameof(ContentDialog));
+        services.AddHandler<NavigateTemplateEventArgs, TaskDialogHandler>(nameof(TaskDialog));
 
         services.AddScoped<INavigationRegionCollection, NavigationRegionCollection>(provider => new NavigationRegionCollection
         {
@@ -69,13 +69,13 @@ public static class IServiceCollectionExtensions
                 services.AddAsyncHandler<SelectionEventArgs<FolderFilter>, IReadOnlyCollection<string>?, SelectFoldersHandler>();
                 services.AddAsyncHandler<SelectionEventArgs<FileFilter>, IReadOnlyCollection<string>?, SelectFilesHandler>();
 
-                services.AddHandler<NavigateEventArgs<ContentControl>, ContentControlHandler>(nameof(ContentControl));
+                services.AddHandler<NavigateTemplateEventArgs, ContentControlHandler>(nameof(ContentControl));
 
-                services.AddHandler<NavigateEventArgs<Frame>, FrameHandler>(nameof(Frame));
+                services.AddHandler<NavigateTemplateEventArgs, FrameHandler>(nameof(Frame));
                 services.TryAddSingleton<ITransientNavigationStore<Frame>, TransientNavigationStore<Frame>>();
 
-                services.AddHandler<NavigateEventArgs<ContentDialog>, ContentDialogHandler>(nameof(ContentDialog));
-                services.AddHandler<NavigateEventArgs<TaskDialog>, TaskDialogHandler>(nameof(TaskDialog));
+                services.AddHandler<NavigateTemplateEventArgs, ContentDialogHandler>(nameof(ContentDialog));
+                services.AddHandler<NavigateTemplateEventArgs, TaskDialogHandler>(nameof(TaskDialog));
             })));
 
         return services;

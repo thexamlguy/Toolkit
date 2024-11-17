@@ -5,7 +5,7 @@ public class ContentFactory(IServiceProvider provider,
     IContentFactory
 {
     public object? Create(IContentTemplateDescriptor descriptor,
-        object[] parameters)
+        object?[] parameters)
     {
         object? content = parameters is { Length: > 0 }
                 ? factory.Create(descriptor.ContentType, args =>

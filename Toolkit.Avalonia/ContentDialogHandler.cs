@@ -5,9 +5,9 @@ using Toolkit.UI.Controls.Avalonia;
 namespace Toolkit.Avalonia;
 
 public class ContentDialogHandler :
-    IHandler<NavigateEventArgs<ContentDialog>>
+    IHandler<NavigateTemplateEventArgs>
 {
-    public async void Handle(NavigateEventArgs<ContentDialog> args)
+    public async void Handle(NavigateTemplateEventArgs args)
     {
         if (args.Template is ContentDialog dialog)
         {

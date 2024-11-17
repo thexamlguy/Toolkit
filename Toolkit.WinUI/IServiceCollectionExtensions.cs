@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.UI.Xaml.Controls;
 using Toolkit.Foundation;
 
 namespace Toolkit.WinUI;
@@ -12,6 +13,9 @@ public static class IServiceCollectionExtensions
         services.AddSingleton<IWindowRegistry, WindowRegistry>();
 
         services.AddTransient<IContentTemplate, ContentTemplate>();
+        services.AddTransient<INavigationRegion, NavigationRegion>();
+
+        services.AddHandler<NavigateTemplateEventArgs, ContentControlHandler>(nameof(ContentControl));
 
         services.AddTransient((Func<IServiceProvider, IProxyServiceCollection<IComponentBuilder>>)(provider =>
             new ProxyServiceCollection<IComponentBuilder>(services =>

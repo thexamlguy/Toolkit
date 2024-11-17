@@ -1,8 +1,8 @@
-﻿using Avalonia.Controls;
-using Avalonia.Interactivity;
+﻿using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using Toolkit.Foundation;
 
-namespace Toolkit.Avalonia;
+namespace Toolkit.WinUI;
 
 public class ContentControlHandler :
     IHandler<NavigateTemplateEventArgs>

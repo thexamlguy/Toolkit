@@ -32,13 +32,17 @@ public class Navigation(IServiceProvider provider,
                 is IContentTemplateDescriptor descriptor)
             {
                 Dictionary<string, object>? arguments = parameters?.ToDictionary(x => x.Key, x => x.Value, StringComparer.InvariantCultureIgnoreCase) ?? [];
-                object[]? resolvedArguments = parameters is not null ? [.. descriptor.ContentType
-                     .GetConstructors()
-                     .FirstOrDefault()?
-                     .GetParameters()
-                     .Select(x => x?.Name is not null && arguments
-                         .TryGetValue(x.Name, out object? argument) ? argument : default)
-                     .Where(argument => argument is not null)] : [];
+                object?[] resolvedArguments = parameters is not null
+                    ? descriptor.ContentType
+                        .GetConstructors()
+                        .FirstOrDefault()?
+                        .GetParameters()
+                        .Select(x =>
+                            x?.Name is not null && arguments is not null && arguments.TryGetValue(x.Name, out object? argument)
+                                ? argument
+                                : null)
+                        .Where(argument => argument is not null)
+                        .ToArray() ?? [] : [];
 
                 if (provider.GetRequiredKeyedService(descriptor.TemplateType, descriptor.Key)
                     is object template)
@@ -67,16 +71,11 @@ public class Navigation(IServiceProvider provider,
                         if (content is not null)
                         {
                             Type navigationType = region is Type type ? type : region.GetType();
-                            Type navigateEventType = typeof(NavigateEventArgs<>).MakeGenericType(navigationType);
 
-                            if (Activator.CreateInstance(navigateEventType, [region, template, content, sender, parameters])
-                                is object navigateEvent)
+                            messenger.Send(new NavigateTemplateEventArgs(region, template, content, sender, parameters), navigationType.Name);
+                            if (currentSegmentIndex == segmentCount)
                             {
-                                messenger.Send(navigateEvent, navigationType.Name);
-                                if (currentSegmentIndex == segmentCount)
-                                {
-                                    navigated?.Invoke(this, EventArgs.Empty);
-                                }
+                                navigated?.Invoke(this, EventArgs.Empty);
                             }
                         }
                     }

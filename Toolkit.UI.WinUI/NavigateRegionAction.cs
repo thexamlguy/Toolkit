@@ -1,30 +1,34 @@
-﻿using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Metadata;
-using Avalonia.Xaml.Interactivity;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.Xaml.Interactivity;
 using Toolkit.Foundation;
+using Windows.UI.Xaml.Markup;
 
-namespace Toolkit.UI.Avalonia;
+namespace Toolkit.UI.WinUI;
 
+[ContentProperty(Name = nameof(Actions))]
 public class NavigateRegionAction :
-    AvaloniaObject,
+    DependencyObject,
     IAction
 {
-    public static readonly DirectProperty<NavigateRegionAction, ActionCollection> ActionsProperty =
-        AvaloniaProperty.RegisterDirect<NavigateRegionAction, ActionCollection>(nameof(Actions), x => x.Actions);
+    public static readonly DependencyProperty ActionsProperty =
+        DependencyProperty.Register(nameof(Actions),
+            typeof(ActionCollection), typeof(NavigateRegionAction),
+                new PropertyMetadata(null));
 
-    public static readonly StyledProperty<string> NameProperty =
-        AvaloniaProperty.Register<NavigateRegionAction, string>(nameof(Name));
+    public static readonly DependencyProperty NameProperty =
+        DependencyProperty.Register(nameof(Name),
+            typeof(string), typeof(NavigateRegionAction),
+                new PropertyMetadata(null));
 
     private ActionCollection? actions;
 
-    [Content]
     public ActionCollection Actions => actions ??= [];
 
     public string Name
     {
-        get => GetValue(NameProperty);
+        get => (string)GetValue(NameProperty);
         set => SetValue(NameProperty, value);
     }
 
