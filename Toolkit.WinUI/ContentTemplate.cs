@@ -29,15 +29,17 @@ public class ContentTemplate :
     }
 
     protected override DataTemplate? SelectTemplateCore(object item,
-        DependencyObject container) => SelectTemplateCore(item);
+        DependencyObject container)
+    {
+        return SelectTemplateCore(item);
+    }
 
     private static DataTemplate CreateDataTemplate(IContentTemplateDescriptor descriptor)
     {
         string xamlString = @$"
                 <DataTemplate xmlns=""http://schemas.microsoft.com/winfx/2006/xaml/presentation""
-                              xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml""
-                              xmlns:local=""using:Toolkit.WinUI"">
-                    <local:TemplateControl />
+                              xmlns:ui=""using:{descriptor.TemplateType.Namespace}"">
+                      <ui:{descriptor.TemplateType.Name} />
                 </DataTemplate>";
 
         return (DataTemplate)XamlReader.Load(xamlString);

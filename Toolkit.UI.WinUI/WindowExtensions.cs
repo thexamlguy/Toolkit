@@ -10,6 +10,7 @@ using Windows.Win32.UI.WindowsAndMessaging;
 using Toolkit.Windows;
 using Rect = Windows.Foundation.Rect;
 using WinUIEx;
+using Windows.Graphics;
 
 namespace Toolkit.UI.WinUI;
 
@@ -34,6 +35,17 @@ public static partial class WindowExtensions
         }
     }
 
+    public static void SetSize(this Window window,
+        int width, 
+        int height)
+    {
+        nint handle = WindowNative.GetWindowHandle(window);
+        if (handle == 0) return;
+
+        float value = PInvoke.GetDpiForWindow(new HWND(handle)) / 96f;
+        window.AppWindow.Resize(new SizeInt32((int)(width * (double)value), (int)(height * (double)value)));
+    }
+
     public static void MoveAndResize(this Window window,
         Rect rect)
     {
@@ -48,7 +60,7 @@ public static partial class WindowExtensions
     }
 
     public static void SetBorderless(this Window window,
-                bool value)
+        bool value)
     {
         WindowStyle windowStyle = window.GetWindowStyle();
 

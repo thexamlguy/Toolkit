@@ -181,6 +181,8 @@ public partial class ObservableCollection<TViewModel> :
 
             Add(item);
         }
+
+        SelectedItem = this.FirstOrDefault();
     }
 
     public void Clear(bool disposeItems = false)
