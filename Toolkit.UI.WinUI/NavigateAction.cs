@@ -75,7 +75,7 @@ public class NavigateAction :
                     ImmutableDictionary<string, object>.Empty;
 
                 observableViewModel.Messenger.Send(new NavigateEventArgs(Route, Region.Equals(this) ? content : Region, Scope ?? null,
-                    content.DataContext, Navigated, parameters));
+                    content, Navigated, parameters));
             }
         }
 

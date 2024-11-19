@@ -9,50 +9,51 @@ public class ContentControlHandler :
 {
     public void Handle(NavigateTemplateEventArgs args)
     {
-        if (args.Region is ContentControl contentControl)
+        if (args.Region is not ContentControl contentControl)
         {
-            if (args.Template is Control control)
+            return;
+        }
+
+        if (args.Template is not Control control)
+        {
+            return;
+        }
+
+        void HandleLoaded(object? sender, RoutedEventArgs args)
+        {
+            control.Loaded -= HandleLoaded;
+            if (control.DataContext is object content)
             {
-                TaskCompletionSource taskCompletionSource = new();
-                void HandleLoaded(object? sender, RoutedEventArgs args)
+                if (content is IActivation activation)
                 {
-                    control.Loaded -= HandleLoaded;
-                    if (control.DataContext is object content)
-                    {
-                        if (content is IActivation activation)
-                        {
-                            activation.IsActive = true;
-                        }
-                    }
-
-                    taskCompletionSource.SetResult();
+                    activation.IsActive = true;
                 }
-
-                void HandleUnloaded(object? sender, RoutedEventArgs args)
-                {
-                    control.Unloaded -= HandleLoaded;
-                    if (control.DataContext is object content)
-                    {
-                        if (content is IActivation activation)
-                        {
-                            activation.IsActive = false;
-                        }
-
-                        if (content is IDisposable disposable)
-                        {
-                            disposable.Dispose();
-                        }
-                    }
-                }
-
-                control.Loaded += HandleLoaded;
-                control.Unloaded += HandleUnloaded;
-
-                control.DataContext = args.Content;
-
-                contentControl.Content = null;
-                contentControl.Content = control;
             }
         }
+
+        void HandleUnloaded(object? sender, RoutedEventArgs args)
+        {
+            control.Unloaded -= HandleLoaded;
+            if (control.DataContext is object content)
+            {
+                if (content is IActivation activation)
+                {
+                    activation.IsActive = false;
+                }
+
+                if (content is IDisposable disposable)
+                {
+                    disposable.Dispose();
+                }
+            }
+        }
+
+        control.Loaded += HandleLoaded;
+        control.Unloaded += HandleUnloaded;
+
+        control.DataContext = args.Content;
+
+        contentControl.Content = null;
+        contentControl.Content = control;
     }
 }

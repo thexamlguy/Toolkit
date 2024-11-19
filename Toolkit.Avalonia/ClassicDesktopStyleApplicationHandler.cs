@@ -10,14 +10,18 @@ public class ClassicDesktopStyleApplicationHandler :
 {
     public void Handle(NavigateTemplateEventArgs args)
     {
-        if (Application.Current?.ApplicationLifetime is
-            IClassicDesktopStyleApplicationLifetime lifeTime)
+        if (Application.Current?.ApplicationLifetime 
+            is not IClassicDesktopStyleApplicationLifetime lifeTime)
         {
-            if (args.Template is Window window)
-            {
-                lifeTime.MainWindow = window;
-                window.DataContext = args.Content;
-            }
+            return;
         }
+
+        if (args.Template is not Window window)
+        {
+            return;
+        }
+
+        lifeTime.MainWindow = window;
+        window.DataContext = args.Content;
     }
 }

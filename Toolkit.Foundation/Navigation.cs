@@ -37,8 +37,7 @@ public class Navigation(IServiceProvider provider,
                         .GetConstructors()
                         .FirstOrDefault()?
                         .GetParameters()
-                        .Select(x =>
-                            x?.Name is not null && arguments is not null && arguments.TryGetValue(x.Name, out object? argument)
+                        .Select(x => x?.Name is not null && arguments is not null && arguments.TryGetValue(x.Name, out object? argument)
                                 ? argument
                                 : null)
                         .Where(argument => argument is not null)
@@ -70,9 +69,7 @@ public class Navigation(IServiceProvider provider,
                         object? content = contentFactory.Create(descriptor, resolvedArguments);
                         if (content is not null)
                         {
-                            Type navigationType = region is Type type ? type : region.GetType();
-
-                            messenger.Send(new NavigateTemplateEventArgs(region, template, content, sender, parameters), navigationType.Name);
+                            messenger.Send(new NavigateTemplateEventArgs(region, template, content, sender, parameters), region is string ? $"{region}" : region.GetType().Name);
                             if (currentSegmentIndex == segmentCount)
                             {
                                 navigated?.Invoke(this, EventArgs.Empty);

@@ -114,9 +114,6 @@ public class ContentDialogHandler :
             dialog.SecondaryButtonClick += HandleSecondaryButtonClick;
 
             await dialog.ShowAsync();
-
-            dialog.PrimaryButtonClick += HandlePrimaryButtonClick;
-            dialog.SecondaryButtonClick += HandleSecondaryButtonClick;
         }
     }
 }
