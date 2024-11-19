@@ -15,10 +15,6 @@
 		<UseWinUI>true</UseWinUI>
 		<WindowsSdkPackageVersion>10.0.19041.41</WindowsSdkPackageVersion>
 	</PropertyGroup>
-
-	<ItemGroup>
-	  <None Remove="TemplatePage.xaml" />
-	</ItemGroup>
 	
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.1742" />
@@ -27,12 +23,6 @@
 	
 	<ItemGroup>
 		<ProjectReference Include="..\Toolkit.Windows\Toolkit.Windows.csproj" />
-	</ItemGroup>
-	
-	<ItemGroup>
-	  <Page Update="TemplatePage.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </Page>
 	</ItemGroup>
 
 </Project>
