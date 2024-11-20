@@ -9,6 +9,7 @@ public class AsyncHandlerInitialization<TMessage, TResponse, THandler>(IServiceP
 {
     public void Initialize() => StrongReferenceMessenger.Default.Register<IServiceProvider, AsyncResponseEventArgs<TMessage, TResponse>>(provider,
          (provider, args) => args.Reply(provider.GetRequiredService<THandler>().Handle(args.Message, args.CancellationToken)));
+                        args.Reply(handler.Handle(args.Message, args.CancellationToken);
 }
 
 public class AsyncHandlerInitialization<TMessage, THandler>(IServiceProvider provider) :
