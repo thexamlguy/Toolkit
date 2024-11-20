@@ -26,7 +26,7 @@ public class TaskDialogHandler(ITopLevelProvider topLevelProvider) :
                         if (args.Result is TaskDialogResult result)
                         {
                             if (result is TaskDialogResult.OK && content is 
-                                IPrimaryConfirmation primaryConfirmation)
+                                IAsyncPrimaryConfirmation primaryConfirmation)
                             {
                                 Deferral deferral = args.GetDeferral();
                                 if (!await primaryConfirmation.ConfirmPrimary())

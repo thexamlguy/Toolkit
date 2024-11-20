@@ -5,23 +5,51 @@ namespace Toolkit.Foundation;
 public static class IServiceCollectionExtensions
 {
     public static IServiceCollection AddAsyncHandler<TMessage, TResponse, THandler>(this IServiceCollection services,
-        ServiceLifetime lifetime = ServiceLifetime.Transient)
+        string key)
+        where THandler : class, IAsyncHandler<TMessage, TResponse>
+        where TMessage : class => AddAsyncHandler<TMessage, TResponse, THandler>(services, ServiceLifetime.Transient, key);
+
+    public static IServiceCollection AddAsyncHandler<TMessage, TResponse, THandler>(this IServiceCollection services,
+        ServiceLifetime lifetime = ServiceLifetime.Transient,
+        string? key = null)
         where THandler : class, IAsyncHandler<TMessage, TResponse>
         where TMessage : class
     {
-        services.Add(new ServiceDescriptor(typeof(THandler), typeof(THandler), lifetime));
-        services.AddInitialization<AsyncHandlerInitialization<TMessage, TResponse, THandler>>();
+        if (key is { Length: > 0 })
+        {
+            services.Add(new ServiceDescriptor(typeof(IAsyncHandler<TMessage, TResponse>), key, typeof(THandler), lifetime));
+            services.AddInitialization<AsyncHandlerKeyedInitialization<TMessage, TResponse, IAsyncHandler<TMessage, TResponse>>>(key);
+        }
+        else
+        {
+            services.Add(new ServiceDescriptor(typeof(IAsyncHandler<TMessage, TResponse>), typeof(THandler), lifetime));
+            services.AddInitialization<AsyncHandlerInitialization<TMessage, TResponse, IAsyncHandler<TMessage, TResponse>>>();
+        }
 
         return services;
     }
 
     public static IServiceCollection AddAsyncHandler<TMessage, THandler>(this IServiceCollection services,
-        ServiceLifetime lifetime = ServiceLifetime.Transient)
+        string key)
+        where THandler : class, IAsyncHandler<TMessage>
+        where TMessage : class => AddAsyncHandler<TMessage, THandler>(services, ServiceLifetime.Transient, key);
+
+    public static IServiceCollection AddAsyncHandler<TMessage, THandler>(this IServiceCollection services,
+        ServiceLifetime lifetime = ServiceLifetime.Transient,
+        string? key = null)
         where THandler : class, IAsyncHandler<TMessage>
         where TMessage : class
     {
-        services.Add(new ServiceDescriptor(typeof(THandler), typeof(THandler), lifetime));
-        services.AddInitialization<AsyncHandlerInitialization<TMessage, THandler>>();
+        if (key is { Length: > 0 })
+        {
+            services.Add(new ServiceDescriptor(typeof(IAsyncHandler<TMessage>), key, typeof(THandler), lifetime));
+            services.AddInitialization<AsyncHandlerInitialization<TMessage, IAsyncHandler<TMessage>>>(key);
+        }
+        else
+        {
+            services.Add(new ServiceDescriptor(typeof(IAsyncHandler<TMessage>), typeof(THandler), lifetime));
+            services.AddInitialization<AsyncHandlerKeyedInitialization<TMessage, IAsyncHandler<TMessage>>>();
+        }
 
         return services;
     }
@@ -35,7 +63,7 @@ public static class IServiceCollectionExtensions
     }
 
     public static IServiceCollection AddCache<TKey, TValue>(this IServiceCollection services)
-            where TKey : notnull
+        where TKey : notnull
         where TValue : notnull
     {
         services.AddScoped<ICache<TKey, TValue>, Cache<TKey, TValue>>();
@@ -61,12 +89,26 @@ public static class IServiceCollectionExtensions
     }
 
     public static IServiceCollection AddHandler<TMessage, TResponse, THandler>(this IServiceCollection services,
-        ServiceLifetime lifetime = ServiceLifetime.Transient)
+        string key)
+        where THandler : class, IHandler<TMessage, TResponse>
+        where TMessage : class => AddHandler<TMessage, TResponse, THandler>(services, ServiceLifetime.Transient, key);
+
+    public static IServiceCollection AddHandler<TMessage, TResponse, THandler>(this IServiceCollection services,
+        ServiceLifetime lifetime = ServiceLifetime.Transient,
+        string? key = null)
         where THandler : class, IHandler<TMessage, TResponse>
         where TMessage : class
     {
-        services.Add(new ServiceDescriptor(typeof(THandler), typeof(THandler), lifetime));
-        services.AddInitialization<HandlerInitialization<TMessage, TResponse, THandler>>();
+        if (key is { Length: > 0 })
+        {
+            services.Add(new ServiceDescriptor(typeof(IHandler<TMessage, TResponse>), key, typeof(THandler), lifetime));
+            services.AddInitialization<HandlerKeyedInitialization<TMessage, TResponse, IHandler<TMessage, TResponse>>>(key);
+        }
+        else
+        {
+            services.Add(new ServiceDescriptor(typeof(IHandler<TMessage, TResponse>), typeof(THandler), lifetime));
+            services.AddInitialization<HandlerInitialization<TMessage, TResponse, IHandler<TMessage, TResponse>>>();
+        }
 
         return services;
     }
@@ -84,13 +126,13 @@ public static class IServiceCollectionExtensions
     {
         if (key is { Length: > 0})
         {
-            services.Add(new ServiceDescriptor(typeof(THandler), key, typeof(THandler), lifetime));
-            services.AddInitialization<HandlerKeyedInitialization<TMessage, THandler>>(key);
+            services.Add(new ServiceDescriptor(typeof(IHandler<TMessage>), key, typeof(THandler), lifetime));
+            services.AddInitialization<HandlerKeyedInitialization<TMessage, IHandler<TMessage>>>(key);
         }
         else
         {
-            services.Add(new ServiceDescriptor(typeof(THandler), typeof(THandler), lifetime));
-            services.AddInitialization<HandlerInitialization<TMessage, THandler>>();
+            services.Add(new ServiceDescriptor(typeof(IHandler<TMessage>), typeof(THandler), lifetime));
+            services.AddInitialization<HandlerInitialization<TMessage, IHandler<TMessage>>>();
         }
 
         return services;
@@ -147,7 +189,7 @@ public static class IServiceCollectionExtensions
     public static IServiceCollection AddTemplate<TViewModel, TViewModelImplementation, TView>(this IServiceCollection services,
         object? key = null,
         ServiceLifetime serviceLifetime = ServiceLifetime.Transient,
-        params object[]? parameters)
+        params object?[]? parameters)
     {
         Type viewModelType = typeof(TViewModel);
         Type viewModelImplementationType = typeof(TViewModelImplementation);
@@ -190,7 +232,7 @@ public static class IServiceCollectionExtensions
         Action<TValue?, TConfiguration> writeDelegate,
         object? key = null,
         ServiceLifetime serviceLifetime = ServiceLifetime.Transient,
-        params object[]? parameters)
+        params object?[]? parameters)
     {
         parameters = [readDelegate, writeDelegate, .. parameters ?? Enumerable.Empty<object?>()];
         return AddTemplate<TViewModel, TViewModel, TView>(services, key, serviceLifetime, parameters);
@@ -201,7 +243,7 @@ public static class IServiceCollectionExtensions
         Action<TValue?, TConfiguration> writeDelegate,
         object? key = null,
         ServiceLifetime serviceLifetime = ServiceLifetime.Transient,
-        params object[]? parameters)
+        params object?[]? parameters)
     {
         parameters = [readDelegate, writeDelegate, .. parameters ?? Enumerable.Empty<object?>()];
         return AddTemplate<TViewModel, TViewModelImplementation, TView>(services, key, serviceLifetime, parameters);

@@ -1,6 +1,6 @@
 ﻿namespace Toolkit.Foundation;
 
-public interface ISecondaryConfirmation
+public interface IAsyncSecondaryConfirmation
 {
     Task<bool> ConfirmSecondary();
 }

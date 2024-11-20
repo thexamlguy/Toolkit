@@ -19,7 +19,7 @@ public class ContentDialogHandler :
                 dialog.PrimaryButtonClick -= HandlePrimaryButtonClick;
                 if (dialog.DataContext is object content)
                 {
-                    if (content is IPrimaryConfirmation primaryConfirmation)
+                    if (content is IAsyncPrimaryConfirmation primaryConfirmation)
                     {
                         Deferral deferral = args.GetDeferral();
                         if (!await primaryConfirmation.ConfirmPrimary())
@@ -39,7 +39,7 @@ public class ContentDialogHandler :
                 dialog.SecondaryButtonClick -= HandleSecondaryButtonClick;
                 if (dialog.DataContext is object content)
                 {
-                    if (content is ISecondaryConfirmation secondaryConfirmation)
+                    if (content is IAsyncSecondaryConfirmation secondaryConfirmation)
                     {
                         Deferral deferral = args.GetDeferral();
                         if (!await secondaryConfirmation.ConfirmSecondary())
@@ -63,7 +63,7 @@ public class ContentDialogHandler :
                     if (dialog.DataContext is object content)
                     {
                         bool cancelled = false;
-                        if (content is IConfirmation confirmation)
+                        if (content is IAsyncConfirmation confirmation)
                         {
                             Deferral deferral = args.GetDeferral();
                             if (!await confirmation.Confirm())

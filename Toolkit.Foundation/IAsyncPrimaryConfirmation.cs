@@ -1,6 +1,6 @@
 ﻿namespace Toolkit.Foundation;
 
-public interface IPrimaryConfirmation
+public interface IAsyncPrimaryConfirmation
 {
     Task<bool> ConfirmPrimary();
 }

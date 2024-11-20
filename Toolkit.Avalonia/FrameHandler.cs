@@ -60,7 +60,7 @@ public class FrameHandler(ITransientNavigationStore<Frame> navigationStore) :
 
                     if (sender.DataContext is object content)
                     {
-                        if (content is IConfirmation confirmation &&
+                        if (content is IAsyncConfirmation confirmation &&
                             !await confirmation.Confirm())
                         {
                             args.Cancel = true;

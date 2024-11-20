@@ -7,22 +7,38 @@ public class HandlerInitialization<TMessage, TResponse, THandler>(IServiceProvid
     IInitialization where THandler : class, IHandler<TMessage, TResponse>
         where TMessage : class
 {
-    public void Initialize() => StrongReferenceMessenger.Default.Register<IServiceProvider, ResponseEventArgs<TMessage, TResponse>>(provider,
-            (provider, args) => args.Reply(provider.GetRequiredService<THandler>().Handle(args.Message)));
+    public void Initialize()
+    {
+        if (!StrongReferenceMessenger.Default.IsRegistered<ResponseEventArgs<TMessage, TResponse>>(provider))
+        {
+            StrongReferenceMessenger.Default.Register<IServiceProvider, ResponseEventArgs<TMessage, TResponse>>(provider,
+                (provider, args) =>
+                {
+                    foreach (IHandler<TMessage, TResponse> handler in provider.GetServices<IHandler<TMessage, TResponse>>())
+                    {
+                        handler.Handle(args.Message);
+                    }
+                });
+        }
+    }
 }
 
 public class HandlerInitialization<TMessage, THandler>(IServiceProvider provider) :
     IInitialization where THandler : class, IHandler<TMessage>
         where TMessage : class
 {
-    public void Initialize() => StrongReferenceMessenger.Default.Register<IServiceProvider, TMessage>(provider,
-        (provider, args) => provider.GetRequiredService<THandler>().Handle(args));
-}
-
-public class HandlerKeyedInitialization<TMessage, THandler>(string key, IServiceProvider provider) :
-    IInitialization where THandler : class, IHandler<TMessage>
-        where TMessage : class
-{
-    public void Initialize() => StrongReferenceMessenger.Default.Register<IServiceProvider, TMessage, string>(provider, key,
-        (provider, args) => provider.GetRequiredKeyedService<THandler>(key).Handle(args));
+    public void Initialize()
+    {
+        if (!StrongReferenceMessenger.Default.IsRegistered<TMessage>(provider))
+        {
+            StrongReferenceMessenger.Default.Register<IServiceProvider, TMessage>(provider,
+                (provider, args) =>
+                {
+                    foreach (IHandler<TMessage> handler in provider.GetServices<IHandler<TMessage>>())
+                    {
+                        handler.Handle(args);
+                    }
+                });
+        }
+    }
 }
