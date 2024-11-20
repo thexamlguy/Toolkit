@@ -1,3 +1,16 @@
 ﻿namespace Toolkit.Foundation;
 
-public record ChangedEventArgs<TSender>(TSender? Sender = default);
+public record ChangedEventArgs<TSender>
+{
+    public TSender? Sender { get; }
+
+    public ChangedEventArgs(TSender sender)
+    {
+        Sender = sender;
+    }
+
+    public ChangedEventArgs()
+    {
+
+    }
+}

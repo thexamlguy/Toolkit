@@ -1,3 +1,16 @@
 ﻿namespace Toolkit.Foundation;
 
-public record OpenedEventArgs<TSender>(TSender? Sender = default);
+public record OpenedEventArgs<TSender>
+{
+    public TSender? Sender { get; }
+
+    public OpenedEventArgs(TSender sender)
+    {
+        Sender = sender;
+    }
+
+    public OpenedEventArgs()
+    {
+
+    }
+}

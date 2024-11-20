@@ -1,3 +1,16 @@
 ﻿namespace Toolkit.Foundation;
 
-public record DeleteEventArgs<TSender>(TSender? Sender = default);
+public record DeleteEventArgs<TSender>
+{
+    public TSender? Sender { get; }
+
+    public DeleteEventArgs(TSender sender)
+    {
+        Sender = sender;
+    }
+
+    public DeleteEventArgs()
+    {
+
+    }
+}
