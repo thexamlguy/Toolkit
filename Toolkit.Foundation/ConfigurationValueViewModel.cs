@@ -23,20 +23,14 @@ public partial class ConfigurationValueViewModel<TConfiguration, TValue>(IServic
         }
     }
 
-    protected override void OnActivated()
-    {
-        Value = read(configuration);
-        base.OnActivated();
-    }
+    protected override void Activated() => Value = read(configuration);
 
-    protected override void OnChanged(TValue? value)
+    protected override void Changed(TValue? value)
     {
         if (IsActive)
         {
             writer.Write(args => write(value, args));
         }
-
-        base.OnChanged(value);
     }
 }
 
@@ -97,10 +91,9 @@ public partial class ConfigurationValueViewModel<TConfiguration, TValue, TItem> 
         }
     }
 
-    protected override void OnActivated()
+    protected override void Activated()
     {
         Value = read(configuration);
-        base.OnActivated();
     }
 
     protected override void OnChanged(TValue? value)

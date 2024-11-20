@@ -38,8 +38,8 @@ public class ContentTemplate :
     {
         string xamlString = @$"
                 <DataTemplate xmlns=""http://schemas.microsoft.com/winfx/2006/xaml/presentation""
-                              xmlns:ui=""using:{descriptor.TemplateType.Namespace}"">
-                      <ui:{descriptor.TemplateType.Name} />
+                              xmlns:Template=""using:{descriptor.TemplateType.Namespace}"">
+                      <Template:{descriptor.TemplateType.Name}/>
                 </DataTemplate>";
 
         return (DataTemplate)XamlReader.Load(xamlString);

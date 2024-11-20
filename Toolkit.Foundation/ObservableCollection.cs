@@ -1,13 +1,15 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections;
 using System.Collections.Specialized;
+using System.Diagnostics.CodeAnalysis;
 using System.Reactive.Disposables;
 
 namespace Toolkit.Foundation;
 
-public partial class ObservableCollection<TViewModel> :
+public abstract partial class ObservableCollection<TViewModel> :
     ObservableRecipient,
     IObservableCollectionViewModel<TViewModel>,
     IList<TViewModel>,
@@ -36,15 +38,10 @@ public partial class ObservableCollection<TViewModel> :
 
     private readonly Dictionary<string, object> trackedProperties = [];
 
+    private bool cleaning;
+
     [ObservableProperty]
     private int count;
-
-    private Func<TViewModel>? defaultSelectionFactory;
-
-    [ObservableProperty]
-    private bool initialized;
-
-    private bool isClearing;
 
     [ObservableProperty]
     private TViewModel? selectedItem;
@@ -128,13 +125,7 @@ public partial class ObservableCollection<TViewModel> :
     public TViewModel Add<T>(params object?[] parameters)
         where T : TViewModel
     {
-        T? item = Factory.Create<T>(args =>
-        {
-            if (args is IInitialization initialization)
-            {
-                initialization.Initialize();
-            }
-        }, parameters);
+        T? item = Factory.Create<T>(parameters);
 
         Add(item);
         return item;
@@ -174,11 +165,6 @@ public partial class ObservableCollection<TViewModel> :
     {
         foreach (TViewModel? item in items)
         {
-            if (item is IInitialization initialization)
-            {
-                initialization.Initialize();
-            }
-
             Add(item);
         }
 
@@ -187,7 +173,7 @@ public partial class ObservableCollection<TViewModel> :
 
     public void Clear(bool disposeItems = false)
     {
-        isClearing = true;
+        cleaning = true;
         if (disposeItems)
         {
             foreach (TViewModel item in this.ToList())
@@ -198,12 +184,12 @@ public partial class ObservableCollection<TViewModel> :
         }
 
         ClearItems();
-        isClearing = false;
+        cleaning = false;
     }
 
     public void Clear()
     {
-        isClearing = true;
+        cleaning = true;
         foreach (TViewModel item in this.ToList())
         {
             Disposer.Dispose(item);
@@ -211,7 +197,7 @@ public partial class ObservableCollection<TViewModel> :
         }
 
         ClearItems();
-        isClearing = false;
+        cleaning = false;
     }
 
     public void Commit()
@@ -258,13 +244,7 @@ public partial class ObservableCollection<TViewModel> :
         where T :
         TViewModel
     {
-        T? item = Factory.Create<T>(args =>
-        {
-            if (args is IInitialization initialization)
-            {
-                initialization.Initialize();
-            }
-        }, parameters);
+        T? item = Factory.Create<T>(parameters);
 
         InsertItem(index, item);
         UpdateSelection(item);
@@ -335,10 +315,6 @@ public partial class ObservableCollection<TViewModel> :
         Insert(index, item);
 
         return true;
-    }
-
-    public virtual void OnInitialize()
-    {
     }
 
     public void Receive(RemoveEventArgs<TViewModel> args)
@@ -447,13 +423,7 @@ public partial class ObservableCollection<TViewModel> :
             index = Count;
         }
 
-        T? item = Factory.Create<T>(args =>
-        {
-            if (args is IInitialization initialization)
-            {
-                initialization.Initialize();
-            }
-        }, parameters);
+        T? item = Factory.Create<T>(parameters);
 
         Insert(index, item);
         return true;
@@ -475,39 +445,11 @@ public partial class ObservableCollection<TViewModel> :
         return true;
     }
 
-    public void Reset(Action<ObservableCollection<TViewModel>> factory, bool disposeItems = true)
-    {
-        SelectedItem = default;
-
-        Clear(disposeItems);
-        factory.Invoke(this);
-    }
-
     public void Revert()
     {
         foreach (object trackedProperty in trackedProperties.Values)
         {
             ((dynamic)trackedProperty).Revert();
-        }
-    }
-
-    public void SetSource(IList<TViewModel> source, Func<TViewModel>? defaultSelectionFactory)
-    {
-        foreach (TViewModel item in source)
-        {
-            Add(item);
-        }
-
-        if (defaultSelectionFactory is not null)
-        {
-            this.defaultSelectionFactory = defaultSelectionFactory;
-            SelectedItem = defaultSelectionFactory.Invoke();
-        }
-
-        if (source is INotifyCollectionChanged observableSource)
-        {
-            observableSource.CollectionChanged -= SourceCollectionChanged;
-            observableSource.CollectionChanged += SourceCollectionChanged;
         }
     }
 
@@ -529,7 +471,7 @@ public partial class ObservableCollection<TViewModel> :
         Disposer.Add(this, item);
         Disposer.Add(item, Disposable.Create(() =>
         {
-            if (item is IDisposable && !isClearing)
+            if (item is IDisposable && !cleaning)
             {
                 if (item is IList collection)
                 {
@@ -541,6 +483,26 @@ public partial class ObservableCollection<TViewModel> :
         }));
 
         collection.Insert(index > Count ? Count : index, item);
+    }
+
+    protected override sealed void OnActivated()
+    {
+        base.OnActivated();
+        Activated();
+    }
+
+    protected override sealed void OnDeactivated()
+    {
+        base.OnDeactivated();
+        Deactivated();
+    }
+
+    protected virtual void Activated()
+    {
+    }
+
+    protected virtual void Deactivated()
+    {
     }
 
     protected virtual void RemoveItem(int index) =>
@@ -609,11 +571,6 @@ public partial class ObservableCollection<TViewModel> :
                     foreach (TViewModel item in collection)
                     {
                         Add(item);
-                    }
-
-                    if (defaultSelectionFactory is not null)
-                    {
-                        SelectedItem = defaultSelectionFactory.Invoke();
                     }
                 }
                 break;

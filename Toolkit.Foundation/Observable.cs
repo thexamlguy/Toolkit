@@ -9,7 +9,7 @@ public partial class Observable(IServiceProvider provider,
     IDisposer disposer) :
     ObservableRecipient,
     IObservableViewModel,
-    IActivityIndicator,
+    IActivation,
     IDisposable,
     IServiceProviderRequired,
     IServiceFactoryRequired,
@@ -22,9 +22,9 @@ public partial class Observable(IServiceProvider provider,
 
     public IServiceFactory Factory { get; } = factory;
 
-    public IServiceProvider Provider { get; } = provider;
-
     public new IMessenger Messenger { get; } = messenger;
+
+    public IServiceProvider Provider { get; } = provider;
 
     public void Commit()
     {
@@ -56,6 +56,26 @@ public partial class Observable(IServiceProvider provider,
             trackedProperties[propertyName] = new TrackedProperty<T>(initialValue, setter, getter);
         }
     }
+
+    protected virtual void Activated()
+    {
+    }
+
+    protected virtual void Deactivated()
+    {
+    }
+
+    protected override sealed void OnActivated()
+    {
+        base.OnActivated();
+        Activated();
+    }
+
+    protected override sealed void OnDeactivated()
+    {
+        base.OnDeactivated();
+        Deactivated();
+    }
 }
 
 public partial class Observable<TValue> :
@@ -73,11 +93,11 @@ public partial class Observable<TValue> :
         Value = value;
     }
 
-    protected virtual void OnChanged(TValue? value)
+    protected virtual void Changed(TValue? value)
     {
     }
 
-    partial void OnValueChanged(TValue? value) => OnChanged(value);
+    partial void OnValueChanged(TValue? value) => Changed(value);
 }
 
 public partial class Observable<TKey, TValue> :
@@ -100,9 +120,9 @@ public partial class Observable<TKey, TValue> :
         Value = value;
     }
 
-    protected virtual void OnValueChanged()
+    protected virtual void ValueChanged()
     {
     }
 
-    partial void OnValueChanged(TValue? value) => OnValueChanged();
+    partial void OnValueChanged(TValue? value) => ValueChanged();
 }
