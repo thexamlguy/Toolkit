@@ -23,21 +23,33 @@ public static class ContentTemplateBinding
     {
         if (dependencyObject is FrameworkElement content)
         {
+            IActivation? cachedActivation = null;
+
             void HandleLoaded(object sender, RoutedEventArgs args)
             {
-                if (content.DataContext is IActivation activation)
+                if (sender is FrameworkElement content)
                 {
                     content.Loaded -= HandleLoaded;
-                    activation.IsActive = true;
+
+                    if (content.DataContext is IActivation activation)
+                    {
+                        cachedActivation = activation;
+                        activation.IsActive = true;
+                    }
                 }
             }
 
             void HandleUnloaded(object sender, RoutedEventArgs args)
             {
-                if (content.DataContext is IActivation activation)
+                if (cachedActivation is not null)
                 {
+                    cachedActivation.IsActive = false;
+                }
+
+                if (sender is FrameworkElement content)
+                {
+                    cachedActivation = null;
                     content.Unloaded -= HandleUnloaded;
-                    activation.IsActive = false;
                 }
             }
 
@@ -45,7 +57,6 @@ public static class ContentTemplateBinding
             {
                 content.Loaded += HandleLoaded;
                 content.Unloaded += HandleUnloaded;
-
             }
             else
             {

@@ -3,12 +3,12 @@ using Toolkit.Foundation;
 
 namespace Toolkit.WinUI;
 
-public class WinUIDispatcher :
+public class WinUIDispatcher(DispatcherQueue dispatcherQueue) :
     IDispatcher
 {
     public Task Invoke(Action action)
     {
-        DispatcherQueue.GetForCurrentThread().TryEnqueue(action.Invoke);
+        dispatcherQueue.TryEnqueue(action.Invoke);
         return Task.CompletedTask;
     }
 }

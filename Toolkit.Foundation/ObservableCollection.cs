@@ -1,10 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 using System.Collections;
 using System.Collections.Specialized;
-using System.Diagnostics.CodeAnalysis;
 using System.Reactive.Disposables;
 
 namespace Toolkit.Foundation;
@@ -37,8 +35,6 @@ public abstract partial class ObservableCollection<TViewModel> :
     private readonly IDispatcher dispatcher;
 
     private readonly Dictionary<string, object> trackedProperties = [];
-
-    private bool cleaning;
 
     [ObservableProperty]
     private int count;
@@ -173,7 +169,6 @@ public abstract partial class ObservableCollection<TViewModel> :
 
     public void Clear(bool disposeItems = false)
     {
-        cleaning = true;
         if (disposeItems)
         {
             foreach (TViewModel item in this.ToList())
@@ -184,12 +179,10 @@ public abstract partial class ObservableCollection<TViewModel> :
         }
 
         ClearItems();
-        cleaning = false;
     }
 
     public void Clear()
     {
-        cleaning = true;
         foreach (TViewModel item in this.ToList())
         {
             Disposer.Dispose(item);
@@ -197,7 +190,6 @@ public abstract partial class ObservableCollection<TViewModel> :
         }
 
         ClearItems();
-        cleaning = false;
     }
 
     public void Commit()
@@ -222,8 +214,8 @@ public abstract partial class ObservableCollection<TViewModel> :
 
     public virtual void Dispose()
     {
-        GC.SuppressFinalize(this);
         Disposer.Dispose(this);
+        GC.SuppressFinalize(this);
     }
 
     public IEnumerator<TViewModel> GetEnumerator() =>
@@ -471,7 +463,7 @@ public abstract partial class ObservableCollection<TViewModel> :
         Disposer.Add(this, item);
         Disposer.Add(item, Disposable.Create(() =>
         {
-            if (item is IDisposable && !cleaning)
+            if (item is IDisposable)
             {
                 if (item is IList collection)
                 {
@@ -487,13 +479,15 @@ public abstract partial class ObservableCollection<TViewModel> :
 
     protected override sealed void OnActivated()
     {
-        base.OnActivated();
+        Messenger.RegisterAll(this);
         Activated();
     }
 
     protected override sealed void OnDeactivated()
     {
-        base.OnDeactivated();
+        Messenger.UnregisterAll(this);
+        Dispose();
+        
         Deactivated();
     }
 

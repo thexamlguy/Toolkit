@@ -43,12 +43,12 @@ public static class IServiceCollectionExtensions
         if (key is { Length: > 0 })
         {
             services.Add(new ServiceDescriptor(typeof(IAsyncHandler<TMessage>), key, typeof(THandler), lifetime));
-            services.AddInitialization<AsyncHandlerInitialization<TMessage, IAsyncHandler<TMessage>>>(key);
+            services.AddInitialization<AsyncHandlerKeyedInitialization<TMessage, IAsyncHandler<TMessage>>>(key);
         }
         else
         {
             services.Add(new ServiceDescriptor(typeof(IAsyncHandler<TMessage>), typeof(THandler), lifetime));
-            services.AddInitialization<AsyncHandlerKeyedInitialization<TMessage, IAsyncHandler<TMessage>>>();
+            services.AddInitialization<AsyncHandlerInitialization<TMessage, IAsyncHandler<TMessage>>>();
         }
 
         return services;

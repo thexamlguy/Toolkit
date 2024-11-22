@@ -34,4 +34,12 @@ public static class IMessengerExtensions
     public static async Task<TResponse> SendAsync<TMessage, TResponse>(this IMessenger messenger,
         TMessage message) where TMessage : class => 
             await messenger.Send(new AsyncResponseEventArgs<TMessage, TResponse> { Message = message });
+
+    public static async Task SendAsync<TMessage>(this IMessenger messenger)
+        where TMessage : class, new() =>
+            await messenger.Send(new AsyncResponseEventArgs<TMessage, Unit> { Message = new TMessage() });
+
+    public static async Task SendAsync<TMessage>(this IMessenger messenger,
+        TMessage message) where TMessage : class =>
+            await messenger.Send(new AsyncResponseEventArgs<TMessage, Unit> { Message = message });
 }

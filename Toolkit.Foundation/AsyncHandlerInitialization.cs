@@ -37,6 +37,7 @@ public class AsyncHandlerInitialization<TMessage, THandler>(IServiceProvider pro
                     foreach (IAsyncHandler<TMessage> handler in provider.GetServices<IAsyncHandler<TMessage>>())
                     {
                         handler.Handle(args.Message, args.CancellationToken);
+                        args.Reply(Unit.Value);
                     }
                 });
         }

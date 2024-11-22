@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml.Controls;
 using Toolkit.Foundation;
 
@@ -8,7 +9,7 @@ public static class IServiceCollectionExtensions
 {
     public static IServiceCollection AddWinUI(this IServiceCollection services)
     {
-        services.AddTransient<IDispatcher, WinUIDispatcher>();
+        services.AddSingleton<IDispatcher>(provider => new WinUIDispatcher(DispatcherQueue.GetForCurrentThread()));
         services.AddTransient<IDispatcherTimerFactory, DispatcherTimerFactory>();
         services.AddSingleton<IWindowRegistry, WindowRegistry>();
 

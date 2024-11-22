@@ -67,13 +67,15 @@ public partial class Observable(IServiceProvider provider,
 
     protected override sealed void OnActivated()
     {
-        base.OnActivated();
+        Messenger.RegisterAll(this);
         Activated();
     }
 
     protected override sealed void OnDeactivated()
     {
-        base.OnDeactivated();
+        Messenger.UnregisterAll(this);
+        Dispose();
+
         Deactivated();
     }
 }

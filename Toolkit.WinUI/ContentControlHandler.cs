@@ -40,11 +40,6 @@ public class ContentControlHandler :
                 {
                     activation.IsActive = false;
                 }
-
-                if (content is IDisposable disposable)
-                {
-                    disposable.Dispose();
-                }
             }
         }
 
