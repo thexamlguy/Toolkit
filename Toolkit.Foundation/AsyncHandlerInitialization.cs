@@ -9,7 +9,7 @@ public class AsyncHandlerInitialization<TMessage, TResponse, THandler>(IServiceP
 {
     public void Initialize()
     {
-        if (!StrongReferenceMessenger.Default.IsRegistered<ResponseEventArgs<TMessage, TResponse>>(provider))
+        if (!StrongReferenceMessenger.Default.IsRegistered<AsyncResponseEventArgs<TMessage, TResponse>>(provider))
         {
             StrongReferenceMessenger.Default.Register<IServiceProvider, AsyncResponseEventArgs<TMessage, TResponse>>(provider,
                 (provider, args) =>
@@ -29,7 +29,7 @@ public class AsyncHandlerInitialization<TMessage, THandler>(IServiceProvider pro
 {
     public void Initialize()
     {
-        if (!StrongReferenceMessenger.Default.IsRegistered<TMessage>(provider))
+        if (!StrongReferenceMessenger.Default.IsRegistered<AsyncResponseEventArgs<TMessage, Unit>>(provider))
         {
             StrongReferenceMessenger.Default.Register<IServiceProvider, AsyncResponseEventArgs<TMessage, Unit>>(provider,
                 (provider, args) =>

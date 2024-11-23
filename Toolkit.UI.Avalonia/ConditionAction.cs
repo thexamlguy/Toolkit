@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Metadata;
 using Avalonia.Xaml.Interactivity;
+using Toolkit.Foundation;
 
 namespace Toolkit.UI.Avalonia;
 

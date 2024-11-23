@@ -9,14 +9,15 @@ public class AsyncHandlerKeyedInitialization<TMessage, THandler>(string key, ISe
 {
     public void Initialize()
     {
-        if (!StrongReferenceMessenger.Default.IsRegistered<TMessage, string>(provider, key))
+        if (!StrongReferenceMessenger.Default.IsRegistered<AsyncResponseEventArgs<TMessage, Unit>, string>(provider, key))
         {
-            StrongReferenceMessenger.Default.Register<IServiceProvider, TMessage, string>(provider, key,
+            StrongReferenceMessenger.Default.Register<IServiceProvider, AsyncResponseEventArgs<TMessage, Unit>, string>(provider, key,
                 (provider, args) =>
                 {
                     foreach (IAsyncHandler<TMessage> handler in provider.GetKeyedServices<IAsyncHandler<TMessage>>(key))
                     {
-                        handler.Handle(args);
+                        handler.Handle(args.Message, args.CancellationToken);
+                        args.Reply(Unit.Value);
                     }
                 });
         }
@@ -29,14 +30,14 @@ public class AsyncHandlerKeyedInitialization<TMessage, TResponse, THandler>(stri
 {
     public void Initialize()
     {
-        if (!StrongReferenceMessenger.Default.IsRegistered<ResponseEventArgs<TMessage, TResponse>, string>(provider, key))
+        if (!StrongReferenceMessenger.Default.IsRegistered<AsyncResponseEventArgs<TMessage, TResponse>, string>(provider, key))
         {
-            StrongReferenceMessenger.Default.Register<IServiceProvider, ResponseEventArgs<TMessage, TResponse>, string>(provider, key,
+            StrongReferenceMessenger.Default.Register<IServiceProvider, AsyncResponseEventArgs<TMessage, TResponse>, string>(provider, key,
                 (provider, args) =>
                 {
                     foreach (IAsyncHandler<TMessage, TResponse> handler in provider.GetKeyedServices<IAsyncHandler<TMessage, TResponse>>(key))
                     {
-                        handler.Handle(args.Message);
+                        args.Reply(handler.Handle(args.Message, args.CancellationToken));
                     }
                 });
         }

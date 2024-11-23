@@ -1,5 +1,6 @@
 ﻿using Avalonia;
 using Avalonia.Metadata;
+using Toolkit.Foundation;
 
 namespace Toolkit.UI.Avalonia;
 

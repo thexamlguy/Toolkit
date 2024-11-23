@@ -1,5 +1,6 @@
 ﻿using Avalonia;
 using Avalonia.Xaml.Interactivity;
+using Toolkit.Foundation;
 
 namespace Toolkit.UI.Avalonia;
 
@@ -35,5 +36,5 @@ public class ComparisonCondition :
     }
 
     public bool Evaluate() => ComparisonLogic.Evaluate(LeftOperand,
-            Operator, RightOperand);
+        Operator, RightOperand);
 }

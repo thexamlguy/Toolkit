@@ -3,7 +3,8 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Toolkit.WinUI;
 
-public interface IWindowRegistry
+public interface IWindowRegistry :
+    IDisposable
 {
     void Add(Window window);
 

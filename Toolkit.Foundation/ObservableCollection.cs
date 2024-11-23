@@ -485,10 +485,10 @@ public abstract partial class ObservableCollection<TViewModel> :
 
     protected override sealed void OnDeactivated()
     {
-        Messenger.UnregisterAll(this);
-        Dispose();
-        
+        Messenger.UnregisterAll(this);        
         Deactivated();
+
+        Dispose();
     }
 
     protected virtual void Activated()
@@ -525,8 +525,6 @@ public abstract partial class ObservableCollection<TViewModel> :
         {
             newSelection.IsSelected = true;
         }
-
-        Messenger.Send(Selection.As(SelectedItem));
     }
 
     private void SourceCollectionChanged(object? sender,

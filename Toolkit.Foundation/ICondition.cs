@@ -1,4 +1,4 @@
-﻿namespace Toolkit.UI.Avalonia;
+﻿namespace Toolkit.Foundation;
 
 public interface ICondition
 {
