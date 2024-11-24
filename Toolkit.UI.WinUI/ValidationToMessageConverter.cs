@@ -3,7 +3,7 @@ using Toolkit.Foundation;
 
 namespace Toolkit.UI.WinUI;
 
-public class ValidationMessageConverter :
+public class ValidationToMessageConverter :
     ValueConverter<IReadOnlyIndexDictionary<string, string>, string?>
 {
     public string? Property { get; set; }

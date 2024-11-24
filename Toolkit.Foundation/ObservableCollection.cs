@@ -612,11 +612,11 @@ public partial class ObservableCollection<TValue, TViewModel> :
         Value = value;
     }
 
-    protected virtual void OnChanged(TValue? value)
+    protected virtual void Changed(TValue? value)
     {
     }
 
-    partial void OnValueChanged(TValue? value) => OnChanged(value);
+    partial void OnValueChanged(TValue? value) => Changed(value);
 }
 
 public partial class ObservableCollection<TKey, TValue, TViewModel> :

@@ -1,10 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Toolkit.Foundation;
 
 public partial class ObservableConfigurationCollection<TConfiguration, TValue, TViewModel> :
     ObservableCollection<TValue, TViewModel>,
-    IHandler<ChangedEventArgs<TConfiguration>>
+    IRecipient<ChangedEventArgs<TConfiguration>>
     where TConfiguration : class
     where TViewModel : notnull,
     IDisposable
@@ -13,6 +14,7 @@ public partial class ObservableConfigurationCollection<TConfiguration, TValue, T
     private readonly Func<TConfiguration, TValue?> read;
     private readonly Action<TValue?, TConfiguration> write;
     private readonly IWritableConfiguration<TConfiguration> writer;
+    private readonly IDispatcher dispatcher;
 
     public ObservableConfigurationCollection(IServiceProvider provider,
         IServiceFactory factory,
@@ -29,6 +31,7 @@ public partial class ObservableConfigurationCollection<TConfiguration, TValue, T
         this.read = read;
         this.write = write;
 
+        dispatcher = provider.GetRequiredService<IDispatcher>();
         Value = value;
     }
 
@@ -48,29 +51,27 @@ public partial class ObservableConfigurationCollection<TConfiguration, TValue, T
         this.read = read;
         this.write = write;
 
+        dispatcher = provider.GetRequiredService<IDispatcher>();
         Value = value;
     }
 
-    public void Handle(ChangedEventArgs<TConfiguration> args)
+    public void Receive(ChangedEventArgs<TConfiguration> args)
     {
         if (args.Sender is TConfiguration configuration)
         {
-            Value = read(configuration);
+            dispatcher.Invoke(() => Value = read(configuration));
         }
     }
 
-    protected override void Activated()
-    {
-        Value = read(configuration);
-    }
+    protected override void Activated() => dispatcher.Invoke(() => Value = read(configuration));
 
-    protected override void OnChanged(TValue? value)
+    protected override void Changed(TValue? value)
     {
         if (IsActive)
         {
             writer.Write(args => write(value, args));
         }
 
-        base.OnChanged(value);
+        base.Changed(value);
     }
 }
