@@ -17,7 +17,10 @@ public interface IValidation :
     void Clear();
 
     Task<bool> Validate<TProperty>(Expression<Func<TProperty>> property,
-            ValidationRule[] rules);
+        ValidationRule[] rules);
+
+    Task<bool> Validate(string name,
+        ValidationRule[] rules);
 
     Task<bool> Validate();
 

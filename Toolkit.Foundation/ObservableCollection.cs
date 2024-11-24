@@ -619,7 +619,7 @@ public partial class ObservableCollection<TValue, TViewModel> :
     partial void OnValueChanged(TValue? value) => OnChanged(value);
 }
 
-public partial class ObservableCollection<TViewModel, TKey, TValue> :
+public partial class ObservableCollection<TKey, TValue, TViewModel> :
     ObservableCollection<TViewModel>
     where TViewModel : IDisposable
 {

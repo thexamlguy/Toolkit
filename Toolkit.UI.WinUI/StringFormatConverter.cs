@@ -4,24 +4,17 @@ using System.Globalization;
 namespace Toolkit.UI.WinUI;
 
 public class StringFormatConverter : 
-    ValueConverter<object, object>
+    ValueConverter<object?, object?>
 {
     public string? StringFormat { get; set; }
 
-    protected override object? ConvertTo(object value, 
+    protected override object? ConvertTo(object? value, 
         Type? targetType,
         object? parameter, 
         string? language)
     {
-        if (value is null)
-        {
-            return null!;
-        }
-
-        if (string.IsNullOrEmpty(StringFormat))
-        {
-            return value.ToString()!;
-        }
+        if (value is null) return null!;
+        if (StringFormat is not { Length: > 0}) return $"{value}"!;
 
         try
         {
