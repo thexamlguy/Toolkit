@@ -5,15 +5,13 @@ namespace Toolkit.Foundation;
 public static class IServiceCollectionExtensions
 {
     public static IServiceCollection AddAsyncHandler<TMessage, TResponse, THandler>(this IServiceCollection services,
-        string key)
-        where THandler : class, IAsyncHandler<TMessage, TResponse>
-        where TMessage : class => AddAsyncHandler<TMessage, TResponse, THandler>(services, ServiceLifetime.Transient, key);
+        string key) where THandler : class, IAsyncHandler<TMessage, TResponse>
+            where TMessage : class => AddAsyncHandler<TMessage, TResponse, THandler>(services, ServiceLifetime.Transient, key);
 
     public static IServiceCollection AddAsyncHandler<TMessage, TResponse, THandler>(this IServiceCollection services,
         ServiceLifetime lifetime = ServiceLifetime.Transient,
-        string? key = null)
-        where THandler : class, IAsyncHandler<TMessage, TResponse>
-        where TMessage : class
+        string? key = null)  where THandler : class, IAsyncHandler<TMessage, TResponse>
+            where TMessage : class
     {
         if (key is { Length: > 0 })
         {
@@ -30,15 +28,13 @@ public static class IServiceCollectionExtensions
     }
 
     public static IServiceCollection AddAsyncHandler<TMessage, THandler>(this IServiceCollection services,
-        string key)
-        where THandler : class, IAsyncHandler<TMessage>
-        where TMessage : class => AddAsyncHandler<TMessage, THandler>(services, ServiceLifetime.Transient, key);
+        string key) where THandler : class, IAsyncHandler<TMessage>
+            where TMessage : class => AddAsyncHandler<TMessage, THandler>(services, ServiceLifetime.Transient, key);
 
     public static IServiceCollection AddAsyncHandler<TMessage, THandler>(this IServiceCollection services,
         ServiceLifetime lifetime = ServiceLifetime.Transient,
-        string? key = null)
-        where THandler : class, IAsyncHandler<TMessage>
-        where TMessage : class
+        string? key = null) where THandler : class, IAsyncHandler<TMessage>
+            where TMessage : class
     {
         if (key is { Length: > 0 })
         {
@@ -55,8 +51,7 @@ public static class IServiceCollectionExtensions
     }
 
     public static IServiceCollection AddAsyncInitialization<TInitialization>(this IServiceCollection services)
-        where TInitialization : class,
-        IAsyncInitialization
+        where TInitialization : class, IAsyncInitialization
     {
         services.AddTransient<IAsyncInitialization, TInitialization>();
         return services;
@@ -81,22 +76,19 @@ public static class IServiceCollectionExtensions
     }
 
     public static IServiceCollection AddComponent<TComponent>(this IServiceCollection services)
-        where TComponent : class,
-        IComponent
+        where TComponent : class, IComponent
     {
         services.AddTransient<IComponent, TComponent>();
         return services;
     }
 
     public static IServiceCollection AddHandler<TMessage, TResponse, THandler>(this IServiceCollection services,
-        string key)
-        where THandler : class, IHandler<TMessage, TResponse>
-        where TMessage : class => AddHandler<TMessage, TResponse, THandler>(services, ServiceLifetime.Transient, key);
+        string key) where THandler : class, IHandler<TMessage, TResponse>
+            where TMessage : class => AddHandler<TMessage, TResponse, THandler>(services, ServiceLifetime.Transient, key);
 
     public static IServiceCollection AddHandler<TMessage, TResponse, THandler>(this IServiceCollection services,
         ServiceLifetime lifetime = ServiceLifetime.Transient,
-        string? key = null)
-        where THandler : class, IHandler<TMessage, TResponse>
+        string? key = null)  where THandler : class, IHandler<TMessage, TResponse>
         where TMessage : class
     {
         if (key is { Length: > 0 })
@@ -114,14 +106,12 @@ public static class IServiceCollectionExtensions
     }
 
     public static IServiceCollection AddHandler<TMessage, THandler>(this IServiceCollection services,
-        string key)
-        where THandler : class, IHandler<TMessage>
-        where TMessage : class => AddHandler<TMessage, THandler>(services, ServiceLifetime.Transient, key);
+        string key) where THandler : class, IHandler<TMessage>
+            where TMessage : class => AddHandler<TMessage, THandler>(services, ServiceLifetime.Transient, key);
 
     public static IServiceCollection AddHandler<TMessage, THandler>(this IServiceCollection services,
         ServiceLifetime lifetime = ServiceLifetime.Transient,
-        string? key = null)
-        where THandler : class, IHandler<TMessage>
+        string? key = null) where THandler : class, IHandler<TMessage>
         where TMessage : class
     {
         if (key is { Length: > 0 })
@@ -140,10 +130,8 @@ public static class IServiceCollectionExtensions
 
     public static IServiceCollection AddInitialization<TInitialization, TInitializationImplementation>(this IServiceCollection services,
         ServiceLifetime lifetime = ServiceLifetime.Transient)
-        where TInitialization : class,
-        IInitialization
-        where TInitializationImplementation : class,
-        TInitialization
+        where TInitialization : class, IInitialization
+        where TInitializationImplementation : class, TInitialization
     {
         services.Add(new ServiceDescriptor(typeof(TInitialization), typeof(TInitializationImplementation), lifetime));
         services.AddTransient<IInitialization>(provider => provider.GetRequiredService<TInitialization>());
@@ -151,8 +139,7 @@ public static class IServiceCollectionExtensions
     }
 
     public static IServiceCollection AddInitialization<TInitialization>(this IServiceCollection services)
-        where TInitialization : class,
-        IInitialization
+        where TInitialization : class, IInitialization
     {
         services.AddTransient<IInitialization, TInitialization>();
         return services;
@@ -160,8 +147,7 @@ public static class IServiceCollectionExtensions
 
     public static IServiceCollection AddInitialization<TInitialization>(this IServiceCollection services,
         params object[] parameters)
-        where TInitialization : class,
-        IInitialization
+        where TInitialization : class, IInitialization
     {
         services.AddTransient<IInitialization>(provider => provider.GetRequiredService<IServiceFactory>()
             .Create<TInitialization>(parameters));
@@ -173,13 +159,31 @@ public static class IServiceCollectionExtensions
         Type behaviorType,
         string? key = null)
     {
-        if (key is { Length: > 0 })
+        bool ImplementsInterface(Type type, Type interfaceType) => 
+            type.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == interfaceType);
+
+        if (ImplementsInterface(behaviorType, typeof(IAsyncPipelineBehavior<,>)))
         {
-            services.AddKeyedTransient(typeof(IAsyncPipelineBehavior<>), key, behaviorType);
+            if (key is { Length: > 0 })
+            {
+                services.AddKeyedTransient(typeof(IAsyncPipelineBehavior<,>), key, behaviorType);
+            }
+            else
+            {
+                services.AddTransient(typeof(IAsyncPipelineBehavior<,>), behaviorType);
+            }
         }
-        else
+        
+        if (ImplementsInterface(behaviorType, typeof(IAsyncPipelineBehavior<>)))
         {
-            services.AddTransient(typeof(IAsyncPipelineBehavior<>), behaviorType);
+            if (key is { Length: > 0 })
+            {
+                services.AddKeyedTransient(typeof(IAsyncPipelineBehavior<>), key, behaviorType);
+            }
+            else
+            {
+                services.AddTransient(typeof(IAsyncPipelineBehavior<>), behaviorType);
+            }
         }
 
         return services;
