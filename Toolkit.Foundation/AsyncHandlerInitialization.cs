@@ -19,16 +19,11 @@ public class AsyncHandlerInitialization<TMessage, TResponse, THandler>(IServiceP
 
                     foreach (IAsyncHandler<TMessage, TResponse> handler in handlers)
                     {
-                        AsyncHandlerDelegate<TResponse> handlerDelegate = () =>
-                            handler.Handle(args.Message, args.CancellationToken);
+                        Task<TResponse> ExecutePipeline(int index) =>index < 0
+                            ? handler.Handle(args.Message, args.CancellationToken)
+                            : behaviors.ElementAt(index).Handle(args.Message, () => ExecutePipeline(index - 1));
 
-                        foreach (IAsyncPipelineBehavior<TMessage, TResponse>? behavior in behaviors.Reverse())
-                        {
-                            AsyncHandlerDelegate<TResponse> next = handlerDelegate;
-                            handlerDelegate = () => behavior.Handle(args.Message, next);
-                        }
-
-                        args.Reply(handlerDelegate());
+                        args.Reply(ExecutePipeline(behaviors.Count() - 1));
                     }
                 });
         }
@@ -47,21 +42,15 @@ public class AsyncHandlerInitialization<TMessage, THandler>(IServiceProvider pro
                 (provider, args) =>
                 {
                     IEnumerable<IAsyncHandler<TMessage>> handlers = provider.GetServices<IAsyncHandler<TMessage>>();
-                    IEnumerable<IAsyncPipelineBehavior<TMessage, Unit>> behaviors = provider.GetServices<IAsyncPipelineBehavior<TMessage, Unit>>();
+                    IEnumerable<IAsyncPipelineBehavior<TMessage>> behaviors = provider.GetServices<IAsyncPipelineBehavior<TMessage>>();
 
                     foreach (IAsyncHandler<TMessage> handler in handlers)
                     {
-                        AsyncHandlerDelegate<Unit> handlerDelegate = () =>
-                            handler.Handle(args.Message, args.CancellationToken).ContinueWith(_ => Unit.Value);
+                        Task<Unit> ExecutePipeline(int index) => index < 0
+                            ? handler.Handle(args.Message, args.CancellationToken).ContinueWith(_ => Unit.Value)
+                            : behaviors.ElementAt(index).Handle(args.Message, () => ExecutePipeline(index - 1)).ContinueWith(_ => Unit.Value);
 
-                        foreach (IAsyncPipelineBehavior<TMessage, Unit> behavior in behaviors.Reverse())
-                        {
-                            AsyncHandlerDelegate<Unit> next = handlerDelegate;
-                            handlerDelegate = () => behavior.Handle(args.Message, next);
-                        }
-
-                        handlerDelegate();
-                        args.Reply(Unit.Value);
+                        args.Reply(ExecutePipeline(behaviors.Count() - 1));
                     }
                 });
         }

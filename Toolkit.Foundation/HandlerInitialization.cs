@@ -17,27 +17,19 @@ public class HandlerInitialization<TMessage, TResponse, THandler>(IServiceProvid
                     IEnumerable<IHandler<TMessage, TResponse>> handlers = provider.GetServices<IHandler<TMessage, TResponse>>();
                     IEnumerable<IPipelineBehavior<TMessage, TResponse>> behaviors = provider.GetServices<IPipelineBehavior<TMessage, TResponse>>();
 
-                    HandlerDelegate<TResponse> handlerDelegate = () =>
+                    foreach (IHandler<TMessage, TResponse> handler in handlers)
                     {
-                        TResponse response = default!;
-                        foreach (IHandler<TMessage, TResponse> handler in handlers)
-                        {
-                            response = handler.Handle(args.Message);
-                        }
-                        return response;
-                    };
+                        TResponse ExecutePipeline(int index) => index < 0
+                            ? handler.Handle(args.Message)
+                            : behaviors.ElementAt(index).Handle(args.Message, () => ExecutePipeline(index - 1));
 
-                    foreach (IPipelineBehavior<TMessage, TResponse> behavior in behaviors.Reverse())
-                    {
-                        HandlerDelegate<TResponse> next = handlerDelegate;
-                        handlerDelegate = () => behavior.Handle(args.Message, next);
+                        ExecutePipeline(behaviors.Count() - 1);
                     }
-
-                    handlerDelegate();
                 });
         }
     }
 }
+
 
 public class HandlerInitialization<TMessage, THandler>(IServiceProvider provider) :
     IInitialization where THandler : class, IHandler<TMessage>
@@ -51,26 +43,28 @@ public class HandlerInitialization<TMessage, THandler>(IServiceProvider provider
                 (provider, args) =>
                 {
                     IEnumerable<IHandler<TMessage>> handlers = provider.GetServices<IHandler<TMessage>>();
-                    IEnumerable<IPipelineBehavior<TMessage, Unit>> behaviors = provider.GetServices<IPipelineBehavior<TMessage, Unit>>();
+                    IEnumerable<IPipelineBehavior<TMessage>> behaviors = provider.GetServices<IPipelineBehavior<TMessage>>();
 
-                    HandlerDelegate<Unit> handlerDelegate = () =>
+                    foreach (IHandler<TMessage> handler in handlers)
                     {
-                        foreach (IHandler<TMessage> handler in handlers)
+                        void ExecutePipeline(int index)
                         {
-                            handler.Handle(args);
+                            if (index < 0)
+                            {
+                                handler.Handle(args);
+                                return;
+                            }
+
+                            behaviors.ElementAt(index).Handle(args, () =>
+                            {
+                                ExecutePipeline(index - 1);
+                                return Unit.Value;
+                            });
                         }
-                        return Unit.Value;
-                    };
 
-                    foreach (IPipelineBehavior<TMessage, Unit> behavior in behaviors.Reverse())
-                    {
-                        HandlerDelegate<Unit> next = handlerDelegate;
-                        handlerDelegate = () => behavior.Handle(args, next);
+                        ExecutePipeline(behaviors.Count() - 1);
                     }
-
-                    handlerDelegate();
                 });
         }
     }
 }
-

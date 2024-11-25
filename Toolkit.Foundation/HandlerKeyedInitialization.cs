@@ -15,29 +15,31 @@ public class HandlerKeyedInitialization<TMessage, THandler>(string key, IService
                 (provider, args) =>
                 {
                     IEnumerable<IHandler<TMessage>> handlers = provider.GetKeyedServices<IHandler<TMessage>>(key);
-                    IEnumerable<IPipelineBehavior<TMessage, Unit>> behaviors = provider.GetServices<IPipelineBehavior<TMessage, Unit>>();
+                    IEnumerable<IPipelineBehavior<TMessage>> behaviors = provider.GetServices<IPipelineBehavior<TMessage>>();
 
-                    HandlerDelegate<Unit> handlerDelegate = () =>
+                    foreach (IHandler<TMessage> handler in handlers)
                     {
-                        foreach (IHandler<TMessage> handler in handlers)
+                        void ExecutePipeline(int index)
                         {
-                            handler.Handle(args);
+                            if (index < 0)
+                            {
+                                handler.Handle(args);
+                                return;
+                            }
+
+                            behaviors.ElementAt(index).Handle(args, () =>
+                            {
+                                ExecutePipeline(index - 1);
+                                return Unit.Value;
+                            });
                         }
-                        return Unit.Value;
-                    };
 
-                    foreach (IPipelineBehavior<TMessage, Unit> behavior in behaviors.Reverse())
-                    {
-                        HandlerDelegate<Unit> next = handlerDelegate;
-                        handlerDelegate = () => behavior.Handle(args, next);
+                        ExecutePipeline(behaviors.Count() - 1);
                     }
-
-                    handlerDelegate();
                 });
         }
     }
 }
-
 
 public class HandlerKeyedInitialization<TMessage, TResponse, THandler>(string key, IServiceProvider provider) :
     IInitialization where THandler : class, IHandler<TMessage, TResponse>
@@ -53,23 +55,14 @@ public class HandlerKeyedInitialization<TMessage, TResponse, THandler>(string ke
                     IEnumerable<IHandler<TMessage, TResponse>> handlers = provider.GetKeyedServices<IHandler<TMessage, TResponse>>(key);
                     IEnumerable<IPipelineBehavior<TMessage, TResponse>> behaviors = provider.GetServices<IPipelineBehavior<TMessage, TResponse>>();
 
-                    HandlerDelegate<TResponse> handlerDelegate = () =>
+                    foreach (IHandler<TMessage, TResponse> handler in handlers)
                     {
-                        TResponse response = default!;
-                        foreach (IHandler<TMessage, TResponse> handler in handlers)
-                        {
-                            response = handler.Handle(args.Message);
-                        }
-                        return response;
-                    };
+                        TResponse ExecutePipeline(int index) => index < 0
+                            ? handler.Handle(args.Message)
+                            : behaviors.ElementAt(index).Handle(args.Message, () => ExecutePipeline(index - 1));
 
-                    foreach (IPipelineBehavior<TMessage, TResponse> behavior in behaviors.Reverse())
-                    {
-                        HandlerDelegate<TResponse> next = handlerDelegate;
-                        handlerDelegate = () => behavior.Handle(args.Message, next);
+                        ExecutePipeline(behaviors.Count() - 1);
                     }
-
-                    handlerDelegate();
                 });
         }
     }

@@ -163,23 +163,25 @@ public static class IServiceCollectionExtensions
         where TInitialization : class,
         IInitialization
     {
-        services.AddTransient<IInitialization>(provider => provider.GetRequiredService<IServiceFactory>().Create<TInitialization>(parameters));
+        services.AddTransient<IInitialization>(provider => provider.GetRequiredService<IServiceFactory>()
+            .Create<TInitialization>(parameters));
+
         return services;
     }
 
-    public static IServiceCollection AddAsyncPipelineBehavior<TMessage, TResponse, TBehavior>(this IServiceCollection services)
-        where TBehavior : class,
-        IAsyncPipelineBehavior<TMessage, TResponse>
+    public static IServiceCollection AddAsyncPipelineBehavior(this IServiceCollection services,
+        Type behaviorType,
+        string? key = null)
     {
-        services.AddTransient<IAsyncPipelineBehavior<TMessage, TResponse>, TBehavior>();
-        return services;
-    }
+        if (key is { Length: > 0 })
+        {
+            services.AddKeyedTransient(typeof(IAsyncPipelineBehavior<>), key, behaviorType);
+        }
+        else
+        {
+            services.AddTransient(typeof(IAsyncPipelineBehavior<>), behaviorType);
+        }
 
-    public static IServiceCollection AddPipelineBehavior<TMessage, TResponse, TBehavior>(this IServiceCollection services)
-        where TBehavior : class,
-        IPipelineBehavior<TMessage, TResponse>
-    {
-        services.AddTransient<IPipelineBehavior<TMessage, TResponse>, TBehavior>();
         return services;
     }
 

@@ -1,8 +1,14 @@
 ﻿namespace Toolkit.Foundation;
 
-public interface IAsyncPipelineBehavior<TMessage,
+public interface IAsyncPipelineBehavior<TMessage, 
     TResponse>
 {
     Task<TResponse> Handle(TMessage message, 
-        AsyncHandlerDelegate<TResponse> next);
+        Func<Task<TResponse>> next);
+}
+
+public interface IAsyncPipelineBehavior<TMessage>
+{
+    Task Handle(TMessage message, 
+        Func<Task> next);
 }
