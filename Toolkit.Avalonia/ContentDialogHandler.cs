@@ -62,15 +62,12 @@ public class ContentDialogHandler :
                     dialog.Closing -= HandleClosing;
                     if (dialog.DataContext is object content)
                     {
-                        bool cancelled = false;
                         if (content is IAsyncConfirmation confirmation)
                         {
                             Deferral deferral = args.GetDeferral();
                             if (!await confirmation.Confirm())
                             {
                                 args.Cancel = true;
-                                cancelled = true;
-
                                 dialog.Closing += HandleClosing;
                             }
 

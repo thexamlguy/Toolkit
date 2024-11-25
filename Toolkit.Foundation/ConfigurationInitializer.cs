@@ -22,6 +22,6 @@ public class ConfigurationInitializer<TConfiguration>(IConfigurationReader<TConf
             }
         }
 
-        messenger.Send(new ActivatedEventArgs<TConfiguration>(configuration));
+        messenger.Send(new ActivatedEventArgs<TConfiguration?>(configuration));
     }
 }

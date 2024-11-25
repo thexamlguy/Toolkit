@@ -14,7 +14,6 @@ public class EventListenerBehaviour :
     public static readonly StyledProperty<object> SourceProperty =
         AvaloniaProperty.Register<EventListenerBehaviour, object>(nameof(Source));
 
-    private readonly Delegate? eventHandler;
     private object? resolvedSource;
 
     static EventListenerBehaviour()
@@ -109,11 +108,6 @@ public class EventListenerBehaviour :
 
     private void UnregisterEvent(string eventName)
     {
-        if (eventHandler is null)
-        {
-            return;
-        }
-
         if (eventName is { Length: 0 })
         {
             return;
