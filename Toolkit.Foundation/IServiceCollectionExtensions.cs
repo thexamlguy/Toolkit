@@ -124,7 +124,7 @@ public static class IServiceCollectionExtensions
         where THandler : class, IHandler<TMessage>
         where TMessage : class
     {
-        if (key is { Length: > 0})
+        if (key is { Length: > 0 })
         {
             services.Add(new ServiceDescriptor(typeof(IHandler<TMessage>), key, typeof(THandler), lifetime));
             services.AddInitialization<HandlerKeyedInitialization<TMessage, IHandler<TMessage>>>(key);
@@ -158,12 +158,28 @@ public static class IServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection AddInitialization<TInitialization>(this IServiceCollection services, 
+    public static IServiceCollection AddInitialization<TInitialization>(this IServiceCollection services,
         params object[] parameters)
         where TInitialization : class,
         IInitialization
     {
         services.AddTransient<IInitialization>(provider => provider.GetRequiredService<IServiceFactory>().Create<TInitialization>(parameters));
+        return services;
+    }
+
+    public static IServiceCollection AddAsyncPipelineBehavior<TMessage, TResponse, TBehavior>(this IServiceCollection services)
+        where TBehavior : class,
+        IAsyncPipelineBehavior<TMessage, TResponse>
+    {
+        services.AddTransient<IAsyncPipelineBehavior<TMessage, TResponse>, TBehavior>();
+        return services;
+    }
+
+    public static IServiceCollection AddPipelineBehavior<TMessage, TResponse, TBehavior>(this IServiceCollection services)
+        where TBehavior : class,
+        IPipelineBehavior<TMessage, TResponse>
+    {
+        services.AddTransient<IPipelineBehavior<TMessage, TResponse>, TBehavior>();
         return services;
     }
 
