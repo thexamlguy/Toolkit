@@ -1,16 +1,18 @@
 ﻿namespace Toolkit.Foundation;
 
-public record RequestEventArgs<TSender>
+public record RequestEventArgs
 {
-    public TSender? Sender { get; }
+    public object? Sender { get; init; }
 
-    public RequestEventArgs(TSender sender)
+    public RequestEventArgs(object? sender = null)
     {
         Sender = sender;
     }
+}
 
-    public RequestEventArgs()
+public record RequestEventArgs<TSender> : RequestEventArgs
+{
+    public RequestEventArgs(TSender sender) : base(sender)
     {
-
     }
 }

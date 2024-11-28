@@ -1,39 +1,53 @@
 ﻿namespace Toolkit.Foundation;
 
-public record Result<TValue> :
-    Result
+public record Result<TValue> : Result
 {
-    private readonly TValue? value;
+    public TValue? Value { get; }
 
-    protected internal Result(TValue? value, bool isSuccess, Error error)
-        : base(isSuccess, error) => this.value = value;
+    public Result(TValue? value, bool isSuccess, Reason reason)
+        : base(isSuccess, reason)
+    {
+        Value = value;
+    }
 
-    public TValue? Value => 
-        IsSuccess ? value! : default;
-
-    public static implicit operator Result<TValue>(TValue? value) => 
+    public static implicit operator Result<TValue>(TValue? value) =>
         Create(value);
+
+    public static implicit operator TValue?(Result<TValue> result) =>
+        result.IsSuccess ? result.Value : default;
 }
 
-public record Result(bool IsSuccess,
-    Error Error)
+public record Result
 {
+    public bool IsSuccess { get; init; }
+
     public bool IsFailure => !IsSuccess;
 
-    public static Result Success() => new(true, Error.None);
+    public Reason Reason { get; init; } = Reason.None;
 
-    public static Result<TValue> Success<TValue>(TValue value) => 
-        new(value, true, Error.None);
+    protected Result(bool isSuccess, Reason reason)
+    {
+        IsSuccess = isSuccess;
+        Reason = reason;
+    }
 
-    public static Result Failure(Error error) => 
-        new(false, error);
+    public static Result Success() => new(true, Reason.None);
 
-    public static Result<TValue> Failure<TValue>(Error error) =>
-        new(default, false, error);
+    public static Result Failure(Reason reason) => new(false, reason);
 
-    public static Result Create(bool condition) => 
-        condition ? Success() : Failure(Error.ConditionNotMet);
+    public static Result Create(bool condition) =>
+        condition ? Success() : Failure(Reason.ConditionNotMet);
 
-    public static Result<TValue> Create<TValue>(TValue? value) => 
-        value is not null ? Success(value) : Failure<TValue>(Error.Null);
+    public static Result<TValue> Success<TValue>(TValue value) =>
+        new(value, true, Reason.None);
+
+    public static Result<TValue> Failure<TValue>(Reason reason, TValue? value = default) =>
+        new(value, false, reason);
+
+    public static Result<TValue> Create<TValue>(TValue? value) =>
+        value is not null ? Success(value) : Failure<TValue>(Reason.Null);
+
+    public static Result Empty() => Failure(Reason.None);
+
+    public static Result<TValue> Empty<TValue>() => Failure<TValue>(Reason.None);
 }
