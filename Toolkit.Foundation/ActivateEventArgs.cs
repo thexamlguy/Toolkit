@@ -14,3 +14,18 @@ public record ActivateEventArgs<TValue>
 
     }
 }
+
+public record ActivateEventArgs<TKey, TValue>
+{
+    public TValue? Value { get; }
+
+    public ActivateEventArgs(TValue value)
+    {
+        Value = value;
+    }
+
+    public ActivateEventArgs()
+    {
+
+    }
+}
