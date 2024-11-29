@@ -155,6 +155,13 @@ public static class IServiceCollectionExtensions
         return services;
     }
 
+    public static IServiceCollection AddInitialization(this IServiceCollection services, 
+        Action<IServiceProvider> delegateAction)
+    {
+        services.AddTransient<IInitialization>(provider => new ActionableInitialization(provider, delegateAction));
+        return services;
+    }
+
     public static IServiceCollection AddAsyncPipelineBehavior(this IServiceCollection services,
         Type behaviorType,
         string? key = null)
