@@ -2,9 +2,9 @@
 
 public record Count
 {
-    public static CountEventArgs<TSender> As<TSender>(TSender sender) =>
-        new(sender);
+    public static CountEventArgs<TValue> As<TValue>(TValue value) =>
+        new(value);
 
-    public static CountEventArgs<TSender> As<TSender>() where TSender : new() =>
-        new(new TSender());
+    public static CountEventArgs<TValue> As<TValue>() where TValue : new() =>
+        new(new TValue());
 }

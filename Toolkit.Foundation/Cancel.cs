@@ -2,7 +2,7 @@
 
 public record Cancel
 {
-    public static CancelEventArgs<TSender> As<TSender>(TSender sender) => new(sender);
+    public static CancelEventArgs<TValue> As<TValue>(TValue value) => new(value);
 
-    public static CancelEventArgs<TSender> As<TSender>() where TSender : new() => new(new TSender());
+    public static CancelEventArgs<TValue> As<TValue>() where TValue : new() => new(new TValue());
 }

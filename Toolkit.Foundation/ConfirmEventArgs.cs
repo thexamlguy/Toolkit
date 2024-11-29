@@ -1,12 +1,12 @@
 ﻿namespace Toolkit.Foundation;
 
-public record ConfirmEventArgs<TSender>
+public record ConfirmEventArgs<TValue>
 {
-    public TSender? Sender { get; }
+    public TValue? Value { get; }
 
-    public ConfirmEventArgs(TSender sender)
+    public ConfirmEventArgs(TValue value)
     {
-        Sender = sender;
+        Value = value;
     }
 
     public ConfirmEventArgs()

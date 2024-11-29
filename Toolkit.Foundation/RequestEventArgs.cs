@@ -2,17 +2,17 @@
 
 public record RequestEventArgs
 {
-    public object? Sender { get; init; }
+    public object? Value { get; init; }
 
-    public RequestEventArgs(object? sender = null)
+    public RequestEventArgs(object? value = null)
     {
-        Sender = sender;
+        Value = value;
     }
 }
 
-public record RequestEventArgs<TSender> : RequestEventArgs
+public record RequestEventArgs<TValue> : RequestEventArgs
 {
-    public RequestEventArgs(TSender sender) : base(sender)
+    public RequestEventArgs(TValue value) : base(value)
     {
     }
 }

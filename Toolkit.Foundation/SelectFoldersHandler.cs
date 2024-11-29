@@ -7,7 +7,7 @@ public class SelectFoldersHandler(IFolderProvider folderProvider) :
     public async Task<IReadOnlyCollection<string>?> Handle(SelectionEventArgs<FolderFilter> args,
         CancellationToken cancellationToken = default)
     {
-        if (args.Sender is FolderFilter filter)
+        if (args.Value is FolderFilter filter)
         {
             if (await folderProvider.SelectFolders(filter)
                 is { Count: > 0 } folders)

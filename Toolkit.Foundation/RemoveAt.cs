@@ -2,6 +2,6 @@
 
 public record RemoveAt
 {
-    public static RemoveAtEventArgs<TSender> As<TSender>(int index) =>
+    public static RemoveAtEventArgs<TValue> As<TValue>(int index) =>
         new(index);
 }

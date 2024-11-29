@@ -313,7 +313,7 @@ public abstract partial class ObservableCollection<TViewModel> :
     {
         foreach (TViewModel item in this.ToList())
         {
-            if (args.Sender is not null && args.Sender.Equals(item))
+            if (args.Value is not null && args.Value.Equals(item))
             {
                 Remove(item);
             }
@@ -322,7 +322,7 @@ public abstract partial class ObservableCollection<TViewModel> :
 
     public void Receive(CreateEventArgs<TViewModel> args)
     {
-        if (args.Sender is TViewModel item)
+        if (args.Value is TViewModel item)
         {
             Add(item);
         }
@@ -330,7 +330,7 @@ public abstract partial class ObservableCollection<TViewModel> :
 
     public void Receive(InsertEventArgs<TViewModel> args)
     {
-        if (args.Sender is TViewModel item)
+        if (args.Value is TViewModel item)
         {
             Insert(args.Index, item);
         }
@@ -343,7 +343,7 @@ public abstract partial class ObservableCollection<TViewModel> :
 
     public void Receive(MoveEventArgs<TViewModel> args)
     {
-        if (args.Sender is TViewModel item)
+        if (args.Value is TViewModel item)
         {
             Move(args.Index, item);
         }
@@ -351,7 +351,7 @@ public abstract partial class ObservableCollection<TViewModel> :
 
     public void Receive(ReplaceEventArgs<TViewModel> args)
     {
-        if (args.Sender is TViewModel item)
+        if (args.Value is TViewModel item)
         {
             Replace(args.Index, item);
         }

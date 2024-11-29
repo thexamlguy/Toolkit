@@ -2,7 +2,7 @@
 
 public record Deactivate
 {
-    public static DeactivateEventArgs<TSender> As<TSender>(TSender sender) => new(sender);
+    public static DeactivateEventArgs<TValue> As<TValue>(TValue value) => new(value);
 
-    public static DeactivateEventArgs<TSender> As<TSender>() where TSender : new() => new(new TSender());
+    public static DeactivateEventArgs<TValue> As<TValue>() where TValue : new() => new(new TValue());
 }

@@ -1,12 +1,12 @@
 ﻿namespace Toolkit.Foundation;
 
-public record CountEventArgs<TSender>
+public record CountEventArgs<TValue>
 {
-    public TSender? Sender { get; }
+    public TValue? Value { get; }
 
-    public CountEventArgs(TSender sender)
+    public CountEventArgs(TValue value)
     {
-        Sender = sender;
+        Value = value;
     }
 
     public CountEventArgs()

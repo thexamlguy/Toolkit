@@ -34,7 +34,7 @@ public partial class ObservableConfiguration<TConfiguration, TValue> :
 
     public void Receive(ChangedEventArgs<TConfiguration> args)
     {
-        if (args.Sender is TConfiguration configuration)
+        if (args.Value is TConfiguration configuration)
         {
             dispatcher.Invoke(() => Value = read(configuration));
         }

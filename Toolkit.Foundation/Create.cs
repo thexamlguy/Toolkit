@@ -2,9 +2,9 @@
 
 public record Create
 {
-    public static CreateEventArgs<TSender> As<TSender>(TSender sender) =>
-        new(sender);
+    public static CreateEventArgs<TValue> As<TValue>(TValue value) =>
+        new(value);
 
-    public static CreateEventArgs<TSender> As<TSender>(params object[] parameters) where TSender : new() =>
-        new(new TSender());
+    public static CreateEventArgs<TValue> As<TValue>() where TValue : new() =>
+        new(new TValue());
 }

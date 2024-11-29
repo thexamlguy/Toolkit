@@ -1,12 +1,12 @@
 ﻿namespace Toolkit.Foundation;
 
-public record ActivateEventArgs<TSender>
+public record ActivateEventArgs<TValue>
 {
-    public TSender? Sender { get; }
+    public TValue? Value { get; }
 
-    public ActivateEventArgs(TSender sender)
+    public ActivateEventArgs(TValue value)
     {
-        Sender = sender;
+        Value = value;
     }
 
     public ActivateEventArgs()

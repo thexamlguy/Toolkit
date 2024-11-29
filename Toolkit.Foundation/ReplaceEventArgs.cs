@@ -1,15 +1,15 @@
 ﻿namespace Toolkit.Foundation;
 
-public record ReplaceEventArgs<TSender>
+public record ReplaceEventArgs<TValue>
 {
-    public TSender? Sender { get; }
+    public TValue? Value { get; }
 
     public int Index { get; }
 
-    public ReplaceEventArgs(TSender sender, 
+    public ReplaceEventArgs(TValue value, 
         int index)
     {
-        Sender = sender;
+        Value = value;
         Index = index;
     }
 

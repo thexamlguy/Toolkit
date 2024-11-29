@@ -6,7 +6,7 @@ public class SelectFilesHandler(IFileProvider fileProvider) :
     public async Task<IReadOnlyCollection<string>?> Handle(SelectionEventArgs<FileFilter> args,
         CancellationToken cancellationToken)
     {
-        if (args.Sender is FileFilter filter)
+        if (args.Value is FileFilter filter)
         {
             if (await fileProvider.SelectFiles(filter)
                 is { Count: > 0 } files)

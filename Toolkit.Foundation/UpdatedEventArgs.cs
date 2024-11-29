@@ -1,12 +1,12 @@
 ﻿namespace Toolkit.Foundation;
 
-public record UpdatedEventArgs<TSender>
+public record UpdatedEventArgs<TValue>
 {
-    public TSender? Sender { get; }
+    public TValue? Value { get; }
 
-    public UpdatedEventArgs(TSender sender)
+    public UpdatedEventArgs(TValue value)
     {
-        Sender = sender;
+        Value = value;
     }
 
     public UpdatedEventArgs()

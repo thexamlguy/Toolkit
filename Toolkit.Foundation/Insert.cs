@@ -2,9 +2,9 @@
 
 public record Insert
 {
-    public static InsertEventArgs<TSender> As<TSender>(int index, TSender sender) =>
-        new(index, sender);
+    public static InsertEventArgs<TValue> As<TValue>(int index, TValue value) =>
+        new(index, value);
 
-    public static InsertEventArgs<TSender> As<TSender>(int index) where TSender : new() =>
-        new(index, new TSender());
+    public static InsertEventArgs<TValue> As<TValue>(int index) where TValue : new() =>
+        new(index, new TValue());
 }

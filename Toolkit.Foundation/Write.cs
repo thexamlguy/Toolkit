@@ -2,9 +2,9 @@
 
 public class Write
 {
-    public static WriteEventArgs<TSender> As<TSender>(TSender sender) =>
-        new(sender);
+    public static WriteEventArgs<TValue> As<TValue>(TValue value) =>
+        new(value);
 
-    public static WriteEventArgs<TSender> As<TSender>() where TSender : new() =>
-        new(new TSender());
+    public static WriteEventArgs<TValue> As<TValue>() where TValue : new() =>
+        new(new TValue());
 }

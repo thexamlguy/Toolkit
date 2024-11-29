@@ -1,12 +1,12 @@
 ﻿namespace Toolkit.Foundation;
 
-public record NotifyEventArgs<TSender>
+public record NotifyEventArgs<TValue>
 {
-    public TSender? Sender { get; }
+    public TValue? Value { get; }
 
-    public NotifyEventArgs(TSender sender)
+    public NotifyEventArgs(TValue value)
     {
-        Sender = sender;
+        Value = value;
     }
 
     public NotifyEventArgs()

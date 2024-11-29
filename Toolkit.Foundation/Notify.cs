@@ -2,7 +2,7 @@
 
 public class Notify
 {
-    public static NotifyEventArgs<TSender> As<TSender>(TSender sender) => new(sender);
+    public static NotifyEventArgs<TValue> As<TValue>(TValue value) => new(value);
 
-    public static NotifyEventArgs<TSender> As<TSender>() where TSender : new() => new(new TSender());
+    public static NotifyEventArgs<TValue> As<TValue>() where TValue : new() => new(new TValue());
 }

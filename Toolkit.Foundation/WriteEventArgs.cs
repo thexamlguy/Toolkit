@@ -1,12 +1,12 @@
 ﻿namespace Toolkit.Foundation;
 
-public record WriteEventArgs<TSender>
+public record WriteEventArgs<TValue>
 {
-    public TSender? Sender { get; }
+    public TValue? Value { get; }
 
-    public WriteEventArgs(TSender sender)
+    public WriteEventArgs(TValue value)
     {
-        Sender = sender;
+        Value = value;
     }
 
     public WriteEventArgs()

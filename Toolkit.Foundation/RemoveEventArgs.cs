@@ -1,12 +1,12 @@
 ﻿namespace Toolkit.Foundation;
 
-public record RemoveEventArgs<TSender>
+public record RemoveEventArgs<TValue>
 {
-    public TSender? Sender { get; }
+    public TValue? Value { get; }
 
-    public RemoveEventArgs(TSender sender)
+    public RemoveEventArgs(TValue value)
     {
-        Sender = sender;
+        Value = value;
     }
 
     public RemoveEventArgs()

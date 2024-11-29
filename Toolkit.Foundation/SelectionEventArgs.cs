@@ -1,12 +1,12 @@
 ﻿namespace Toolkit.Foundation;
 
-public record SelectionEventArgs<TSender>
+public record SelectionEventArgs<TValue>
 {
-    public TSender? Sender { get; }
+    public TValue? Value { get; }
 
-    public SelectionEventArgs(TSender sender)
+    public SelectionEventArgs(TValue value)
     {
-        Sender = sender;
+        Value = value;
     }
 
     public SelectionEventArgs()

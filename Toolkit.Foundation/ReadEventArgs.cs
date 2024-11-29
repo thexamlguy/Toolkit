@@ -1,12 +1,12 @@
 ﻿namespace Toolkit.Foundation;
 
-public record ReadEventArgs<TSender>
+public record ReadEventArgs<TValue>
 {
-    public TSender? Sender { get; }
+    public TValue? Value { get; }
 
-    public ReadEventArgs(TSender sender)
+    public ReadEventArgs(TValue value)
     {
-        Sender = sender;
+        Value = value;
     }
 
     public ReadEventArgs()

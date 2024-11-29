@@ -1,12 +1,12 @@
 ﻿namespace Toolkit.Foundation;
 
-public record QueryEventArgs<TSender>
+public record QueryEventArgs<TValue>
 {
-    public TSender? Sender { get; }
+    public TValue? Value { get; }
 
-    public QueryEventArgs(TSender sender)
+    public QueryEventArgs(TValue value)
     {
-        Sender  = sender;
+        Value  = value;
     }
 
     public QueryEventArgs()

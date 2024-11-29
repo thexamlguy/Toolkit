@@ -7,7 +7,7 @@ public class ConfigurationChangedHandler<TConfiguration, TValue>(ConfigurationVa
 {
     public void Handle(ChangedEventArgs<TConfiguration> args)
     {
-        if (args.Sender is TConfiguration configuration)
+        if (args.Value is TConfiguration configuration)
         {
             if (configurationValue.TryUpdate(configuration, out TValue value))
             {

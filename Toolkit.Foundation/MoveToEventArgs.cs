@@ -1,18 +1,18 @@
 ﻿namespace Toolkit.Foundation;
 
-public record MoveToEventArgs<TSender>
+public record MoveToEventArgs<TValue>
 {
-    public TSender? Sender { get; }
+    public TValue? Value { get; }
 
     public int OldIndex { get; }
 
     public int NewIndex { get; }
 
-    public MoveToEventArgs(TSender sender, 
+    public MoveToEventArgs(TValue value, 
         int oldIndex, 
         int newIndex)
     {
-        Sender = sender;
+        Value = value;
         OldIndex = oldIndex;
         NewIndex = newIndex;
     }
