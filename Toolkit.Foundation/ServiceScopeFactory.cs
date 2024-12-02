@@ -2,9 +2,9 @@
 
 namespace Toolkit.Foundation;
 
-public class ScopeServiceFactory<TService>(IServiceScopeFactory serviceScopeFactory,
+public class ServiceScopeFactory<TService>(IServiceScopeFactory serviceScopeFactory,
     ICache<TService, IServiceScope> cache) :
-    IScopeServiceFactory<TService>
+    IServiceScopeFactory<TService>
     where TService : notnull
 {
     public (IServiceScope, TService) Create(params object?[] parameters)

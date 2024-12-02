@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections;
 using System.Collections.Specialized;
+using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 
 namespace Toolkit.Foundation;
@@ -31,6 +32,8 @@ public abstract partial class ObservableCollection<TViewModel> :
     IDisposable
 {
     private readonly System.Collections.ObjectModel.ObservableCollection<TViewModel> collection = [];
+
+    private readonly Lock syncLock = new();
 
     private readonly IDispatcher dispatcher;
 
@@ -95,8 +98,27 @@ public abstract partial class ObservableCollection<TViewModel> :
 
     public TViewModel this[int index]
     {
-        get => collection[index];
-        set => SetItem(index, value);
+        get
+        {
+            lock (syncLock)
+            {
+                return collection[index];
+            }
+        }
+        set
+        {
+            if (dispatcher.CheckAccess())
+            {
+                lock (syncLock)
+                {
+                    SetItem(index, value);
+                }
+            }
+            else
+            {
+                dispatcher.Invoke(() => SetItem(index, value));
+            }
+        }
     }
 
     object? IList.this[int index]
@@ -129,10 +151,18 @@ public abstract partial class ObservableCollection<TViewModel> :
 
     public void Add(TViewModel item)
     {
-        int index = collection.Count;
-        InsertItem(index, item);
-
-        UpdateSelection(item);
+        if (dispatcher.CheckAccess())
+        {
+            lock (syncLock)
+            {
+                InsertItem(collection.Count, item);
+                UpdateSelection(item);
+            }
+        }
+        else
+        {
+            dispatcher.Invoke(() => Add(item));
+        }
     }
 
     public void Add(object item)
@@ -263,36 +293,32 @@ public abstract partial class ObservableCollection<TViewModel> :
 
     public bool Move(int oldIndex, int newIndex)
     {
-        if (oldIndex < 0)
+        if (dispatcher.CheckAccess())
         {
-            return false;
-        }
-
-        TViewModel item = this[oldIndex];
-
-        bool moveSelection = false;
-        if (item is ISelectable oldSelection)
-        {
-            if (oldSelection.IsSelected)
+            lock (syncLock)
             {
-                moveSelection = true;
-                SelectedItem = default;
+                if (oldIndex < 0 || newIndex < 0 || oldIndex >= Count || newIndex >= Count)
+                {
+                    return false;
+                }
+
+                TViewModel item = collection[oldIndex];
+                collection.Move(oldIndex, newIndex);
+
+                if (item is ISelectable selectable && selectable.IsSelected)
+                {
+                    dispatcher.Invoke(() => SelectedItem = item);
+                }
+
+                return true;
             }
         }
-
-        RemoveItem(oldIndex);
-        InsertItem(newIndex, item);
-
-        if (moveSelection)
+        else
         {
-            if (item is ISelectable newSelection)
-            {
-                newSelection.IsSelected = true;
-                dispatcher.Invoke(() => SelectedItem = item);
-            }
+            bool result = false;
+            dispatcher.Invoke(() => result = Move(oldIndex, newIndex));
+            return result;
         }
-
-        return true;
     }
 
     public bool Move(int index, TViewModel item)
@@ -368,26 +394,38 @@ public abstract partial class ObservableCollection<TViewModel> :
 
     public bool Remove(TViewModel item)
     {
-        int index = collection.IndexOf(item);
-        if (index < 0)
+        if (dispatcher.CheckAccess())
         {
-            return false;
+            lock (syncLock)
+            {
+                int index = collection.IndexOf(item);
+                if (index < 0)
+                {
+                    return false;
+                }
+
+                Disposer.Dispose(item);
+                Disposer.Remove(this, item);
+
+                TViewModel? oldSelection = SelectedItem;
+                RemoveItem(index);
+
+                if (item.Equals(oldSelection))
+                {
+                    int newIndex = Math.Min(index, Count - 1);
+                    TViewModel? selectedItem = newIndex >= 0 ? this[newIndex] : default;
+                    SelectedItem = selectedItem;
+                }
+
+                return true;
+            }
         }
-
-        Disposer.Dispose(item);
-        Disposer.Remove(this, item);
-
-        TViewModel? oldSelection = SelectedItem;
-        RemoveItem(index);
-
-        if (item.Equals(oldSelection))
+        else
         {
-            int newIndex = Math.Min(index, Count - 1);
-            TViewModel? selectedItem = newIndex >= 0 ? this[newIndex] : default;
-            dispatcher.Invoke(() => SelectedItem = selectedItem);
+            bool result = false;
+            dispatcher.Invoke(() => result = Remove(item));
+            return result;
         }
-
-        return true;
     }
 
     void IList.Remove(object? value)
@@ -421,21 +459,33 @@ public abstract partial class ObservableCollection<TViewModel> :
         return true;
     }
 
-    public bool Replace(int index,
-        TViewModel item)
+    public bool Replace(int index, TViewModel item)
     {
-        if (index <= Count - 1)
+        if (dispatcher.CheckAccess())
         {
-            RemoveItem(index);
+            lock (syncLock)
+            {
+                if (index <= Count - 1)
+                {
+                    RemoveItem(index);
+                }
+                else
+                {
+                    index = Count;
+                }
+
+                Insert(index, item);
+                return true;
+            }
         }
         else
         {
-            index = Count;
+            bool result = false;
+            dispatcher.Invoke(() => result = Replace(index, item));
+            return result;
         }
-
-        Insert(index, item);
-        return true;
     }
+
 
     public void Revert()
     {

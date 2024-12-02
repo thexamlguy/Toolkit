@@ -2,7 +2,7 @@
 
 namespace Toolkit.Foundation;
 
-public interface IScopeServiceFactory<TService>
+public interface IServiceScopeFactory<TService>
 {
     (IServiceScope, TService) Create(params object?[] parameters);
 }
