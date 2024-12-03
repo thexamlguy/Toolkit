@@ -3,15 +3,17 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Toolkit.Foundation;
 
-public class AsyncHandlerKeyedInitialization<TMessage, THandler>(string key, IServiceProvider provider) :
+public class AsyncHandlerKeyedInitialization<TMessage, THandler>(string key, 
+    IMessenger messenger, 
+    IServiceProvider provider) :
     IInitialization where THandler : class, IAsyncHandler<TMessage>
     where TMessage : class
 {
     public void Initialize()
     {
-        if (!StrongReferenceMessenger.Default.IsRegistered<AsyncResponseEventArgs<TMessage, Unit>, string>(provider, key))
+        if (!messenger.IsRegistered<AsyncResponseEventArgs<TMessage, Unit>, string>(provider, key))
         {
-            StrongReferenceMessenger.Default.Register<IServiceProvider, AsyncResponseEventArgs<TMessage, Unit>, string>(provider, key,
+            messenger.Register<IServiceProvider, AsyncResponseEventArgs<TMessage, Unit>, string>(provider, key,
                 (provider, args) =>
                 {
                     IEnumerable<IAsyncHandler<TMessage>> handlers = provider.GetKeyedServices<IAsyncHandler<TMessage>>(key);
@@ -30,15 +32,16 @@ public class AsyncHandlerKeyedInitialization<TMessage, THandler>(string key, ISe
     }
 }
 
-public class AsyncHandlerKeyedInitialization<TMessage, TResponse, THandler>(string key, IServiceProvider provider) :
+public class AsyncHandlerKeyedInitialization<TMessage, TResponse, THandler>(string key, IMessenger messenger, 
+    IServiceProvider provider) :
     IInitialization where THandler : class, IAsyncHandler<TMessage, TResponse>
     where TMessage : class
 {
     public void Initialize()
     {
-        if (!StrongReferenceMessenger.Default.IsRegistered<AsyncResponseEventArgs<TMessage, TResponse>, string>(provider, key))
+        if (!messenger.IsRegistered<AsyncResponseEventArgs<TMessage, TResponse>, string>(provider, key))
         {
-            StrongReferenceMessenger.Default.Register<IServiceProvider, AsyncResponseEventArgs<TMessage, TResponse>, string>(provider, key,
+            messenger.Register<IServiceProvider, AsyncResponseEventArgs<TMessage, TResponse>, string>(provider, key,
                 (provider, args) =>
                 {
                     IEnumerable<IAsyncHandler<TMessage, TResponse>> handlers = provider.GetKeyedServices<IAsyncHandler<TMessage, TResponse>>(key);

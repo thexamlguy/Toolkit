@@ -38,6 +38,7 @@ public class WndProc(IMessenger messenger) :
 
         PInvoke.DestroyWindow((HWND)Handle);
     }
+
     private LRESULT HandleWndProc(HWND hWnd, uint msg,
         WPARAM wParam, LPARAM lParam)
     {

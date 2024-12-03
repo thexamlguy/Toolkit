@@ -22,7 +22,7 @@ public class DefaultHostBuilder :
                 ComponentHostCollection>();
 
             services.AddSingleton<IDisposer, Disposer>();
-            services.AddSingleton<IMessenger, StrongReferenceMessenger>(_ => StrongReferenceMessenger.Default);
+            services.AddScoped<IMessenger, StrongReferenceMessenger>();
 
             services.AddTransient<IValidation, Validation>();
             services.AddTransient<IValidatorCollection, ValidatorCollection>();

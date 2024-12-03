@@ -3,15 +3,16 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Toolkit.Foundation;
 
-public class HandlerInitialization<TMessage, TResponse, THandler>(IServiceProvider provider) :
+public class HandlerInitialization<TMessage, TResponse, THandler>(IMessenger messenger,
+    IServiceProvider provider) :
     IInitialization where THandler : class, IHandler<TMessage, TResponse>
     where TMessage : class
 {
     public void Initialize()
     {
-        if (!StrongReferenceMessenger.Default.IsRegistered<ResponseEventArgs<TMessage, TResponse>>(provider))
+        if (!messenger.IsRegistered<ResponseEventArgs<TMessage, TResponse>>(provider))
         {
-            StrongReferenceMessenger.Default.Register<IServiceProvider, ResponseEventArgs<TMessage, TResponse>>(provider,
+            messenger.Register<IServiceProvider, ResponseEventArgs<TMessage, TResponse>>(provider,
                 (provider, args) =>
                 {
                     IEnumerable<IHandler<TMessage, TResponse>> handlers = provider.GetServices<IHandler<TMessage, TResponse>>();
@@ -31,15 +32,16 @@ public class HandlerInitialization<TMessage, TResponse, THandler>(IServiceProvid
 }
 
 
-public class HandlerInitialization<TMessage, THandler>(IServiceProvider provider) :
+public class HandlerInitialization<TMessage, THandler>(IMessenger messenger, 
+    IServiceProvider provider) :
     IInitialization where THandler : class, IHandler<TMessage>
     where TMessage : class
 {
     public void Initialize()
     {
-        if (!StrongReferenceMessenger.Default.IsRegistered<TMessage>(provider))
+        if (!messenger.IsRegistered<TMessage>(provider))
         {
-            StrongReferenceMessenger.Default.Register<IServiceProvider, TMessage>(provider,
+            messenger.Register<IServiceProvider, TMessage>(provider,
                 (provider, args) =>
                 {
                     IEnumerable<IHandler<TMessage>> handlers = provider.GetServices<IHandler<TMessage>>();

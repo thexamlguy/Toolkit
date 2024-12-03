@@ -3,15 +3,17 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Toolkit.Foundation;
 
-public class HandlerKeyedInitialization<TMessage, THandler>(string key, IServiceProvider provider) :
+public class HandlerKeyedInitialization<TMessage, THandler>(string key,
+    IMessenger messenger,
+    IServiceProvider provider) :
     IInitialization where THandler : class, IHandler<TMessage>
     where TMessage : class
 {
     public void Initialize()
     {
-        if (!StrongReferenceMessenger.Default.IsRegistered<TMessage, string>(provider, key))
+        if (!messenger.IsRegistered<TMessage, string>(provider, key))
         {
-            StrongReferenceMessenger.Default.Register<IServiceProvider, TMessage, string>(provider, key,
+            messenger.Register<IServiceProvider, TMessage, string>(provider, key,
                 (provider, args) =>
                 {
                     IEnumerable<IHandler<TMessage>> handlers = provider.GetKeyedServices<IHandler<TMessage>>(key);
@@ -41,15 +43,17 @@ public class HandlerKeyedInitialization<TMessage, THandler>(string key, IService
     }
 }
 
-public class HandlerKeyedInitialization<TMessage, TResponse, THandler>(string key, IServiceProvider provider) :
+public class HandlerKeyedInitialization<TMessage, TResponse, THandler>(string key, 
+    IMessenger messenger,
+    IServiceProvider provider) :
     IInitialization where THandler : class, IHandler<TMessage, TResponse>
     where TMessage : class
 {
     public void Initialize()
     {
-        if (!StrongReferenceMessenger.Default.IsRegistered<ResponseEventArgs<TMessage, TResponse>, string>(provider, key))
+        if (!messenger.IsRegistered<ResponseEventArgs<TMessage, TResponse>, string>(provider, key))
         {
-            StrongReferenceMessenger.Default.Register<IServiceProvider, ResponseEventArgs<TMessage, TResponse>, string>(provider, key,
+            messenger.Register<IServiceProvider, ResponseEventArgs<TMessage, TResponse>, string>(provider, key,
                 (provider, args) =>
                 {
                     IEnumerable<IHandler<TMessage, TResponse>> handlers = provider.GetKeyedServices<IHandler<TMessage, TResponse>>(key);
