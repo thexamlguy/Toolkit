@@ -6,7 +6,7 @@ namespace Toolkit.Foundation;
 public class HandlerKeyedInitialization<TMessage, THandler>(string key,
     IMessenger messenger,
     IServiceProvider provider) :
-    IInitialization where THandler : class, IHandler<TMessage>
+    IInitialization, IInitializationScoped where THandler : class, IHandler<TMessage>
     where TMessage : class
 {
     public void Initialize()
@@ -46,7 +46,7 @@ public class HandlerKeyedInitialization<TMessage, THandler>(string key,
 public class HandlerKeyedInitialization<TMessage, TResponse, THandler>(string key, 
     IMessenger messenger,
     IServiceProvider provider) :
-    IInitialization where THandler : class, IHandler<TMessage, TResponse>
+    IInitialization, IInitializationScoped where THandler : class, IHandler<TMessage, TResponse>
     where TMessage : class
 {
     public void Initialize()

@@ -10,6 +10,8 @@ public class ContentTemplate :
     DataTemplateSelector,
     IContentTemplate
 {
+    private readonly Dictionary<string, DataTemplate> _cache = [];
+
     protected override DataTemplate? SelectTemplateCore(object item)
     {
         if (item is IObservableViewModel observableViewModel)
@@ -17,10 +19,19 @@ public class ContentTemplate :
             if (observableViewModel.Provider is IServiceProvider provider)
             {
                 Type itemType = item.GetType();
-                if (provider.GetRequiredKeyedService<IContentTemplateDescriptor>(itemType.Name.Replace("ViewModel", ""))
+                string key = itemType.Name.Replace("ViewModel", "");
+
+                if (_cache.TryGetValue(key, out DataTemplate? cachedTemplate))
+                {
+                    return cachedTemplate;
+                }
+
+                if (provider.GetRequiredKeyedService<IContentTemplateDescriptor>(key)
                     is IContentTemplateDescriptor descriptor)
                 {
-                    return CreateDataTemplate(descriptor);
+                    var newTemplate = CreateDataTemplate(descriptor);
+                    _cache[key] = newTemplate;
+                    return newTemplate;
                 }
             }
         }
@@ -29,10 +40,7 @@ public class ContentTemplate :
     }
 
     protected override DataTemplate? SelectTemplateCore(object item,
-        DependencyObject container)
-    {
-        return SelectTemplateCore(item);
-    }
+        DependencyObject container) => SelectTemplateCore(item);
 
     private static DataTemplate CreateDataTemplate(IContentTemplateDescriptor descriptor)
     {

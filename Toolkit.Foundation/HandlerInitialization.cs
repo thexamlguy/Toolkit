@@ -5,7 +5,7 @@ namespace Toolkit.Foundation;
 
 public class HandlerInitialization<TMessage, TResponse, THandler>(IMessenger messenger,
     IServiceProvider provider) :
-    IInitialization where THandler : class, IHandler<TMessage, TResponse>
+    IInitialization, IInitializationScoped where THandler : class, IHandler<TMessage, TResponse>
     where TMessage : class
 {
     public void Initialize()
@@ -34,7 +34,7 @@ public class HandlerInitialization<TMessage, TResponse, THandler>(IMessenger mes
 
 public class HandlerInitialization<TMessage, THandler>(IMessenger messenger, 
     IServiceProvider provider) :
-    IInitialization where THandler : class, IHandler<TMessage>
+    IInitialization, IInitializationScoped where THandler : class, IHandler<TMessage>
     where TMessage : class
 {
     public void Initialize()

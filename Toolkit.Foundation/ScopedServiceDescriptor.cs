@@ -1,7 +1,7 @@
 ﻿namespace Toolkit.Foundation;
 
-public class DecoratorService<T> :
-    IDecoratorService<T>
+public class ScopedServiceDescriptor<T> :
+    IScopedServiceDescriptor<T>
 {
     public T? Value { get; private set; }
 

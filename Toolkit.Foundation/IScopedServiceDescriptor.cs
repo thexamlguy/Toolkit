@@ -1,6 +1,6 @@
 ﻿namespace Toolkit.Foundation;
 
-public interface IDecoratorService<T>
+public interface IScopedServiceDescriptor<T>
 {
     T? Value { get; }
 
