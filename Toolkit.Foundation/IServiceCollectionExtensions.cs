@@ -62,12 +62,16 @@ public static class IServiceCollectionExtensions
         if (key is { Length: > 0 })
         {
             services.Add(new ServiceDescriptor(typeof(IAsyncHandler<TMessage, TResponse>), key, typeof(THandler), lifetime));
+
             services.AddInitializationScoped<AsyncHandlerKeyedInitialization<TMessage, TResponse, IAsyncHandler<TMessage, TResponse>>>(key);
+            services.AddInitialization<AsyncHandlerKeyedInitialization<TMessage, TResponse, IAsyncHandler<TMessage, TResponse>>>(key);
         }
         else
         {
             services.Add(new ServiceDescriptor(typeof(IAsyncHandler<TMessage, TResponse>), typeof(THandler), lifetime));
+
             services.AddInitializationScoped<AsyncHandlerInitialization<TMessage, TResponse, IAsyncHandler<TMessage, TResponse>>>();
+            services.AddInitialization<AsyncHandlerInitialization<TMessage, TResponse, IAsyncHandler<TMessage, TResponse>>>();
         }
 
         return services;
@@ -85,12 +89,16 @@ public static class IServiceCollectionExtensions
         if (key is { Length: > 0 })
         {
             services.Add(new ServiceDescriptor(typeof(IAsyncHandler<TMessage>), key, typeof(THandler), lifetime));
+
             services.AddInitializationScoped<AsyncHandlerKeyedInitialization<TMessage, IAsyncHandler<TMessage>>>(key);
+            services.AddInitialization<AsyncHandlerKeyedInitialization<TMessage, IAsyncHandler<TMessage>>>(key);
         }
         else
         {
             services.Add(new ServiceDescriptor(typeof(IAsyncHandler<TMessage>), typeof(THandler), lifetime));
+
             services.AddInitializationScoped<AsyncHandlerInitialization<TMessage, IAsyncHandler<TMessage>>>();
+            services.AddInitialization<AsyncHandlerInitialization<TMessage, IAsyncHandler<TMessage>>>();
         }
 
         return services;
@@ -220,12 +228,16 @@ public static class IServiceCollectionExtensions
         if (key is { Length: > 0 })
         {
             services.Add(new ServiceDescriptor(typeof(IHandler<TMessage>), key, typeof(THandler), lifetime));
+
             services.AddInitializationScoped<HandlerKeyedInitialization<TMessage, IHandler<TMessage>>>(key);
+            services.AddInitialization<HandlerKeyedInitialization<TMessage, IHandler<TMessage>>>(key);
         }
         else
         {
             services.Add(new ServiceDescriptor(typeof(IHandler<TMessage>), typeof(THandler), lifetime));
+
             services.AddInitializationScoped<HandlerInitialization<TMessage, IHandler<TMessage>>>();
+            services.AddInitialization<HandlerInitialization<TMessage, IHandler<TMessage>>>();
         }
 
         return services;
@@ -240,15 +252,21 @@ public static class IServiceCollectionExtensions
         string? key = null) where THandler : class, IHandler<TMessage, TResponse>
         where TMessage : class
     {
+        services.AddHandler<TMessage, TResponse, THandler>(lifetime, key);
+
         if (key is { Length: > 0 })
         {
             services.Add(new ServiceDescriptor(typeof(IHandler<TMessage, TResponse>), key, typeof(THandler), lifetime));
+
             services.AddInitializationScoped<HandlerKeyedInitialization<TMessage, TResponse, IHandler<TMessage, TResponse>>>(key);
+            services.AddInitialization<HandlerKeyedInitialization<TMessage, TResponse, IHandler<TMessage, TResponse>>>(key);
         }
         else
         {
             services.Add(new ServiceDescriptor(typeof(IHandler<TMessage, TResponse>), typeof(THandler), lifetime));
+
             services.AddInitializationScoped<HandlerInitialization<TMessage, TResponse, IHandler<TMessage, TResponse>>>();
+            services.AddInitialization<HandlerInitialization<TMessage, TResponse, IHandler<TMessage, TResponse>>>();
         }
 
         return services;
@@ -294,7 +312,7 @@ public static class IServiceCollectionExtensions
         where TInitializationImplementation : class, IInitializationScoped
     {
         services.Add(new ServiceDescriptor(typeof(IInitializationScoped), typeof(TInitializationImplementation), lifetime));
-        services.AddTransient<IInitializationScoped>(provider => provider.GetRequiredService<IInitializationScoped>());
+        services.AddTransient(provider => provider.GetRequiredService<IInitializationScoped>());
         return services;
     }
 

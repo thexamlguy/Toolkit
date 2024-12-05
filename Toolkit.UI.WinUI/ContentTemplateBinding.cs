@@ -50,6 +50,18 @@ public static class ContentTemplateBinding
                 {
                     cachedActivation = null;
                     content.Unloaded -= HandleUnloaded;
+                    content.DataContextChanged -= HandleDataContextChanged;
+                }
+            }
+
+            void HandleDataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
+            {
+                if (sender is FrameworkElement content)
+                {
+                    if (content.DataContext is IActivation activation)
+                    {
+                        activation.IsActive = true;
+                    }
                 }
             }
 
@@ -57,11 +69,13 @@ public static class ContentTemplateBinding
             {
                 content.Loaded += HandleLoaded;
                 content.Unloaded += HandleUnloaded;
+                content.DataContextChanged += HandleDataContextChanged;
             }
             else
             {
                 content.Loaded -= HandleLoaded;
                 content.Unloaded -= HandleUnloaded;
+                content.DataContextChanged -= HandleDataContextChanged;
             }
         }
     }
