@@ -10,16 +10,15 @@
 			win10-x86;win10-x64;win10-arm64
 		</RuntimeIdentifiers>
 		<UseWinUI>true</UseWinUI>
-		<WindowsSdkPackageVersion>10.0.19041.41</WindowsSdkPackageVersion>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<Nullable>enable</Nullable>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.1742" />
-		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.241114003" />
-		<PackageReference Include="WinUIEx" Version="2.5.0" />
-		<PackageReference Include="Microsoft.Xaml.Behaviors.WinUI.Managed" Version="2.0.9" />
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.250108002" />
+		<PackageReference Include="WinUIEx" Version="2.5.1" />
+		<PackageReference Include="Microsoft.Xaml.Behaviors.WinUI.Managed" Version="3.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>

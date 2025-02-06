@@ -1,4 +1,4 @@
-﻿using Microsoft.Xaml.Interactions.Core;
+﻿using Microsoft.Xaml.Interactivity;
 using System;
 using System.ComponentModel;
 using System.Globalization;

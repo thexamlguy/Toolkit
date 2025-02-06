@@ -166,7 +166,7 @@ public static partial class WindowExtensions
                     HBRUSH hBrush = PInvoke.CreateSolidBrush(new COLORREF((uint)ToWin32(Color.Black)));
                     _ = PInvoke.FillRect(new HDC((nint)wParam.Value),
                         &rect, hBrush);
-                    _ = PInvoke.DeleteObject(new HGDIOBJ(hBrush));
+                    _ = PInvoke.DeleteObject(new HGDIOBJ((void*)hBrush));
 
                     return new LRESULT(1);
                 }

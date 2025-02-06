@@ -1,5 +1,5 @@
 ﻿using Microsoft.UI.Xaml;
-using Microsoft.Xaml.Interactions.Core;
+using Microsoft.Xaml.Interactivity;
 using Toolkit.Foundation;
 
 namespace Toolkit.UI.WinUI;
