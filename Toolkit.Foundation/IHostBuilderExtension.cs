@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.FileProviders.Physical;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using System.Text.Json;
 
 namespace Toolkit.Foundation;
@@ -194,6 +195,21 @@ public static class IHostBuilderExtension
         });
 
         return builder;
+    }
+
+    public static IHostBuilder ConfigureSerial<TConfiguration, TSerialReader, TContent>(this IHostBuilder hostBuilder,
+        Action<HostBuilderContext> configureDelegate) where TSerialReader : SerialReader<TContent>
+        where TConfiguration : ISerialConfiguration, new()
+    {
+        hostBuilder.ConfigureServices((hostBuilderContext, serviceCollection) =>
+        {
+            configureDelegate.Invoke(hostBuilderContext);
+
+            serviceCollection.TryAddSingleton<ISerialFactory, SerialFactory>();
+            serviceCollection.AddSingleton(provider => provider.GetService<ISerialFactory>()!.Create<TSerialReader, TContent>(provider.GetService<IOptionsMonitor<TConfiguration>>()!.CurrentValue));
+        });
+
+        return hostBuilder;
     }
 
     public static IHostBuilder UseContentRoot(this IHostBuilder hostBuilder,
