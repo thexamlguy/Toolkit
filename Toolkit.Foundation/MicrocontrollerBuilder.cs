@@ -1,22 +1,21 @@
-﻿using Microsoft.Extensions.Configuration;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 
 namespace Toolkit.Foundation;
 
-public class MicrocontrollerBuilder :
-    IMicrocontrollerBuilder
+public class MicroControllerBuilder :
+    IMicroControllerBuilder
 {
-    private readonly List<IMicrocontrollerBuilderConfiguration> configurations = [];
+    private readonly List<IMicroControllerBuilderConfiguration> configurations = [];
 
-    public IReadOnlyCollection<IMicrocontrollerBuilderConfiguration> Configurations => 
-        new ReadOnlyCollection<IMicrocontrollerBuilderConfiguration>(configurations);
+    public IReadOnlyCollection<IMicroControllerBuilderConfiguration> Configurations => 
+        new ReadOnlyCollection<IMicroControllerBuilderConfiguration>(configurations);
 
-    public IMicrocontrollerBuilderConfiguration<TConfiguration, TSerialReader, TRead, TReadDeserializer> Add<TConfiguration, TSerialReader, TRead, TReadDeserializer>(IConfiguration configuration)
-        where TConfiguration : IMicrocontrollerConfiguration, new()
-        where TSerialReader : SerialReader<TRead>
-        where TReadDeserializer : IMicrocontrollerModuleDeserializer<TRead>, new()
+    public IMicroControllerBuilderConfiguration<TConfiguration, TReader, TRead, TEvent> Add<TConfiguration, TReader, TRead, TEvent>()
+        where TConfiguration : ISerialConfiguration
+        where TReader : SerialReader<TRead>
+        where TEvent : ISerialEventArgs<TRead>
     {
-        MicrocontrollerBuilderConfiguration<TConfiguration, TSerialReader, TRead, TReadDeserializer>? builderConfiguration = new(configuration);
+        MicroControllerBuilderConfiguration<TConfiguration, TReader, TRead, TEvent>? builderConfiguration = new();
         configurations.Add(builderConfiguration);
 
         return builderConfiguration;

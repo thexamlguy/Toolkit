@@ -1,3 +1,3 @@
 ﻿namespace Toolkit.Foundation;
 
-public interface IMicrocontrollerModule;
+public interface IMicroControllerModule;

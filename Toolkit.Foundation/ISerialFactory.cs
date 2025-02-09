@@ -2,6 +2,7 @@
 
 public interface ISerialFactory
 {
-    ISerialContext<TSerialReader, TContent> Create<TSerialReader, TContent>(ISerialConfiguration configuration)
-        where TSerialReader : SerialReader<TContent>;
+    ISerialContext<TReader, TRead>? Create<TConfiguration, TReader, TRead>()
+        where TConfiguration : ISerialConfiguration
+        where TReader : SerialReader<TRead>;
 }

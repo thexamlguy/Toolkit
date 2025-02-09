@@ -1,17 +1,19 @@
 ﻿namespace Toolkit.Foundation;
 
-public interface IMicrocontrollerBuilderConfiguration
+public interface IMicroControllerBuilderConfiguration
 {
-    IReadOnlyCollection<IMicrocontrollerModuleDescriptor> Modules { get; }
+    IReadOnlyCollection<IMicroControllerModuleDescriptor> Modules { get; }
 
-    Func<IServiceProvider, IMicrocontrollerContext> Factory { get; }
+    Func<IServiceProvider, IMicroControllerContext?> Factory { get; }
 }
 
-public interface IMicrocontrollerBuilderConfiguration<TConfiguration, TSerialReader, TRead, TReadDeserializer> :
-    IMicrocontrollerBuilderConfiguration where TConfiguration : IMicrocontrollerConfiguration, new()
-    where TSerialReader : SerialReader<TRead> where TReadDeserializer : IMicrocontrollerModuleDeserializer<TRead>, new()
+public interface IMicroControllerBuilderConfiguration<TConfiguration, TReader, TRead, IEvent> :
+    IMicroControllerBuilderConfiguration
+    where TConfiguration : ISerialConfiguration
+    where TReader : SerialReader<TRead>
+    where IEvent : ISerialEventArgs<TRead>
 {
 
-    IMicrocontrollerBuilderConfiguration<TConfiguration, TSerialReader, TRead, TReadDeserializer> AddModule<TModule>()
-        where TModule : IMicrocontrollerModule, new();
+    IMicroControllerBuilderConfiguration<TConfiguration, TReader, TRead, IEvent> AddModule<TModule>()
+        where TModule : IMicroControllerModule, new();
 }

@@ -2,10 +2,11 @@
 
 namespace Toolkit.Foundation;
 
-public class MicrocontrollerContext<TRead, TReadDeserializer>(IReadOnlyCollection<IMicrocontrollerModuleDescriptor> modules,
+public class MicroControllerContext<TRead, TEvent>(IReadOnlyCollection<IMicroControllerModuleDescriptor> modules,
     IMessenger messenger,
     ISerialContext serialContext) : 
-    IMicrocontrollerContext<TRead, TReadDeserializer> where TReadDeserializer : IMicrocontrollerModuleDeserializer<TRead>, new()
+    IMicroControllerContext<TRead, TEvent> 
+    where TEvent : ISerialEventArgs<TRead>
 {
     public async Task InitializeAsync()
     {

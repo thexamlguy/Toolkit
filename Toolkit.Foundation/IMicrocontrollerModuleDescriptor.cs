@@ -1,12 +1,13 @@
 ﻿namespace Toolkit.Foundation;
 
-public interface IMicrocontrollerModuleDescriptor<TModule> : 
-    IMicrocontrollerModuleDescriptor where TModule : IMicrocontrollerModule
+public interface IMicroControllerModuleDescriptor<TModule> : 
+    IMicroControllerModuleDescriptor 
+    where TModule : IMicroControllerModule
 {
     Func<TModule>? Factory { get; }
 }
 
-public interface IMicrocontrollerModuleDescriptor
+public interface IMicroControllerModuleDescriptor
 {
     Type Type { get; }
 }

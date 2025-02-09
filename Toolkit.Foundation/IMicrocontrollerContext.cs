@@ -1,6 +1,7 @@
 ﻿namespace Toolkit.Foundation;
 
-public interface IMicrocontrollerContext<TRead, TModuleDeserializer> :
-    IMicrocontrollerContext where TModuleDeserializer : IMicrocontrollerModuleDeserializer<TRead>, new();
+public interface IMicroControllerContext<TRead, TEvent> :
+    IMicroControllerContext 
+    where TEvent : ISerialEventArgs<TRead>;
 
-public interface IMicrocontrollerContext;
+public interface IMicroControllerContext;

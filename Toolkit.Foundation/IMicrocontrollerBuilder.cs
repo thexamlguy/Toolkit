@@ -1,12 +1,11 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿namespace Toolkit.Foundation;
 
-namespace Toolkit.Foundation;
-
-public interface IMicrocontrollerBuilder
+public interface IMicroControllerBuilder
 {
-    IReadOnlyCollection<IMicrocontrollerBuilderConfiguration> Configurations { get; }
+    IReadOnlyCollection<IMicroControllerBuilderConfiguration> Configurations { get; }
 
-    IMicrocontrollerBuilderConfiguration<TConfiguration, TSerialReader, TRead, TReadDeserializer> Add<TConfiguration, TSerialReader, TRead, TReadDeserializer>(IConfiguration configuration)
-        where TConfiguration : IMicrocontrollerConfiguration, new()
-        where TSerialReader : SerialReader<TRead> where TReadDeserializer : IMicrocontrollerModuleDeserializer<TRead>, new();
+    IMicroControllerBuilderConfiguration<TConfiguration, TReader, TRead, TEvent> Add<TConfiguration, TReader, TRead, TEvent>()
+        where TConfiguration : ISerialConfiguration
+        where TReader : SerialReader<TRead> 
+        where TEvent : ISerialEventArgs<TRead>;
 }

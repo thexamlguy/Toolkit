@@ -1,7 +1,7 @@
 ﻿namespace Toolkit.Foundation;
 
-public record MicrocontrollerModuleDescriptor<TModule> : 
-    IMicrocontrollerModuleDescriptor<TModule> where TModule : IMicrocontrollerModule, new()
+public record MicroControllerModuleDescriptor<TModule> : 
+    IMicroControllerModuleDescriptor<TModule> where TModule : IMicroControllerModule, new()
 {
     public Type Type => typeof(TModule);
 

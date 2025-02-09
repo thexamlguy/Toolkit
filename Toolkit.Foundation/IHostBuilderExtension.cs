@@ -197,16 +197,20 @@ public static class IHostBuilderExtension
         return builder;
     }
 
-    public static IHostBuilder ConfigureSerial<TConfiguration, TSerialReader, TContent>(this IHostBuilder hostBuilder,
-        Action<HostBuilderContext> configureDelegate) where TSerialReader : SerialReader<TContent>
-        where TConfiguration : ISerialConfiguration, new()
+    public static IHostBuilder ConfigureMicroControllers(this IHostBuilder hostBuilder, Action<IMicroControllerBuilder> builderDelegate)
     {
         hostBuilder.ConfigureServices((hostBuilderContext, serviceCollection) =>
         {
-            configureDelegate.Invoke(hostBuilderContext);
+            MicroControllerBuilder? builder = new();
 
+            builderDelegate.Invoke(builder);
             serviceCollection.TryAddSingleton<ISerialFactory, SerialFactory>();
-            serviceCollection.AddSingleton(provider => provider.GetService<ISerialFactory>()!.Create<TSerialReader, TContent>(provider.GetService<IOptionsMonitor<TConfiguration>>()!.CurrentValue));
+            serviceCollection.TryAddSingleton<IMicroControllerContextFactory, MicroControllerContextFactory>();
+
+            foreach (IMicroControllerBuilderConfiguration configuration in builder.Configurations)
+            {
+                serviceCollection.AddSingleton(provider => configuration.Factory.Invoke(provider) ?? throw new NullReferenceException());
+            }
         });
 
         return hostBuilder;

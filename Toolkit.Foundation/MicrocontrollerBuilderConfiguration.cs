@@ -1,24 +1,25 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using System.Collections.ObjectModel;
 
 namespace Toolkit.Foundation;
 
-public class MicrocontrollerBuilderConfiguration<TConfiguration, TSerialReader, TRead, TReadDeserializer>(IConfiguration configuration) : 
-    IMicrocontrollerBuilderConfiguration<TConfiguration, TSerialReader, TRead, TReadDeserializer>
-    where TConfiguration : IMicrocontrollerConfiguration, new()
-    where TSerialReader : SerialReader<TRead> where TReadDeserializer : IMicrocontrollerModuleDeserializer<TRead>, new()
+public class MicroControllerBuilderConfiguration<TConfiguration, TReader, TRead, TEvent> : 
+    IMicroControllerBuilderConfiguration<TConfiguration, TReader, TRead, TEvent>
+    where TConfiguration : ISerialConfiguration
+    where TReader : SerialReader<TRead> 
+    where TEvent : ISerialEventArgs<TRead>
 {
-    private readonly List<IMicrocontrollerModuleDescriptor> modules = new();
+    private readonly List<IMicroControllerModuleDescriptor> modules = [];
 
-    public Func<IServiceProvider, IMicrocontrollerContext> Factory => (IServiceProvider provider) => provider.GetService<IMicrocontrollerFactory>()!.Create<TSerialReader, TRead, TReadDeserializer>(configuration.Get<TConfiguration>(), Modules);
+    public Func<IServiceProvider, IMicroControllerContext?> Factory => (IServiceProvider provider) => provider.GetService<IMicroControllerContextFactory>()!
+        .Create<TConfiguration, TReader, TRead, TEvent>(Modules);
 
-    public IReadOnlyCollection<IMicrocontrollerModuleDescriptor> Modules => new ReadOnlyCollection<IMicrocontrollerModuleDescriptor>(modules);
+    public IReadOnlyCollection<IMicroControllerModuleDescriptor> Modules => new ReadOnlyCollection<IMicroControllerModuleDescriptor>(modules);
 
-    public IMicrocontrollerBuilderConfiguration<TConfiguration, TSerialReader, TRead, TReadDeserializer> AddModule<TModule>()
-        where TModule : IMicrocontrollerModule, new()
+    public IMicroControllerBuilderConfiguration<TConfiguration, TReader, TRead, TEvent> AddModule<TModule>()
+        where TModule : IMicroControllerModule, new()
     {
-        modules.Add(new MicrocontrollerModuleDescriptor<TModule>());
+        modules.Add(new MicroControllerModuleDescriptor<TModule>());
         return this;
     }
 }

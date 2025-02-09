@@ -2,8 +2,8 @@
 
 namespace Toolkit.Foundation;
 
-public class MicrocontrollerConfiguration : 
-    IMicrocontrollerConfiguration
+public class MicroControllerConfiguration : 
+    ISerialConfiguration
 {
     [NotNull]
     public string? PortName { get; set; }
