@@ -18,7 +18,7 @@ public class SerialContext<TReader, TValue, TEvent>(IMessenger messenger,
 
         IsOpen = true;
 
-        _ = ReadAsync();
+        _ = Task.Run(ReadAsync);
         return true;
     }
 

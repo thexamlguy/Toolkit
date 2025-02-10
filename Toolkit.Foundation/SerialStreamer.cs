@@ -5,5 +5,5 @@ namespace Toolkit.Foundation;
 public class SerialStreamer(SerialPort serialPort) : 
     ISerialStreamer
 {
-    public Stream Create() => serialPort.BaseStream;
+    public Stream Create() => new SerialPortStream(serialPort);
 }

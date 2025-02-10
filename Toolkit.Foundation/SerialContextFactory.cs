@@ -21,9 +21,13 @@ public class SerialContextFactory(IServiceProvider provider,
                 return (ISerialContext<TReader, TValue, TEvent>)context;
             }
 
-            SerialPort serialPort = new(configuration.PortName, configuration.BaudRate);
-            serialPort.ReadTimeout = 500;  // Prevents blocking if no data is available
-            serialPort.WriteTimeout = 500;
+            SerialPort serialPort = new(configuration.PortName, configuration.BaudRate)
+            {
+                ReadTimeout = SerialPort.InfiniteTimeout,
+                WriteTimeout = SerialPort.InfiniteTimeout,
+                DtrEnable = false,
+                RtsEnable = false
+            };
 
             SerialConnection connection = new(serialPort);
             SerialStreamer streamer = new(serialPort);
