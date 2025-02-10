@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Toolkit.Foundation;
 
-public class SerialLineReader(Stream stream) :
+public class SerialLineReader(Stream stream) : 
     SerialReader<string>(stream)
 {
     private readonly PipeReader reader = PipeReader.Create(stream);
@@ -13,24 +13,31 @@ public class SerialLineReader(Stream stream) :
     {
         while (true)
         {
-            ReadResult result = await reader.ReadAsync();
-            ReadOnlySequence<byte> buffer = result.Buffer;
+            ReadResult result;
+            try
+            {
+                result = await reader.ReadAsync();
+            }
+            catch
+            {
+                continue;
+            }
 
+            ReadOnlySequence<byte> buffer = result.Buffer;
             while (TryReadLine(ref buffer, out ReadOnlySequence<byte> line))
             {
                 yield return EncodingExtensions.GetString(Encoding.UTF8, line);
             }
 
             reader.AdvanceTo(buffer.Start, buffer.End);
-            if (result.IsCompleted)
-            {
-                break;
-            }
-        }
 
+            if (result.IsCompleted)
+                break;
+        }
     }
 
-    private bool TryReadLine(ref ReadOnlySequence<byte> buffer, out ReadOnlySequence<byte> line)
+    private bool TryReadLine(ref ReadOnlySequence<byte> buffer,
+        out ReadOnlySequence<byte> line)
     {
         SequencePosition? position = buffer.PositionOf((byte)'\n');
         if (position == null)

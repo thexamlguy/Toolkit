@@ -2,24 +2,42 @@
 
 namespace Toolkit.Foundation;
 
-public class SerialContext<TSerialReader, TContent>(IMessenger messenger,
+public class SerialContext<TReader, TValue, TEvent>(IMessenger messenger,
     ISerialConnection connection,
     ISerialStreamer serialStreamer) : 
-    ISerialContext<TSerialReader, TContent> where TSerialReader : SerialReader<TContent>
+    ISerialContext<TReader, TValue, TEvent>
+    where TReader : SerialReader<TValue>
+    where TEvent : SerialEventArgs<TValue>, new()
 {
-    public async void Open()
-    {
-        if (connection.Open())
-        {
-            Stream stream = serialStreamer.Create();
+    public bool IsOpen { get; private set; }
 
-            if ((TSerialReader?)Activator.CreateInstance(typeof(TSerialReader), [stream]) is TSerialReader reader)
+    public bool Open()
+    {
+        if (!connection.Open())
+            return false;
+
+        IsOpen = true;
+
+        _ = ReadAsync();
+        return true;
+    }
+
+    private async Task ReadAsync()
+    {
+        try
+        {
+            await using Stream stream = serialStreamer.Create();
+            if (Activator.CreateInstance(typeof(TReader), [stream]) is TReader reader)
             {
-                await foreach (TContent content in reader.ReadAsync())
+                await foreach (TValue value in reader.ReadAsync())
                 {
-                    messenger.Send(SerialResponse.Create(this, content));
+                    messenger.Send(new SerialEventArgs<TValue> { Value = value });
                 }
             }
+        }
+        catch
+        {
+            IsOpen = false;
         }
     }
 }

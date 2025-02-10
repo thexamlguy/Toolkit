@@ -5,7 +5,6 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.FileProviders.Physical;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
 using System.Text.Json;
 
 namespace Toolkit.Foundation;
@@ -197,24 +196,38 @@ public static class IHostBuilderExtension
         return builder;
     }
 
-    public static IHostBuilder ConfigureMicroControllers(this IHostBuilder hostBuilder, Action<IMicroControllerBuilder> builderDelegate)
+    public static IHostBuilder AddSerial<TConfiguration, TReader, TRead, TEvent>(this IHostBuilder hostBuilder)
+        where TConfiguration : ISerialConfiguration
+        where TReader : SerialReader<TRead>
+        where TEvent : SerialEventArgs<TRead>, new()
     {
         hostBuilder.ConfigureServices((hostBuilderContext, serviceCollection) =>
         {
-            MicroControllerBuilder? builder = new();
-
-            builderDelegate.Invoke(builder);
-            serviceCollection.TryAddSingleton<ISerialFactory, SerialFactory>();
-            serviceCollection.TryAddSingleton<IMicroControllerContextFactory, MicroControllerContextFactory>();
-
-            foreach (IMicroControllerBuilderConfiguration configuration in builder.Configurations)
-            {
-                serviceCollection.AddSingleton(provider => configuration.Factory.Invoke(provider) ?? throw new NullReferenceException());
-            }
+            serviceCollection.TryAddSingleton<ISerialContextFactory, SerialContextFactory>();
+            serviceCollection.AddSingleton<ISerialContext<TReader, TRead, TEvent>>(provider => provider.GetRequiredService<ISerialContextFactory>().Create<TConfiguration, TReader, TRead, TEvent>() 
+                ?? throw new NullReferenceException());
         });
 
         return hostBuilder;
     }
+
+    //public static IHostBuilder ConfigureSerials(this IHostBuilder hostBuilder, Action<ISerialBuilder> builderDelegate)
+    //{
+    //    hostBuilder.ConfigureServices((hostBuilderContext, serviceCollection) =>
+    //    {
+    //        SerialBuilder? builder = new();
+
+    //        builderDelegate.Invoke(builder);
+    //        serviceCollection.TryAddSingleton<ISerialContextFactory, SerialContextFactory>();
+
+    //        foreach (ISerialBuilderConfiguration configuration in builder.Configurations)
+    //        {
+    //            serviceCollection.AddSingleton(provider => configuration.Factory.Invoke(provider) ?? throw new NullReferenceException());
+    //        }
+    //    });
+
+    //    return hostBuilder;
+    //}
 
     public static IHostBuilder UseContentRoot(this IHostBuilder hostBuilder,
         string contentRoot,
