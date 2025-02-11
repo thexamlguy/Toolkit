@@ -12,8 +12,7 @@ public class SerialStructReader(Stream stream) :
     {
         while (true)
         {
-            ReadResult? result = default;
-
+            ReadResult result;
             try
             {
                 result = await reader.ReadAsync();
@@ -31,21 +30,18 @@ public class SerialStructReader(Stream stream) :
                 yield break;
             }
 
-            if (result.HasValue)
+            ReadOnlySequence<byte> buffer = result.Buffer;
+            while (TryParse(ref buffer, out SerialStructEventArgs serialEvent))
             {
-                ReadOnlySequence<byte> buffer = result.Value.Buffer;
-                while (TryParse(ref buffer, out SerialStructEventArgs serialEvent))
-                {
-                    yield return serialEvent;
-                }
-
-                reader.AdvanceTo(buffer.Start, buffer.End);
+                yield return serialEvent;
             }
 
+            reader.AdvanceTo(buffer.Start, buffer.End);
         }
     }
 
-    private bool TryParse(ref ReadOnlySequence<byte> buffer, out SerialStructEventArgs serialEvent)
+    private bool TryParse(ref ReadOnlySequence<byte> buffer, 
+        out SerialStructEventArgs serialEvent)
     {
         SequenceReader<byte> reader = new(buffer);
         serialEvent = default!;

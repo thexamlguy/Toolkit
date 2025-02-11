@@ -31,7 +31,7 @@ public class SerialContext<TReader, TValue, TEvent>(IMessenger messenger,
             {
                 await foreach (TValue value in reader.ReadAsync())
                 {
-                    messenger.Send(new SerialEventArgs<TValue> { Value = value });
+                    messenger.Send(new TEvent { Value = value });
                 }
             }
         }
