@@ -52,8 +52,10 @@ public class DefaultHostBuilder :
             services.AddTransient<IComponentFactory, ComponentFactory>();
             services.AddTransient<IComponentScopeProvider, ComponentScopeProvider>();
 
-            services.AddHandlerScoped<NavigateEventArgs, NavigateHandler>();
-            services.AddHandlerScoped<NavigateBackEventArgs, NavigateBackHandler>();
+            services.AddScopedHandler<NavigateEventArgs, NavigateHandler>();
+            services.AddScopedHandler<NavigateBackEventArgs, NavigateBackHandler>();
+
+            services.AddTransient<IFileProvider, FileProvider>();
 
             services.AddInitialization<ComponentInitializer>();
         });

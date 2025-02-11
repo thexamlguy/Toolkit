@@ -2,8 +2,8 @@
 
 namespace Toolkit.Foundation;
 
-public class ServiceScopeProvider<TService>(ICache<TService, IServiceScope> cache) :
-    IServiceScopeProvider<TService>
+public class ScopedServiceProvider<TService>(ICache<TService, IServiceScope> cache) :
+    IScopedServiceProvider<TService>
     where TService : notnull
 {
     public bool TryGet(TService service,

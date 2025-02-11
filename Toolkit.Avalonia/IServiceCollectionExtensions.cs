@@ -12,8 +12,8 @@ public static class IServiceCollectionExtensions
     public static IServiceCollection AddAvalonia(this IServiceCollection services)
     {
         services.AddTransient<ITopLevelProvider, TopLevelProvider>();
-        services.AddTransient<IFileProvider, FileProvider>();
-        services.AddTransient<IFolderProvider, FolderProvider>();
+        services.AddTransient<IFilePicker, FilePicker>();
+        services.AddTransient<IFolderPicker, FolderPicker>();
 
         services.AddTransient<IClipboardWriter, ClipboardWriter>();
 
@@ -27,8 +27,8 @@ public static class IServiceCollectionExtensions
         services.AddTransient<INavigationRegion, NavigationRegion>();
 
         services.AddAsyncHandler<WriteEventArgs<Clipboard<object>>, WriteClipboardHandler>();
-        services.AddAsyncHandler<SelectionEventArgs<FolderFilter>, IReadOnlyCollection<string>?, SelectFoldersHandler>();
-        services.AddAsyncHandler<SelectionEventArgs<FileFilter>, IReadOnlyCollection<string>?, SelectFilesHandler>();
+        services.AddAsyncHandler<SelectionEventArgs<FolderPickerPicker>, IReadOnlyCollection<string>?, SelectFoldersHandler>();
+        services.AddAsyncHandler<SelectionEventArgs<FilePickerFilter>, IReadOnlyCollection<string>?, SelectFilesHandler>();
 
         services.AddHandler<NavigateTemplateEventArgs, ClassicDesktopStyleApplicationHandler>(nameof(IClassicDesktopStyleApplicationLifetime));
         services.AddHandler<NavigateTemplateEventArgs, SingleViewApplicationHandler>(nameof(ISingleViewApplicationLifetime));
@@ -51,8 +51,8 @@ public static class IServiceCollectionExtensions
             new ProxyServiceCollection<IComponentBuilder>(services =>
             {
                 services.AddTransient<ITopLevelProvider, TopLevelProvider>();
-                services.AddTransient<IFileProvider, FileProvider>();
-                services.AddTransient<IFolderProvider, FolderProvider>();
+                services.AddTransient<IFilePicker, FilePicker>();
+                services.AddTransient<IFolderPicker, FolderPicker>();
 
                 services.AddTransient<IClipboardWriter, ClipboardWriter>();
 
@@ -66,8 +66,8 @@ public static class IServiceCollectionExtensions
                 services.AddTransient<INavigationRegion, NavigationRegion>();
 
                 services.AddAsyncHandler<WriteEventArgs<Clipboard<object>>, WriteClipboardHandler>();
-                services.AddAsyncHandler<SelectionEventArgs<FolderFilter>, IReadOnlyCollection<string>?, SelectFoldersHandler>();
-                services.AddAsyncHandler<SelectionEventArgs<FileFilter>, IReadOnlyCollection<string>?, SelectFilesHandler>();
+                services.AddAsyncHandler<SelectionEventArgs<FolderPickerPicker>, IReadOnlyCollection<string>?, SelectFoldersHandler>();
+                services.AddAsyncHandler<SelectionEventArgs<FilePickerFilter>, IReadOnlyCollection<string>?, SelectFilesHandler>();
 
                 services.AddHandler<NavigateTemplateEventArgs, ContentControlHandler>(nameof(ContentControl));
 

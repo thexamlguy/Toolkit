@@ -4,10 +4,10 @@ using Toolkit.Foundation;
 
 namespace Toolkit.Avalonia;
 
-public class FolderProvider(ITopLevelProvider topLevelProvider) :
-    IFolderProvider
+public class FolderPicker(ITopLevelProvider topLevelProvider) :
+    IFolderPicker
 {
-    public async Task<IReadOnlyCollection<string>> SelectFolders(FolderFilter filter)
+    public async Task<IReadOnlyCollection<string>> Get(FolderPickerPicker filter)
     {
         if (topLevelProvider.Get() is TopLevel topLevel)
         {

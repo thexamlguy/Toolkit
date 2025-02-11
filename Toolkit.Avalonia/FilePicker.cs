@@ -4,10 +4,10 @@ using Toolkit.Foundation;
 
 namespace Toolkit.Avalonia;
 
-public class FileProvider(ITopLevelProvider topLevelProvider) :
-    IFileProvider
+public class FilePicker(ITopLevelProvider topLevelProvider) :
+    IFilePicker
 {
-    public async Task<IReadOnlyCollection<string>> SelectFiles(FileFilter filter)
+    public async Task<IReadOnlyCollection<string>> Get(FilePickerFilter filter)
     {
         if (topLevelProvider.Get() is TopLevel topLevel)
         {

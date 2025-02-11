@@ -1,14 +1,14 @@
 ﻿namespace Toolkit.Foundation;
 
-public class SelectFilesHandler(IFileProvider fileProvider) :
-    IAsyncHandler<SelectionEventArgs<FileFilter>, IReadOnlyCollection<string>?>
+public class SelectFilesHandler(IFilePicker fileProvider) :
+    IAsyncHandler<SelectionEventArgs<FilePickerFilter>, IReadOnlyCollection<string>?>
 {
-    public async Task<IReadOnlyCollection<string>?> Handle(SelectionEventArgs<FileFilter> args,
+    public async Task<IReadOnlyCollection<string>?> Handle(SelectionEventArgs<FilePickerFilter> args,
         CancellationToken cancellationToken)
     {
-        if (args.Value is FileFilter filter)
+        if (args.Value is FilePickerFilter filter)
         {
-            if (await fileProvider.SelectFiles(filter)
+            if (await fileProvider.Get(filter)
                 is { Count: > 0 } files)
             {
                 return files;

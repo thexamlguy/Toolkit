@@ -1,6 +1,8 @@
-﻿namespace Toolkit.Foundation;
-
-public interface IFileProvider
+﻿
+namespace Toolkit.Foundation
 {
-    Task<IReadOnlyCollection<string>> SelectFiles(FileFilter filter);
+    public interface IFileProvider
+    {
+        IReadOnlyCollection<string> Get(string path, FileProviderFilter filter);
+    }
 }

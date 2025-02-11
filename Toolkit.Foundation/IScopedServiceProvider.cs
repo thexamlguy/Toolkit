@@ -2,7 +2,7 @@
 
 namespace Toolkit.Foundation;
 
-public interface IServiceScopeProvider<TService>
+public interface IScopedServiceProvider<TService>
 {
     bool TryGet(TService service, out IServiceScope? serviceScope);
 }

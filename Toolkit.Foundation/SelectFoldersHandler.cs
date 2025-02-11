@@ -1,15 +1,15 @@
 ﻿namespace Toolkit.Foundation;
 
 
-public class SelectFoldersHandler(IFolderProvider folderProvider) :
-    IAsyncHandler<SelectionEventArgs<FolderFilter>, IReadOnlyCollection<string>?>
+public class SelectFoldersHandler(IFolderPicker folderProvider) :
+    IAsyncHandler<SelectionEventArgs<FolderPickerPicker>, IReadOnlyCollection<string>?>
 {
-    public async Task<IReadOnlyCollection<string>?> Handle(SelectionEventArgs<FolderFilter> args,
+    public async Task<IReadOnlyCollection<string>?> Handle(SelectionEventArgs<FolderPickerPicker> args,
         CancellationToken cancellationToken = default)
     {
-        if (args.Value is FolderFilter filter)
+        if (args.Value is FolderPickerPicker filter)
         {
-            if (await folderProvider.SelectFolders(filter)
+            if (await folderProvider.Get(filter)
                 is { Count: > 0 } folders)
             {
                 return folders;
