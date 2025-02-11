@@ -16,8 +16,8 @@ public static class IServiceCollectionExtensions
         services.AddTransient<IContentTemplate, ContentTemplate>();
         services.AddTransient<INavigationRegion, NavigationRegion>();
 
-        services.AddHandler<NavigateTemplateEventArgs, ContentControlHandler>(nameof(ContentControl));
-        services.AddHandler<NavigateTemplateEventArgs, ContentDialogHandler>(nameof(ContentDialog));
+        services.AddHandlerScoped<NavigateTemplateEventArgs, ContentControlHandler>(nameof(ContentControl));
+        services.AddHandlerScoped<NavigateTemplateEventArgs, ContentDialogHandler>(nameof(ContentDialog));
 
         services.AddTransient((Func<IServiceProvider, IProxyServiceCollection<IComponentBuilder>>)(provider =>
             new ProxyServiceCollection<IComponentBuilder>(services =>

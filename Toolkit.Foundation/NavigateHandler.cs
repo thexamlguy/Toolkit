@@ -2,7 +2,7 @@
 
 namespace Toolkit.Foundation;
 
-public class NavigateHandler(NamedComponent scope,
+public class NavigateHandler(NamedComponent named,
     IComponentScopeProvider componentScopeProvider) :
     IHandler<NavigateEventArgs>
 {
@@ -28,7 +28,7 @@ public class NavigateHandler(NamedComponent scope,
 
         if (navigation is null)
         {
-            ComponentScopeDescriptor? descriptor = componentScopeProvider.Get(args.Scope ?? scope.Key);
+            ComponentScopeDescriptor? descriptor = componentScopeProvider.Get(args.Scope ?? named.Key);
             navigation = descriptor?.Services?.GetRequiredService<INavigation>();
         }
 

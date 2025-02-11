@@ -28,7 +28,7 @@ public class Navigation(IServiceProvider provider,
         {
             currentSegmentIndex++;
 
-            if (provider.GetKeyedService<IContentTemplateDescriptor>(segment)
+            if (provider.GetRequiredKeyedService<IContentTemplateDescriptor>(segment)
                 is IContentTemplateDescriptor descriptor)
             {
                 Dictionary<string, object>? arguments = parameters?.ToDictionary(x => x.Key, x => x.Value, StringComparer.InvariantCultureIgnoreCase) ?? [];

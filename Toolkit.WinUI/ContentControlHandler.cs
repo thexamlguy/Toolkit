@@ -10,14 +10,10 @@ public class ContentControlHandler :
     public void Handle(NavigateTemplateEventArgs args)
     {
         if (args.Region is not ContentControl contentControl)
-        {
             return;
-        }
 
         if (args.Template is not Control control)
-        {
             return;
-        }
 
         void HandleLoaded(object? sender, RoutedEventArgs args)
         {

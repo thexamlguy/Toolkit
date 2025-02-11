@@ -38,7 +38,7 @@ public class DefaultHostBuilder :
 
             services.AddTransient<IContentFactory, ContentFactory>();
 
-            services.AddScoped<INavigationRegionCollection, NavigationRegionCollection>();
+            services.AddSingleton<INavigationRegionCollection, NavigationRegionCollection>();
             services.AddTransient<INavigationRegionProvider, NavigationRegionProvider>();
 
             services.AddScoped<INavigation, Navigation>();
@@ -52,8 +52,8 @@ public class DefaultHostBuilder :
             services.AddTransient<IComponentFactory, ComponentFactory>();
             services.AddTransient<IComponentScopeProvider, ComponentScopeProvider>();
 
-            services.AddHandler<NavigateEventArgs, NavigateHandler>();
-            services.AddHandler<NavigateBackEventArgs, NavigateBackHandler>();
+            services.AddHandlerScoped<NavigateEventArgs, NavigateHandler>();
+            services.AddHandlerScoped<NavigateBackEventArgs, NavigateBackHandler>();
 
             services.AddInitialization<ComponentInitializer>();
         });
