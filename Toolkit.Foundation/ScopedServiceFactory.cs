@@ -3,11 +3,11 @@
 namespace Toolkit.Foundation;
 
 public class ScopedServiceFactory<TScopedService>(IServiceScopeFactory serviceScopeFactory,
-    ICache<TScopedService, IServiceScope> cache) :
+    ICache<TScopedService, IServiceProvider> cache) :
     IScopedServiceFactory<TScopedService>
     where TScopedService : notnull
 {
-    public (IServiceScope, TScopedService) Create(params object?[] parameters)
+    public (IServiceProvider, TScopedService) Create(params object?[] parameters)
     {
         if (serviceScopeFactory.CreateScope() is IServiceScope serviceScope)
         {
@@ -18,14 +18,14 @@ public class ScopedServiceFactory<TScopedService>(IServiceScopeFactory serviceSc
                 if (factory.Create<TScopedService>(parameters) is TScopedService service)
                 {
                     serviceProvider.GetRequiredService<IScopedServiceDescriptor<TScopedService>>().Set(service);
-                    cache.Add(service, serviceScope);
+                    cache.Add(service, serviceProvider);
 
-                    foreach (IInitializationScoped initializationScoped in serviceScope.ServiceProvider.GetServices<IInitializationScoped>())
+                    foreach (IInitializationScoped initializationScoped in serviceProvider.GetServices<IInitializationScoped>())
                     {
                         initializationScoped.Initialize();
                     }
 
-                    return (serviceScope, service);
+                    return (serviceProvider, service);
                 }
             }
         }

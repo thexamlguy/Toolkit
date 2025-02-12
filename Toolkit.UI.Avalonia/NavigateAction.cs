@@ -22,12 +22,10 @@ public class NavigateAction :
     public static readonly StyledProperty<string> RouteProperty =
         AvaloniaProperty.Register<NavigateAction, string>(nameof(Route));
 
-    public static readonly StyledProperty<string> ScopeProperty =
-        AvaloniaProperty.Register<NavigateAction, string>(nameof(Scope));
+    public static readonly StyledProperty<NavigateScope?> ScopeProperty =
+        AvaloniaProperty.Register<NavigateAction, NavigateScope?>(nameof(Scope));
 
     private ParameterCollection parameterCollection = [];
-
-    public event EventHandler? Navigated;
 
     public object Region
     {
@@ -45,7 +43,7 @@ public class NavigateAction :
         set => SetValue(RouteProperty, value);
     }
 
-    public string Scope
+    public NavigateScope? Scope
     {
         get => GetValue(ScopeProperty);
         set => SetValue(ScopeProperty, value);
@@ -65,7 +63,7 @@ public class NavigateAction :
                     ImmutableDictionary<string, object>.Empty;
 
                 observableViewModel.Messenger.Send(new NavigateEventArgs(Route, Region == this ? content : Region, Scope ?? null,
-                    content.DataContext, Navigated, parameters));
+                    content.DataContext, parameters));
             }
         }
 

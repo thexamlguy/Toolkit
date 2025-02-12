@@ -1,21 +1,19 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿namespace Toolkit.Foundation;
 
-namespace Toolkit.Foundation;
-
-public class ScopedServiceProvider<TService>(ICache<TService, IServiceScope> cache) :
+public class ScopedServiceProvider<TService>(ICache<TService, IServiceProvider> cache) :
     IScopedServiceProvider<TService>
     where TService : notnull
 {
     public bool TryGet(TService service,
-        out IServiceScope? serviceScope)
+        out IServiceProvider? serviceProvider)
     {
-        if (cache.TryGetValue(service, out IServiceScope? value))
+        if (cache.TryGetValue(service, out IServiceProvider? value))
         {
-            serviceScope = value;
+            serviceProvider = value;
             return true;
         }
 
-        serviceScope = null;
+        serviceProvider = null;
         return false;
     }
 }

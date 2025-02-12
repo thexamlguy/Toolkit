@@ -42,13 +42,13 @@ public partial class ObservableConfiguration<TConfiguration, TValue> :
 
     protected override void Activated() => dispatcher.Invoke(() => Value = read(configuration));
 
-    protected override void Changed(TValue? value)
+    protected override void ValueChanged(TValue? value)
     {
         if (IsActive)
         {
             writer.Write(args => write(value, args));
         }
 
-        base.Changed(value);
+        base.ValueChanged(value);
     }
 }

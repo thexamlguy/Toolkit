@@ -4,5 +4,5 @@ namespace Toolkit.Foundation;
 
 public interface IScopedServiceFactory<TService>
 {
-    (IServiceScope, TService) Create(params object?[] parameters);
+    (IServiceProvider, TService) Create(params object?[] parameters);
 }

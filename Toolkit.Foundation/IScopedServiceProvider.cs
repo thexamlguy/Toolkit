@@ -1,8 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-
-namespace Toolkit.Foundation;
+﻿namespace Toolkit.Foundation;
 
 public interface IScopedServiceProvider<TService>
 {
-    bool TryGet(TService service, out IServiceScope? serviceScope);
+    bool TryGet(TService service, out IServiceProvider? serviceProvider);
 }

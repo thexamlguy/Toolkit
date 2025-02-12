@@ -47,7 +47,7 @@ public class ComponentFactory(IServiceProvider provider,
                     provider.GetRequiredService<IComponentScopeProvider>());
 
                 services.AddRange(proxy.Services);
-                services.AddSingleton(new NamedComponent(key));
+                services.AddSingleton(new Scoped(key));
 
                 if (servicesDelegate is not null)
                 {

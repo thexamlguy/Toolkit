@@ -1,6 +1,6 @@
 ﻿namespace Toolkit.Foundation;
 
-public record NamedComponent(string Key)
+public record Scoped(string Key)
 {
     public override string ToString() => Key;
 }

@@ -28,8 +28,8 @@ public class NavigateAction :
 
     public static readonly DependencyProperty ScopeProperty =
         DependencyProperty.Register(nameof(Scope),
-            typeof(string), typeof(NavigateAction),
-                new PropertyMetadata(null));
+            typeof(NavigateScope), typeof(NavigateAction),
+                new PropertyMetadata(NavigateScope.Default));
 
     public static readonly DependencyProperty ParametersProperty =
         DependencyProperty.Register(nameof(Parameters),
@@ -37,8 +37,6 @@ public class NavigateAction :
                 new PropertyMetadata(null));
 
     private ParameterCollection parameterCollection = [];
-
-    public event EventHandler? Navigated;
 
     public object Region
     {
@@ -55,9 +53,9 @@ public class NavigateAction :
         set => SetValue(RouteProperty, value);
     }
 
-    public string Scope
+    public NavigateScope Scope
     {
-        get => (string)GetValue(ScopeProperty);
+        get => (NavigateScope)GetValue(ScopeProperty);
         set => SetValue(ScopeProperty, value);
     }
 
@@ -74,8 +72,8 @@ public class NavigateAction :
                 ImmutableDictionary<string, object>? parameters = Parameters is { Count: > 0 } ? Parameters.ToImmutableDictionary(x => x.Key, x => x.Value) :
                     ImmutableDictionary<string, object>.Empty;
 
-                observableViewModel.Messenger.Send(new NavigateEventArgs(Route, Region.Equals(this) ? content : Region, Scope ?? null,
-                    content.DataContext, Navigated, parameters));
+                observableViewModel.Messenger.Send(new NavigateEventArgs(Route, Region.Equals(this) ? content : Region, Scope,
+                    content.DataContext, parameters));
             }
         }
 

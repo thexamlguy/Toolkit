@@ -662,11 +662,18 @@ public partial class ObservableCollection<TValue, TViewModel> :
         Value = value;
     }
 
-    protected virtual void Changed(TValue? value)
+    protected virtual void ValueChanged(TValue? value)
     {
     }
 
-    partial void OnValueChanged(TValue? value) => Changed(value);
+    protected virtual void ValueChanged(TValue? oldValue, TValue? newValue)
+    {
+
+    }
+
+    partial void OnValueChanged(TValue? value) => ValueChanged(value);
+
+    partial void OnValueChanged(TValue? oldValue, TValue? newValue) => ValueChanged(oldValue, newValue);
 }
 
 public partial class ObservableCollection<TKey, TValue, TViewModel> :
@@ -701,6 +708,19 @@ public partial class ObservableCollection<TKey, TValue, TViewModel> :
         Key = key;
         Value = value;
     }
+
+    protected virtual void ValueChanged(TValue? value)
+    {
+    }
+
+    protected virtual void ValueChanged(TValue? oldValue, TValue? newValue)
+    {
+
+    }
+
+    partial void OnValueChanged(TValue? value) => ValueChanged(value);
+
+    partial void OnValueChanged(TValue? oldValue, TValue? newValue) => ValueChanged(oldValue, newValue);
 }
 
 public class ObservableCollection :

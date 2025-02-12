@@ -2,7 +2,6 @@
 
 public record NavigateEventArgs(string Route,
     object? Region = null,
-    string? Scope = null,
+    NavigateScope? Scope = null,
     object? Sender = null,
-    EventHandler? Navigated = null,
     IDictionary<string, object>? Parameters = null);

@@ -38,7 +38,7 @@ public class ComponentInitializer(IEnumerable<IComponent> components,
 
                 services.AddRange(typedServices.Services);
 
-                services.AddSingleton(new NamedComponent(component.GetType().Name));
+                services.AddSingleton(new Scoped(component.GetType().Name));
             });
 
             IComponentHost host = builder.Build();

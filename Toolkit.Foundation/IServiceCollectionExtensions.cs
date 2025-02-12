@@ -50,11 +50,11 @@ public static class IServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection AddAsyncHandlerScoped<TMessage, TResponse, THandler>(this IServiceCollection services,
+    public static IServiceCollection AddScopedAsyncHandler<TMessage, TResponse, THandler>(this IServiceCollection services,
         string key) where THandler : class, IAsyncHandler<TMessage, TResponse>
-            where TMessage : class => AddAsyncHandlerScoped<TMessage, TResponse, THandler>(services, ServiceLifetime.Transient, key);
+            where TMessage : class => AddScopedAsyncHandler<TMessage, TResponse, THandler>(services, ServiceLifetime.Transient, key);
 
-    public static IServiceCollection AddAsyncHandlerScoped<TMessage, TResponse, THandler>(this IServiceCollection services,
+    public static IServiceCollection AddScopedAsyncHandler<TMessage, TResponse, THandler>(this IServiceCollection services,
         ServiceLifetime lifetime = ServiceLifetime.Transient,
         string? key = null) where THandler : class, IAsyncHandler<TMessage, TResponse>
             where TMessage : class
@@ -77,11 +77,11 @@ public static class IServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection AddAsyncHandlerScoped<TMessage, THandler>(this IServiceCollection services,
+    public static IServiceCollection AddScopedAsyncHandler<TMessage, THandler>(this IServiceCollection services,
         string key) where THandler : class, IAsyncHandler<TMessage>
-            where TMessage : class => AddAsyncHandlerScoped<TMessage, THandler>(services, ServiceLifetime.Transient, key);
+            where TMessage : class => AddScopedAsyncHandler<TMessage, THandler>(services, ServiceLifetime.Transient, key);
 
-    public static IServiceCollection AddAsyncHandlerScoped<TMessage, THandler>(this IServiceCollection services,
+    public static IServiceCollection AddScopedAsyncHandler<TMessage, THandler>(this IServiceCollection services,
         ServiceLifetime lifetime = ServiceLifetime.Transient,
         string? key = null) where THandler : class, IAsyncHandler<TMessage>
             where TMessage : class
@@ -357,7 +357,7 @@ public static class IServiceCollectionExtensions
         services.AddScoped<IScopedServiceDescriptor<TScopedService>, ScopedServiceDescriptor<TScopedService>>();
         services.AddScoped(provider => provider.GetRequiredService<IScopedServiceDescriptor<TScopedService>>().Value!);
 
-        services.AddCache<TScopedService, IServiceScope>();
+        services.AddCache<TScopedService, IServiceProvider>();
 
         services.AddTransient<IScopedServiceProvider<TScopedService>, ScopedServiceProvider<TScopedService>>();
         services.AddTransient<IScopedServiceFactory<TScopedService>, ScopedServiceFactory<TScopedService>>();
@@ -372,7 +372,7 @@ public static class IServiceCollectionExtensions
         services.AddScoped<IScopedServiceDescriptor<TScopedService>, ScopedServiceDescriptor<TScopedService>>();
         services.AddScoped(provider => provider.GetRequiredService<IScopedServiceDescriptor<TScopedService>>().Value!);
 
-        services.AddCache<TScopedService, IServiceScope>();
+        services.AddCache<TScopedService, IServiceProvider>();
 
         services.AddTransient<IScopedServiceProvider<TScopedService>, ScopedServiceProvider<TScopedService>>();
         services.AddTransient<IScopedServiceFactory<TScopedService>, ScopedServiceFactory<TScopedService>>(provider =>
@@ -380,7 +380,7 @@ public static class IServiceCollectionExtensions
             providerDelegate.Invoke(provider);
 
             IServiceScopeFactory factory = provider.GetRequiredService<IServiceScopeFactory>();
-            ICache<TScopedService, IServiceScope> cache = provider.GetRequiredService<ICache<TScopedService, IServiceScope>>();
+            ICache<TScopedService, IServiceProvider> cache = provider.GetRequiredService<ICache<TScopedService, IServiceProvider>>();
 
             return new ScopedServiceFactory<TScopedService>(factory, cache);
         });

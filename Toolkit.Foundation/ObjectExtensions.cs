@@ -4,17 +4,10 @@ namespace Toolkit.Foundation;
 
 public static class ObjectExtensions
 {
-    public static object? GetPropertyValue(this object obj, Func<object> selector)
+    public static T Also<T>(this T value, Action<T> action)
     {
-        Type type = obj.GetType();
-
-        object? key = selector();
-        if (type.GetProperty($"{key}") is PropertyInfo property && property.GetValue(obj) is { } value)
-        {
-            return value;
-        }
-
-        return null;
+        action(value);
+        return value;
     }
 
     public static TAttribute? GetAttribute<TAttribute>(this object obj)
@@ -39,5 +32,18 @@ public static class ObjectExtensions
         }
 
         return Enumerable.Empty<TAttribute>();
+    }
+
+    public static object? GetPropertyValue(this object obj, Func<object> selector)
+    {
+        Type type = obj.GetType();
+
+        object? key = selector();
+        if (type.GetProperty($"{key}") is PropertyInfo property && property.GetValue(obj) is { } value)
+        {
+            return value;
+        }
+
+        return null;
     }
 }

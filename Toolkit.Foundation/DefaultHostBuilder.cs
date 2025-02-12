@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System;
 
 namespace Toolkit.Foundation;
 
@@ -38,26 +39,54 @@ public class DefaultHostBuilder :
 
             services.AddTransient<IContentFactory, ContentFactory>();
 
-            services.AddSingleton<INavigationRegionCollection, NavigationRegionCollection>();
+            services.AddScoped<INavigationRegionCollection, NavigationRegionCollection>();
             services.AddTransient<INavigationRegionProvider, NavigationRegionProvider>();
 
             services.AddScoped<INavigation, Navigation>();
 
-            services.AddSingleton(new NamedComponent("Root"));
-            services.AddScoped<IComponentScopeCollection, ComponentScopeCollection>(provider =>
-            [
-                new ComponentScopeDescriptor("Root", provider.GetRequiredService<IServiceProvider>())
-            ]);
+            services.AddTransient<IComparer<Scoped>>(provider => Comparer<Scoped>.Create((x, z) =>
+                StringComparer.CurrentCultureIgnoreCase.Compare(x.Key, z.Key)));
 
-            services.AddTransient<IComponentFactory, ComponentFactory>();
-            services.AddTransient<IComponentScopeProvider, ComponentScopeProvider>();
+            Scoped named = new("Root");
+            services.AddSingleton<IScopedServiceDescriptor<Scoped>>(provider =>
+            {
+                ScopedServiceDescriptor<Scoped> descriptor = new();
+                descriptor.Set(named);
+
+                return descriptor;
+            });
+
+            services.AddSingleton(provider => provider.GetRequiredService<IScopedServiceDescriptor<Scoped>>().Value!);
+
+            services.AddSingleton<ICache<Scoped, IServiceProvider>>(provider =>
+            {
+                Cache<Scoped, IServiceProvider> cache = new(provider.GetRequiredService<IComparer<Scoped>>())
+                {
+                    { named, provider }
+                };
+
+                return cache;
+            });
+
+            services.AddTransient(provider => provider.GetService<ICache<Scoped, IServiceProvider>>()!.Select(x => x.Value));
+
+            services.AddTransient<IScopedServiceProvider<Scoped>, ScopedServiceProvider<Scoped>>();
+            services.AddTransient<IScopedServiceFactory<Scoped>, ScopedServiceFactory<Scoped>>();
+
+            //services.AddScoped<IComponentScopeCollection, ComponentScopeCollection>(provider =>
+            //[
+            //    new ComponentScopeDescriptor("Root", provider.GetRequiredService<IServiceProvider>())
+            //]);
+
+            //services.AddTransient<IComponentFactory, ComponentFactory>();
+            //services.AddTransient<IComponentScopeProvider, ComponentScopeProvider>();
 
             services.AddScopedHandler<NavigateEventArgs, NavigateHandler>();
             services.AddScopedHandler<NavigateBackEventArgs, NavigateBackHandler>();
 
             services.AddTransient<IFileProvider, FileProvider>();
 
-            services.AddInitialization<ComponentInitializer>();
+            //services.AddInitialization<ComponentInitializer>();
         });
 
         builderDelegate.Invoke(hostBuilder);
