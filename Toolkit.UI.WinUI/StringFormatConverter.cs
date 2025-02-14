@@ -19,6 +19,12 @@ public class StringFormatConverter :
         try
         {
             CultureInfo culture = string.IsNullOrWhiteSpace(language) ? CultureInfo.InvariantCulture : new CultureInfo(language);
+
+            if (value is TimeSpan timeSpan)
+            {
+                return timeSpan.ToString(StringFormat, culture);
+            }
+
             return string.Format(culture, StringFormat, value);
         }
         catch
