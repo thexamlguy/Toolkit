@@ -49,3 +49,5 @@ DispatchMessage
 PostQuitMessage
 DestroyWindow
 GetModuleHandle
+RegisterHotKey
+UnregisterHotKey

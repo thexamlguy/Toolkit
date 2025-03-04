@@ -62,7 +62,7 @@ public class NotifyIcon(IWndProc wndProc,
         GC.SuppressFinalize(this);
     }
 
-    public unsafe PointerLocation GetPointerPosition()
+    public static unsafe PointerLocation GetPointerPosition()
     {
         Point point = new();
         _ = PInvoke.GetCursorPos(&point);

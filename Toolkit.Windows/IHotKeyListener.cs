@@ -2,6 +2,6 @@
 
 namespace Toolkit.Windows;
 
-public interface ITaskbarButtonMonitor : 
+public interface IHotKeyListener :
     IInitialization,
     IDisposable;

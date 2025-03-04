@@ -22,48 +22,27 @@ public class Cache<TValue>(IComparer<TValue> comparer) :
     public void Clear() =>
         items.Clear();
 
-    public bool Contains(TValue item)
-    {
-        int index = items.IndexOf(item);
-        if (index >= 0)
-        {
-            return true;
-        }
-
-        return false;
-    }
+    public bool Contains(TValue item) =>
+        items.IndexOf(item) >= 0;
 
     public IEnumerator<TValue> GetEnumerator() =>
         items.GetEnumerator();
 
-    IEnumerator IEnumerable.GetEnumerator() => items.GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() =>
+        items.GetEnumerator();
 
     public int IndexOf(TValue item) =>
         items.IndexOf(item);
 
-    public bool Remove(TValue item)
+    public bool Remove(TValue item) =>
+        items.Remove(item);
+
+    public bool TryGetValue(TValue key, 
+        out TValue? item)
     {
-        int index = items.IndexOf(item);
-        if (index >= 0)
-        {
-            items.RemoveAt(index);
-            return true;
-        }
-
-        return false;
-    }
-
-    public bool TryGetValue(TValue key, out TValue? item)
-    {
-        int index = items.IndexOf(key);
-        if (index >= 0)
-        {
-            item = items[index];
-            return true;
-        }
-
-        item = default;
-        return false;
+        var index = items.IndexOf(key);
+        item = index >= 0 ? items[index] : default;
+        return index >= 0;
     }
 
     private int FindInsertIndex(TValue item)
@@ -94,20 +73,20 @@ public class Cache<TValue>(IComparer<TValue> comparer) :
     }
 }
 
-public class Cache<TKey, TValue>(IComparer<TKey> comparer) :
+public class Cache<TKey, TValue>(IComparer<TKey>? comparer = null) : 
     ICache<TKey, TValue>
-    where TKey :
-    notnull
-    where TValue :
-    notnull
+    where TKey : notnull
+    where TValue : notnull
 {
+    private readonly IComparer<TKey> comparer = comparer ?? Comparer<TKey>.Default;
     private readonly List<KeyValuePair<TKey, TValue?>> items = [];
 
     public TValue? this[TKey key]
     {
         get
         {
-            int index = items.BinarySearch(new KeyValuePair<TKey, TValue?>(key, default),
+            int index = items.BinarySearch(
+                new KeyValuePair<TKey, TValue?>(key, default),
                 new KeyValuePairComparer<TKey, TValue?>(comparer));
 
             if (index >= 0)
@@ -119,7 +98,8 @@ public class Cache<TKey, TValue>(IComparer<TKey> comparer) :
         }
         set
         {
-            int index = items.BinarySearch(new KeyValuePair<TKey, TValue?>(key, default),
+            int index = items.BinarySearch(
+                new KeyValuePair<TKey, TValue?>(key, default),
                 new KeyValuePairComparer<TKey, TValue?>(comparer));
 
             if (index >= 0)
@@ -135,7 +115,8 @@ public class Cache<TKey, TValue>(IComparer<TKey> comparer) :
 
     public void Add(TKey key, TValue value)
     {
-        int index = items.BinarySearch(new KeyValuePair<TKey, TValue?>(key, default),
+        int index = items.BinarySearch(
+            new KeyValuePair<TKey, TValue?>(key, default),
             new KeyValuePairComparer<TKey, TValue?>(comparer));
 
         if (index < 0)
@@ -148,53 +129,28 @@ public class Cache<TKey, TValue>(IComparer<TKey> comparer) :
 
     public void Clear() => items.Clear();
 
-    public bool Contains(TKey key)
-    {
-        int index = items.FindIndex(kvp => comparer.Compare(kvp.Key, key) == 0);
-        if (index >= 0)
-        {
-            items.RemoveAt(index);
-            return true;
-        }
-        return false;
-    }
+    public bool Contains(TKey key) =>
+        items.FindIndex(kvp => comparer.Compare(kvp.Key, key) == 0) >= 0;
 
-    public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator() =>
-            items.GetEnumerator();
+    public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator() => 
+        items.GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator() =>
         GetEnumerator();
 
-    public int IndexOf(TKey key) =>
+    public int IndexOf(TKey key) => 
         items.FindIndex(kvp => comparer.Compare(kvp.Key, key) == 0);
 
-    public bool Remove(TKey key)
-    {
-        int index = items.FindIndex(kvp => comparer.Compare(kvp.Key, key) == 0);
-        if (index >= 0)
-        {
-            items.RemoveAt(index);
-            return true;
-        }
-        return false;
-    }
+    public bool Remove(TKey key) => 
+        items.RemoveAll(kvp => comparer.Compare(kvp.Key, key) == 0) > 0;
 
-    public bool TryGetValue(TKey key, out TValue? value)
-    {
-        int index = items.BinarySearch(new KeyValuePair<TKey, TValue?>(key, default(TValue)),
-            new KeyValuePairComparer<TKey, TValue?>(comparer));
+    public bool TryGetValue(TKey key, out TValue? value) =>
+        (items.BinarySearch(new KeyValuePair<TKey, TValue?>(key, default),
+            new KeyValuePairComparer<TKey, TValue?>(comparer)) is int index && index >= 0)
+        ? (value = items[index].Value, true).Item2
+        : (value = default, false).Item2;
 
-        if (index >= 0)
-        {
-            value = items[index].Value;
-            return true;
-        }
-
-        value = default;
-        return false;
-    }
-
-    private class KeyValuePairComparer<TK, TV>(IComparer<TK> comparer) :
+    private class KeyValuePairComparer<TK, TV>(IComparer<TK> comparer) : 
         IComparer<KeyValuePair<TK, TV>>
     {
         private readonly IComparer<TK> comparer = comparer ?? Comparer<TK>.Default;

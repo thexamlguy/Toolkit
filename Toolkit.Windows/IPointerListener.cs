@@ -2,6 +2,6 @@
 
 namespace Toolkit.Windows;
 
-public interface IPointer :
+public interface IPointerListener :
     IInitialization, 
     IDisposable;

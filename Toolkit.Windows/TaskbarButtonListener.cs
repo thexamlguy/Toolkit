@@ -4,8 +4,8 @@ using UIAutomationClient;
 
 namespace Toolkit.Windows;
 
-public class TaskbarButtonMonitor : 
-    ITaskbarButtonMonitor
+public class TaskbarButtonListener : 
+    ITaskbarButtonListener
 {
     private readonly IDispatcherTimer dispatcherTimer;
     private readonly IDispatcherTimerFactory dispatcherTimerFactory;
@@ -19,7 +19,7 @@ public class TaskbarButtonMonitor :
     private IUIAutomationElement? taskListElement;
     private IntPtr taskListHandle;
 
-    public TaskbarButtonMonitor(ITaskbarList taskbarList,
+    public TaskbarButtonListener(ITaskbarList taskbarList,
         IMessenger messenger,
         IDispatcherTimerFactory dispatcherTimerFactory,
         IServiceFactory serviceFactory,

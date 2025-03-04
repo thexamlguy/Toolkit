@@ -42,7 +42,7 @@ public class TaskbarButton :
 
     public void Receive(PointerReleasedEventArgs args)
     {
-        if (!isDrag && isWithinBounds)
+        if (args.Button is PointerButton.Left && !isDrag && isWithinBounds)
         {
             messenger.Send(new TaskbarButtonInvokedEventArgs(this));
         }

@@ -1,14 +1,13 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
 using System.Diagnostics.CodeAnalysis;
-using System.Drawing;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace Toolkit.Windows;
 
-public class Pointer(IMessenger messenger) : 
-    IPointer
+public class PointerListener(IMessenger messenger) : 
+    IPointerListener
 {
     private bool isDisposed;
     private bool isPointerDrag;
@@ -16,7 +15,7 @@ public class Pointer(IMessenger messenger) :
     private HOOKPROC? mouseEventDelegate;
     private UnhookWindowsHookExSafeHandle? mouseHandle;
 
-    ~Pointer()
+    ~PointerListener()
     {
         Dispose(false);
     }
@@ -27,23 +26,20 @@ public class Pointer(IMessenger messenger) :
         GC.SuppressFinalize(this);
     }
 
-    public unsafe void Initialize() => 
-        InitializeHook();
+    public unsafe void Initialize()
+    {
+        mouseEventDelegate = new HOOKPROC(MouseProc);
+        mouseHandle = PInvoke.SetWindowsHookEx(WINDOWS_HOOK_ID.WH_MOUSE_LL, mouseEventDelegate,
+            PInvoke.GetModuleHandle("user32.dll"), 0);
+    }
 
     protected virtual void Dispose(bool disposing)
     {
         if (!isDisposed)
         {
-            RemoveHook();
+            Remove();
             isDisposed = true;
         }
-    }
-
-    private unsafe void InitializeHook()
-    {
-        mouseEventDelegate = new HOOKPROC(MouseProc);
-        mouseHandle = PInvoke.SetWindowsHookEx(WINDOWS_HOOK_ID.WH_MOUSE_LL, mouseEventDelegate,
-            PInvoke.GetModuleHandle("user32.dll"), 0);
     }
 
     private LRESULT MouseProc(int nCode, WPARAM wParam, LPARAM lParam)
@@ -82,7 +78,7 @@ public class Pointer(IMessenger messenger) :
         return PInvoke.CallNextHookEx(mouseHandle, nCode, wParam, lParam);
     }
 
-    private unsafe void RemoveHook()
+    private unsafe void Remove()
     {
         if (mouseHandle is not null && mouseHandle.DangerousGetHandle() != nint.Zero)
         {
